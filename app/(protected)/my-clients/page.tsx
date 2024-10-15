@@ -1,86 +1,85 @@
 "use client";
+import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import axios from "axios";
+import { getCurrentUser } from "@/server_functions/auth";
+import ClientsTable from "@/components/ClientsTable";
+
+// Define the Client interface
+interface Client {
+    uid: string;
+    name: string;
+    email: string;
+    phone: string;
+    trainer_name?: string; // Optional property
+}
 
 export default function MyClients() {
-  const [search, setSearch] = useState("");
+    const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
+    const [lastId, setLastId] = useState(""); // State to hold the last ID of the fetched clients
+    const [isFetching, setIsFetching] = useState(false); // State to track if a fetch is in progress
+    const [hasMore, setHasMore] = useState(true);
 
-  const filteredClients = useMemo(() => {
-    const clients = [
-      {
-        uid: "1",
-        name: "John Doe",
-        email: "johndoe@gmail.com",
-        phone: "123-456-7890",
-        trainer_id: 123,
-        trainer_name: "Jane Smith",
-      },
-      {
-        uid: "2",
-        name: "Jane Smith",
-        email: "janesmith@gmail.com",
-        phone: "234-567-8901",
-        trainer_id: 234,
-        trainer_name: "John Doe",
-      },
-    ];
+    useEffect(() => {
+        debouncedFetchData(lastId);
+    }, [lastId]);
 
-    return clients.filter((client) => {
-      return (
-        client.name.toLowerCase().includes(search.toLowerCase()) ||
-        client.email.toLowerCase().includes(search.toLowerCase()) ||
-        client.phone.toLowerCase().includes(search.toLowerCase())
-      );
-    });
-  }, [search]);
+    const debounce = (func: Function, wait: number) => {
+        let timeout: NodeJS.Timeout;
+        return function (this: any, ...args: any[]) {
+            const context = this;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), wait);
+        };
+    };
 
-  return (
-    <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
-      <div className="text-center mt-4 flex flex-col gap-8 w-full">
-        <div className="border border-gray-400 rounded-full overflow-hidden h-12 w-600 px-5 w-full">
-          <input
-            className="w-full h-full"
-            value={search}
-            placeholder="Search clients by name, email, or phone"
-            onChange={(e) => {
-              console.log(e.target.value);
-              setSearch(e.target.value);
-            }}
-          />
+    const fetchData = async (lastId: string) => {
+        if (isFetching) return; // Prevent multiple simultaneous fetches
+        setIsFetching(true);
+
+        const current_user = await getCurrentUser();
+        const userId = current_user?.$id; // Extract the $id property
+        const response = await axios.get(
+            `http://127.0.0.1:8000/mvmt/v1/trainer/clients?tid=${userId}&lastId=${lastId}&limit=50`,
+            {
+                withCredentials: true, // Include cookies in the request
+            }
+        );
+        // const newItems = await response.json();
+        const newItems = response.data;
+        console.log(newItems);
+        // Filter out newItems that already exist in clients
+        const uniqueNewItems = newItems.filter(
+            (newItem: Client) =>
+                !clients.some((client) => client.uid === newItem.uid)
+        );
+
+        setClients((prevItems) => [...prevItems, ...uniqueNewItems]);
+        if (newItems.length === 0 || newItems.length < 50) {
+            setHasMore(false);
+        }
+        // } else {
+        //     setClients((prevItems) => [...prevItems, ...newItems]);
+        // }
+        setIsFetching(false);
+    };
+    const debouncedFetchData = useCallback(debounce(fetchData, 300), [
+        fetchData,
+    ]);
+
+    const fetchMoreData = () => {
+        const newLastId = clients[clients.length - 1]?.uid;
+        setLastId(newLastId);
+        fetchData(newLastId);
+    };
+
+    return (
+        <div>
+            <ClientsTable
+                clients={clients}
+                fetchMoreData={fetchMoreData}
+                hasMore={hasMore}
+            />
         </div>
-        <div className="w-full flex flex-col items-start gap-4">
-          <h2 className="text-3xl font-bold text-black text-left">
-            My Clients
-          </h2>
-          <table className="text-left w-full">
-            <tbody>
-              <tr className="gap-3 bg-primary text-white">
-                <th className="font-normal min-w-200 pl-5 h-12">Client Name</th>
-                <th className="font-normal min-w-200">Email</th>
-                <th className="font-normal min-w-200">Phone Number</th>
-                <th className="font-normal min-w-200">Trainer Name</th>
-                <th className="font-normal min-w-200"></th>
-              </tr>
-              {filteredClients.map((client: any, index: number) => (
-                <tr
-                  key={client.uid}
-                  className={`${index % 2 ? "bg-gray-200" : "bg-white"} h-12`}
-                >
-                  <td className="pl-5">{client.name}</td>
-                  <td>{client.email}</td>
-                  <td>{client.phone}</td>
-                  <td>{client.trainer_name}</td>
-                  <td>
-                    <Link href={`client/${client.uid}`}>
-                      <p>View Details</p>
-                    </Link>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </main>
-  );
+    );
 }
