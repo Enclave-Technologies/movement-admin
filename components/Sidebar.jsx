@@ -1,10 +1,11 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LuUsers2 } from "react-icons/lu";
 import { PiUsersFour } from "react-icons/pi";
 import { FiSettings } from "react-icons/fi";
 import { IoLogOutOutline } from "react-icons/io5";
+import { AiOutlineMenu } from "react-icons/ai"; // Hamburger icon import
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 
@@ -33,42 +34,54 @@ const sidebarItems = [
 
 const Sidebar = () => {
   const pathname = usePathname();
-  useEffect(() => {}, [pathname]);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
 
   return (
-    <aside className="left-0 w-64 h-screen bg-primary text-white shadow-lg z-40 pt-16">
-      <div className="px-4 flex flex-col gap-4">
-        <TrainerInfo />
-        <nav className="space-y-4">
-          {sidebarItems.map((item) => {
-            var isItemActive = pathname === item.href;
-            var className = isItemActive
-              ? "bg-white text-primary"
-              : "text-white";
-            return (
-              <Link href={item.href} key={item.label}>
-                <div
-                  className={`flex items-center p-3 rounded-md cursor-pointer ${className}`}
-                >
-                  {item.icon()}
-                  <span className="ml-2">{item.label}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </nav>
+    <div className="flex">
+      <aside className={` left-0 h-screen bg-primary text-white shadow-lg z-40 pt-16 transition-all duration-300 ${isCollapsed ? "w-16" : "w-64"}`}>
+        <div className="px-4 flex flex-col gap-4">
+          <div className="flex justify-between items-center">
+            {!isCollapsed && <TrainerInfo />} {/* Only show TrainerInfo if not collapsed */}
+            <div onClick={toggleSidebar} className="text-white cursor-pointer mt-2">
+              <AiOutlineMenu /> {/* Hamburger icon */}
+            </div>
+          </div>
+          <nav className="space-y-4">
+            {sidebarItems.map((item) => {
+              const isItemActive = pathname === item.href;
+              const className = isItemActive ? "bg-white text-primary" : "text-white";
+
+              return (
+                <Link href={item.href} key={item.label} className={className}>
+                  <div className={`flex items-center p-3 rounded-md cursor-pointer ${className}`}>
+                    {item.icon()} {/* Render the icon */}
+                    <span className={`ml-2 ${isCollapsed ? "hidden" : ""}`}>{item.label}</span> {/* Show label only if not collapsed */}
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+      </aside>
+
+      <div className={`ml-${isCollapsed ? "16" : "64"} transition-all duration-300`}>
+        {/* Your main content goes here */}
       </div>
-    </aside>
+    </div>
   );
 };
 
 const TrainerInfo = () => {
   const trainer = {
     name: "Kenny C",
-    image:
-      "https://movementfitnesshk.com/wp-content/uploads/2024/01/Kenny-Cheung-web600x800_Movement-Fitness.jpg",
+    image: "https://movementfitnesshk.com/wp-content/uploads/2024/01/Kenny-Cheung-web600x800_Movement-Fitness.jpg",
     description: "Personal Trainer | Body Transformation",
   };
+
   return (
     <div className="flex flex-col items-center gap-1">
       <Image
@@ -81,9 +94,7 @@ const TrainerInfo = () => {
       />
       <div className="flex flex-col items-center gap-0.5">
         <h2>{trainer.name}</h2>
-        <span className="text-center text-gray-300 text-sm">
-          {trainer.description}
-        </span>
+        <span className="text-center text-gray-300 text-sm">{trainer.description}</span>
       </div>
     </div>
   );

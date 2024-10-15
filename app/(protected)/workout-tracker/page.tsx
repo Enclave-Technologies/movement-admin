@@ -2,7 +2,7 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-
+import Sidebar from '@/components/Sidebar';
 const Page = () => {
   // Sample session data
   const sessions = [
