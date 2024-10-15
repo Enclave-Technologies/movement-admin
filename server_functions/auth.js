@@ -25,7 +25,7 @@ export async function register(state, formData) {
     });
     if (!validatedResult.success) {
         // Handle validation errors
-        const errors = validationResult.error.formErrors.fieldErrors;
+        const errors = validatedResult.error.formErrors.fieldErrors;
         return { success: false, errors };
     }
     const { username, email, password } = validatedResult.data;
@@ -88,7 +88,36 @@ export async function login(state, formData) {
             email,
             password
         );
-        cookies().set(SESSION_COOKIE_NAME, session.secret, {
+
+        const { account: sessAccount, teams: sessTeam } =
+            await createSessionClient(session.secret);
+        const team = await sessTeam.list();
+        if (team.total === 0 || team.teams[0].name === "Clients") {
+            await sessAccount.deleteSession("current");
+            return {
+                success: false,
+                errors: {
+                    email: ["Please use the client App to login."],
+                    password: [
+                        "Invalid credentials. Please check the email and password.",
+                    ],
+                },
+            };
+        }
+        const acc = await sessAccount.get();
+        console.log("================");
+        const sessionData = {
+            session: session.secret,
+            $id: acc.$id,
+            role: "admin",
+            email: acc.email,
+            name: acc.name,
+            team: team.teams[0].name,
+        };
+
+        console.log("================");
+
+        cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
             httpOnly: true,
             sameSite: "strict",
             secure: true,
@@ -96,7 +125,7 @@ export async function login(state, formData) {
             path: "/",
         });
 
-        console.log("4. LOGIN", session);
+        console.log("4. LOGIN");
     } catch (error) {
         console.error(error);
         if (
@@ -124,9 +153,11 @@ export async function login(state, formData) {
 }
 
 export async function logout() {
-    const sessionCookie = cookies().get(SESSION_COOKIE_NAME);
     try {
-        const { account } = await createSessionClient(sessionCookie.value);
+        const sessionCookie = JSON.parse(
+            cookies().get(SESSION_COOKIE_NAME).value
+        );
+        const { account } = await createSessionClient(sessionCookie.session);
         await account.deleteSession("current");
     } catch (error) {
         console.log(error);
@@ -137,16 +168,19 @@ export async function logout() {
 }
 
 export async function getCurrentUser() {
-    const sessionCookie = cookies().get(SESSION_COOKIE_NAME);
-    if (sessionCookie) {
-        try {
-            const { account } = await createSessionClient(sessionCookie.value);
-            return account.get();
-        } catch (error) {
-            console.log(error);
-            cookies().delete(SESSION_COOKIE_NAME);
-            return null;
-        }
+    if (!cookies().has(SESSION_COOKIE_NAME)) {
+        return null;
     }
+    try {
+        const sessionCookie = JSON.parse(
+            cookies().get(SESSION_COOKIE_NAME).value
+        );
+        const { account } = await createSessionClient(sessionCookie.session);
+        return account.get();
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+
     return null;
 }
