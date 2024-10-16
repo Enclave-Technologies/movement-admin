@@ -57,7 +57,15 @@ const Page = ({ params }: { params: { id: string } }) => {
         setUserData(params); // Store the user data in Context API
     }, [params, setUserData]);
 
-    // const customTexts = ["Body Mass Index"];
+    const user = {
+        uid: "1",
+        name: "John Doe",
+        email: "johndoe@gmail.com",
+        phone: "123-456-7890",
+        trainer_id: 123,
+        trainer_name: "Jane Smith",
+        image: "https://movementfitnesshk.com/wp-content/uploads/2024/07/Gina-Lai.png",
+    };
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
             <div className="text-center mt-4 flex flex-col gap-8 w-full">

@@ -58,7 +58,7 @@ const Sidebar = () => {
     };
 
     return (
-        <aside className="left-0 w-64 h-screen bg-primary text-white shadow-lg z-40 pt-16">
+        <aside className="sticky top-0 left-0 w-64 h-screen bg-primary text-white shadow-lg z-40 pt-16">
             <div className="px-4 flex flex-col gap-4">
                 <TrainerInfo />
                 <nav className="space-y-4">
