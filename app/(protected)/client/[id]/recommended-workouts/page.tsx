@@ -46,7 +46,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     }, []); // Empty dependency array means this runs once on mount
 
     const handleAddPhase = () => {
-        router.push(`/client/${id}/recommended-workouts/untitled-phase`);
+        router.push(`/client/${id}/recommended-workouts/new-phase`);
     };
 
     return (
