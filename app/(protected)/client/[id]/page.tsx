@@ -64,7 +64,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         phone: "123-456-7890",
         trainer_id: 123,
         trainer_name: "Jane Smith",
-        image: "https://movementfitnesshk.com/wp-content/uploads/2024/07/Gina-Lai.png",
+        imageUrl: "https://movementfitnesshk.com/wp-content/uploads/2024/07/Gina-Lai.png",
     };
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
