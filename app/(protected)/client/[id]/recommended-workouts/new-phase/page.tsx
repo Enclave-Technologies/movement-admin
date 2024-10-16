@@ -1,8 +1,9 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useUser } from "@/context/ClientContext";
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 interface ExSession {
     sessionName: string;
@@ -10,23 +11,76 @@ interface ExSession {
     time: string;
 }
 
+const debounce = (func: Function, wait: number) => {
+    let timeout: NodeJS.Timeout;
+    return function (this: any, ...args: any[]) {
+        const context = this;
+        clearTimeout(timeout);
+        timeout = setTimeout(() => func.apply(context, args), wait);
+    };
+};
+
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser();
     const router = useRouter();
     const page_title = ["Training Program", "Untitled Phase"];
     const [phaseTitle, setPhaseTitle] = useState("Phase 1");
+    const [phaseId, setPhaseId] = useState<string | null>(null);
     const [sessions, setSessions] = useState<ExSession[]>([]);
+    // TODO: Remove the debounce and save on defocus
+    const fetchPhaseId = useCallback(async () => {
+        try {
+            console.log(phaseId);
+            const response = await axios.post(
+                "http://127.0.0.1:8000/mvmt/v1/trainer/phase",
+                {
+                    title: phaseTitle,
+                    currentId: phaseId,
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    withCredentials: true, // Include cookies in the request
+                }
+            );
 
-    const addSession = () => {
+            const data = response.data;
+
+            setPhaseId(data.phaseId);
+        } catch (error) {
+            console.error("Error fetching phaseId:", error);
+        }
+    }, [phaseTitle, phaseId]);
+
+    // Use useMemo to ensure the debounce function is only created once
+    const debouncedFetchPhaseId = useMemo(
+        () => debounce(fetchPhaseId, 1000),
+        [fetchPhaseId]
+    ); // 1000ms = 1 second
+
+    const handlePhaseTitleChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            const newTitle = e.target.value;
+            setPhaseTitle(newTitle);
+            debouncedFetchPhaseId();
+        },
+        [debouncedFetchPhaseId]
+    );
+
+    const addSession = useCallback(async () => {
+        if (!phaseId) {
+            await fetchPhaseId();
+        }
         // Navigate to the new session page with additional information
         router.push(
             `/client/${
                 params.id
             }/recommended-workouts/new-phase/new-session?phaseTitle=${encodeURIComponent(
                 phaseTitle
-            )}`
+            )}&phaseId=${encodeURIComponent(phaseId || "")}`
         );
-    };
+    }, [phaseId, fetchPhaseId, router, params.id, phaseTitle]);
 
     return (
         <div>
@@ -39,7 +93,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             <input
                 type="text"
                 value={phaseTitle}
-                onChange={(e) => setPhaseTitle(e.target.value)}
+                onChange={handlePhaseTitleChange}
                 placeholder="Phase 1"
                 className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
             />
