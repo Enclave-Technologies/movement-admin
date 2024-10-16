@@ -2,10 +2,13 @@
 import React, { useState, useEffect } from "react";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useUser } from "@/context/ClientContext";
+import { useRouter } from "next/navigation";
 
-const Page = () => {
+const Page = ({ params }: { params: { id: string } }) => {
+    const router = useRouter();
     const { userData } = useUser();
     const page_title = ["Training Program"];
+    const id = params.id;
 
     // State variables for dropdown options
     const [firstDropdownOptions, setFirstDropdownOptions] = useState([
@@ -41,6 +44,10 @@ const Page = () => {
         // fetchDropdownData();
         // fetchTableData();
     }, []); // Empty dependency array means this runs once on mount
+
+    const handleAddPhase = () => {
+        router.push(`/client/${id}/recommended-workouts/untitled-phase`);
+    };
 
     return (
         <div>
@@ -115,7 +122,10 @@ const Page = () => {
                 </tbody>
             </table>
             {/* Button Component */}
-            <button className="w-full mt-4 p-2 border-2 rounded">
+            <button
+                onClick={handleAddPhase}
+                className="w-full mt-4 p-2 border-2 rounded"
+            >
                 + Add Phase
             </button>
         </div>
