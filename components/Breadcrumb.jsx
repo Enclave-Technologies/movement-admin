@@ -4,11 +4,12 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
-const Breadcrumb = ({ customTexts }) => {
+const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
     const pathname = usePathname();
     const segments = pathname.split("/").filter(Boolean); // Split the path into segments
-
+    console.log(segments);
     // Base path for the breadcrumbs assuming the first segment after the base URL is the client ID
     const basePath = `/client/${segments[1]}`; // segments[1] corresponds to the [id]
 
@@ -21,13 +22,26 @@ const Breadcrumb = ({ customTexts }) => {
                         href={`/client/${segments[1]}`}
                         className="text-gray-700 hover:text-blue-600"
                     >
-                        Client
+                        <Image
+                            unoptimized
+                            src={homeImage}
+                            alt="Home"
+                            width={20}
+                            height={20}
+                        />
+                        <span>{homeTitle}</span>
                     </Link>
                 </li>
                 {segments.slice(2).map((segment, index) => {
                     const href = `${basePath}/${segments
-                        .slice(2, index + 2)
+                        .slice(2, index + 3)
                         .join("/")}`; // Build the breadcrumb link
+                    // console.log(
+                    //     "Inside segment creation ",
+                    //     segments.slice(2, 3),
+                    //     index,
+                    //     href
+                    // );
                     return (
                         <li key={index}>
                             <div className="flex items-center">

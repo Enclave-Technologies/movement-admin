@@ -18,19 +18,20 @@ const LinkTileData = [
         stat: "24 Entries",
     },
     {
-        href: (params: { id: string }) => `${params.id}/training-plan`,
-        label: "Training Plan",
+        href: (params: { id: string }) => `${params.id}/recommended-workouts`,
+        label: "Recommended Workouts",
         stat: "4 Phases / 18 Sessions",
     },
     {
-        href: (params: { id: string }) => `${params.id}/workouts`,
-        label: "Workout History",
+        href: (params: { id: string }) => `${params.id}/tracked-workouts`,
+        label: "Tracked Workouts",
         stat: "76 Entries",
     },
     {
-        href: (params: { id: string }) => `${params.id}/workout-tracker`,
-        label: "Track New Workout",
-        stat: new Date().toLocaleDateString(), // Display today's date
+        href: (params: { id: string }) => `${params.id}/profile`,
+        label: "Profile",
+        // stat: new Date().toLocaleDateString(), // Display today's date
+        stat: "Last Updated: " + new Date().toLocaleDateString(),
     },
 ];
 
