@@ -46,9 +46,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                         withCredentials: true, // Include cookies in the request
                     }
                 );
-
-                console.log(response.data);
-
                 setUserData(response.data); // Assuming setUserData updates the user data
             } catch (error) {
                 console.error("Error fetching user data:", error);

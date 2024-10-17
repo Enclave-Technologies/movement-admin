@@ -1,3 +1,5 @@
+// components/Breadcrumb.js
+
 "use client"; // This component needs to be rendered on the client side
 
 import { usePathname } from "next/navigation";
