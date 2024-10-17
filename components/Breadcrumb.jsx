@@ -20,7 +20,7 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
                     >
                         <Image
                             unoptimized
-                            src={homeImage}
+                            src={homeImage || ""}
                             alt="Home"
                             width={20}
                             height={20}
