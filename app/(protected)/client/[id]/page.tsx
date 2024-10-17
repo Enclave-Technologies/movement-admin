@@ -64,7 +64,8 @@ const Page = ({ params }: { params: { id: string } }) => {
         phone: "123-456-7890",
         trainer_id: 123,
         trainer_name: "Jane Smith",
-        image: "https://movementfitnesshk.com/wp-content/uploads/2024/07/Gina-Lai.png",
+        imageUrl:
+            "https://movementfitnesshk.com/wp-content/uploads/2024/07/Gina-Lai.png",
     };
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
@@ -72,7 +73,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <div className="flex flex-col gap-4 p-4 bg-white">
                     <div className="flex flex-row gap-4 items-center">
                         <Image
-                            src={userData?.imageUrl}
+                            src={userData?.imageUrl || ""}
                             unoptimized
                             height={80}
                             width={80}
