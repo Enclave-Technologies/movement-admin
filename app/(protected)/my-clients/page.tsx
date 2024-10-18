@@ -19,59 +19,58 @@ interface Client {
 export default function MyClients() {
     const [clients, setClients] = useState<Client[]>([
         {
-            "uid": "1",
-            "name": "Alice Johnson",
-            "email": "alice.john@ple.com",
-            "phone": "555-1234",
-            "trainer_name": "Bob Smith"
+            uid: "1",
+            name: "Alice Johnson",
+            email: "alice.john@ple.com",
+            phone: "555-1234",
+            trainer_name: "Bob Smith",
         },
         {
-            "uid": "2",
-            "name": "David Lee",
-            "email": "david.lee@le.com",
-            "phone": "555-5678"
+            uid: "2",
+            name: "David Lee",
+            email: "david.lee@le.com",
+            phone: "555-5678",
         },
         {
-            "uid": "3",
-            "name": "Emma Brown",
-            "email": "emma.n@example.com",
-            "phone": "555-8765",
-            "trainer_name": "Charlie Davis"
+            uid: "3",
+            name: "Emma Brown",
+            email: "emma.n@example.com",
+            phone: "555-8765",
+            trainer_name: "Charlie Davis",
         },
         {
-            "uid": "4",
-            "name": "Sophia ",
-            "email": "sophia.ms@example.com",
-            "phone": "555-4321"
+            uid: "4",
+            name: "Sophia ",
+            email: "sophia.ms@example.com",
+            phone: "555-4321",
         },
         {
-            "uid": "1",
-            "name": "Alice Johnson",
-            "email": "alice.john@ple.com",
-            "phone": "555-1234",
-            "trainer_name": "Bob Smith"
+            uid: "1",
+            name: "Alice Johnson",
+            email: "alice.john@ple.com",
+            phone: "555-1234",
+            trainer_name: "Bob Smith",
         },
         {
-            "uid": "2",
-            "name": "David Lee",
-            "email": "david.lee@le.com",
-            "phone": "555-5678"
+            uid: "2",
+            name: "David Lee",
+            email: "david.lee@le.com",
+            phone: "555-5678",
         },
         {
-            "uid": "3",
-            "name": "Emma Brown",
-            "email": "emma.n@example.com",
-            "phone": "555-8765",
-            "trainer_name": "Charlie Davis"
+            uid: "3",
+            name: "Emma Brown",
+            email: "emma.n@example.com",
+            phone: "555-8765",
+            trainer_name: "Charlie Davis",
         },
         {
-            "uid": "4",
-            "name": "Sophia ",
-            "email": "sophia.ms@example.com",
-            "phone": "555-4321"
-        }
-    ]
-    ); // State to hold the clients data
+            uid: "4",
+            name: "Sophia ",
+            email: "sophia.ms@example.com",
+            phone: "555-4321",
+        },
+    ]); // State to hold the clients data
     const [lastId, setLastId] = useState(""); // State to hold the last ID of the fetched clients
     const [isFetching, setIsFetching] = useState(false); // State to track if a fetch is in progress
     const [hasMore, setHasMore] = useState(true);
@@ -135,7 +134,6 @@ export default function MyClients() {
                 clients={clients}
                 fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
-                
             />
         </div>
     );
