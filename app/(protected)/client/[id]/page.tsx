@@ -36,31 +36,31 @@ const LinkTileData = [
 ];
 
 const Page = ({ params }: { params: { id: string } }) => {
-    const { userData, setUserData } = useUser(); // Use the context to set user data
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
-                    {
-                        withCredentials: true, // Include cookies in the request
-                    }
-                );
-                setUserData(response.data); // Assuming setUserData updates the user data
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
+    // const { userData, setUserData } = useUser(); // Use the context to set user data
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.get(
+    //                 `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+    //                 {
+    //                     withCredentials: true, // Include cookies in the request
+    //                 }
+    //             );
+    //             setUserData(response.data); // Assuming setUserData updates the user data
+    //         } catch (error) {
+    //             console.error("Error fetching user data:", error);
+    //         }
+    //     };
 
-        fetchData();
+    //     fetchData();
 
-        setUserData(params); // Store the user data in Context API
-    }, [params, setUserData]);
+    //     setUserData(params); // Store the user data in Context API
+    // }, [params, setUserData]);
 
-    const user = {
+    const userData = {
         uid: "1",
-        name: "John Doe",
-        email: "johndoe@gmail.com",
+        name: "Gina Lai",
+        email: "gina@gmail.com",
         phone: "123-456-7890",
         trainer_id: 123,
         trainer_name: "Jane Smith",
