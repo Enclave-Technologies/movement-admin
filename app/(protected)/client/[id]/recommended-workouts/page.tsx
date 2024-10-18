@@ -12,7 +12,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     const page_title = ["Training Program"];
     const id = params.id;
     const [pageLoading, setPageLoading] = useState(true);
-    const [pendingOperations, setPendingOperations] = useState(2);
+    const [pendingOperations, setPendingOperations] = useState(0);
 
     // State variables for dropdown options
     const [firstDropdownOptions, setFirstDropdownOptions] = useState([
@@ -31,64 +31,110 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [phaseList, setPhaseList] = useState<PhaseRow[]>([]);
 
     // Example useEffect to load data for dropdowns and table
+    // useEffect(() => {
+    //     let isMounted = true; // To prevent state updates on unmounted components
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.get(
+    //                 `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+    //                 {
+    //                     withCredentials: true, // Include cookies in the request
+    //                 }
+    //             );
+    //             if (isMounted) {
+    //                 setUserData(response.data); // Assuming setUserData updates the user data
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching user data:", error);
+    //         } finally {
+    //             if (isMounted) {
+    //                 console.log("USER DATA LOADING", pendingOperations);
+    //                 setPendingOperations((prev) => prev - 1); // Decrement pending operations
+    //             }
+    //         }
+    //     };
+
+    //     const performOtherAsyncOperations = async () => {
+    //         // Example of another async operation
+    //         try {
+    //             // Perform other async operations here
+    //             const response = await axios.get(
+    //                 `http://127.0.0.1:8000/mvmt/v1/client/phases?client_id=${params.id}`,
+    //                 {
+    //                     withCredentials: true, // Include cookies in the request
+    //                 }
+    //             );
+    //             console.log(response.data);
+    //             // await new Promise((resolve) => setTimeout(resolve, 1000));
+    //         } catch (error) {
+    //             console.error("Error in other async operations:", error);
+    //         } finally {
+    //             console.log(isMounted);
+    //             if (isMounted) {
+    //                 console.log("OTHER ASYNC OPERATIONS", pendingOperations);
+    //                 setPendingOperations((prev) => prev - 1); // Decrement pending operations
+    //             }
+    //         }
+    //     };
+
+    //     setPageLoading(true); // Set loading to true before fetching data
+    //     setPendingOperations(2); // Set the number of pending operations
+
+    //     if (!userData) {
+    //         fetchData();
+    //     } else {
+    //         console.log("USERDATA FOUND!", pendingOperations);
+    //         setPendingOperations((prev) => prev - 1); // Decrement pending operations if userData is already available
+    //     }
+    //     performOtherAsyncOperations();
+    //     return () => {
+    //         isMounted = false; // Cleanup function to prevent state updates on unmounted components
+    //     };
+    // }, [params.id, setUserData, userData, pendingOperations]); // Empty dependency array means this runs once on mount
+
+    // useEffect(() => {
+    //     if (pendingOperations === 0) {
+    //         setPageLoading(false); // Set loading to false when all operations are completed
+    //     }
+    // }, [pendingOperations]);
+
     useEffect(() => {
-        let isMounted = true; // To prevent state updates on unmounted components
         const fetchData = async () => {
             try {
                 const response = await axios.get(
                     `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
-                    {
-                        withCredentials: true, // Include cookies in the request
-                    }
+                    { withCredentials: true }
                 );
-                if (isMounted) {
-                    setUserData(response.data); // Assuming setUserData updates the user data
-                }
+                setUserData(response.data);
             } catch (error) {
                 console.error("Error fetching user data:", error);
-            } finally {
-                if (isMounted) {
-                    console.log("USER DATA LOADING", pendingOperations);
-                    setPendingOperations((prev) => prev - 1); // Decrement pending operations
-                }
             }
         };
 
         const performOtherAsyncOperations = async () => {
-            // Example of another async operation
             try {
-                // Perform other async operations here
-                await new Promise((resolve) => setTimeout(resolve, 1000));
+                const response = await axios.get(
+                    `http://127.0.0.1:8000/mvmt/v1/client/phases?client_id=${params.id}`,
+                    { withCredentials: true }
+                );
+                console.log(response.data);
             } catch (error) {
                 console.error("Error in other async operations:", error);
-            } finally {
-                if (isMounted) {
-                    console.log("OTHER ASYNC OPERATIONS", pendingOperations);
-                    setPendingOperations((prev) => prev - 1); // Decrement pending operations
-                }
             }
         };
 
-        setPageLoading(true); // Set loading to true before fetching data
-        setPendingOperations(2); // Set the number of pending operations
+        setPageLoading(true);
 
-        if (!userData) {
-            fetchData();
-        } else {
-            console.log("USERDATA FOUND!", pendingOperations);
-            setPendingOperations((prev) => prev - 1); // Decrement pending operations if userData is already available
-        }
-        performOtherAsyncOperations();
-        return () => {
-            isMounted = false; // Cleanup function to prevent state updates on unmounted components
+        const fetchAllData = async () => {
+            if (!userData) {
+                await fetchData();
+            }
+            await performOtherAsyncOperations();
+            setPageLoading(false);
         };
-    }, [params.id, setUserData, userData]); // Empty dependency array means this runs once on mount
 
-    useEffect(() => {
-        if (pendingOperations === 0) {
-            setPageLoading(false); // Set loading to false when all operations are completed
-        }
-    }, [pendingOperations]);
+        fetchAllData();
+    }, [params.id, setUserData, userData]);
 
     const handleAddPhase = () => {
         router.push(`/client/${id}/recommended-workouts/new-phase`);

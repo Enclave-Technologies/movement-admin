@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useUser } from "@/context/ClientContext";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
@@ -12,7 +12,7 @@ interface ExSession {
 }
 
 const Page = ({ params }: { params: { id: string } }) => {
-    const { userData } = useUser();
+    const { userData, setUserData } = useUser();
     const router = useRouter();
     const page_title = ["Training Program", "Untitled Phase"];
     const [phase, setPhase] = useState({
@@ -20,20 +20,55 @@ const Page = ({ params }: { params: { id: string } }) => {
         id: null as string | null,
         unchangedInput: true,
     });
-    // const [sessions, setSessions] = useState<ExSession[]>([]);
+    const [pageLoading, setPageLoading] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        let isMounted = true;
+
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    { withCredentials: true }
+                );
+                if (isMounted) {
+                    setUserData(response.data);
+                    setPageLoading(false); // Set loading to false after data is fetched
+                }
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+                if (isMounted) {
+                    setPageLoading(false); // Set loading to false in case of error
+                }
+            }
+        };
+
+        setPageLoading(true); // Set loading to true before fetching data
+
+        if (!userData) {
+            fetchData();
+        } else {
+            setPageLoading(false); // Set loading to false if userData is already available
+        }
+
+        return () => {
+            isMounted = false; // Cleanup function to prevent state updates on unmounted components
+        };
+    }, [params.id, setUserData, userData]);
 
     const fetchPhaseId = async (title: string) => {
         try {
             const response = await axios.post(
                 "http://127.0.0.1:8000/mvmt/v1/client/phase",
-                { title, currentId: phase.id },
+                { title, currentId: phase.id, userId: params.id },
                 {
                     headers: { "Content-Type": "application/json" },
                     withCredentials: true,
                 }
             );
             setPhase((prev) => ({ ...prev, id: response.data.phaseId }));
+            return response.data.phaseId;
         } catch (error) {
             console.error("Error fetching phaseId:", error);
         }
@@ -57,15 +92,15 @@ const Page = ({ params }: { params: { id: string } }) => {
         try {
             setIsLoading(true);
             if (!phase.id) {
-                await fetchPhaseId(phase.title);
-            }
-            if (phase.id) {
+                const phaseId = await fetchPhaseId(phase.title);
+                console.log(phaseId);
+
                 router.push(
-                    `/client/${params.id}/recommended-workouts/${
-                        phase.id
-                    }/new-session?phaseTitle=${encodeURIComponent(
+                    `/client/${
+                        params.id
+                    }/recommended-workouts/${phaseId}/new-session?phaseTitle=${encodeURIComponent(
                         phase.title
-                    )}&phaseId=${encodeURIComponent(phase.id)}`
+                    )}&phaseId=${encodeURIComponent(phaseId)}`
                 );
             }
         } catch (error) {
@@ -75,7 +110,9 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
     };
 
-    return (
+    return pageLoading ? (
+        <div>Loading...</div>
+    ) : (
         <div>
             <Breadcrumb
                 homeImage={userData?.imageUrl}

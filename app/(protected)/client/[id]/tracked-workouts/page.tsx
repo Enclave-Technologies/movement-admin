@@ -1,8 +1,3 @@
-<<<<<<<< HEAD:app/(protected)/client/[id]/tracked-workouts/page.tsx
-export default function Page() {
-    return <h1>Goals</h1>;
-}
-========
 "use client";
 
 import React from "react";
@@ -27,4 +22,3 @@ const Page = () => {
 };
 
 export default Page;
->>>>>>>> rajkumar:app/(protected)/client/[id]/(subfolders)/body-mass-composition/page.tsx
