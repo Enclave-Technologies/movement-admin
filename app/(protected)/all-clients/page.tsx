@@ -12,6 +12,8 @@ interface Client {
     email: string;
     phone: string;
     trainer_name?: string; // Optional property
+    trainer_id?: string;
+    imageUrl?: string;
 }
 
 export default function AllClients() {
