@@ -5,7 +5,7 @@ import Breadcrumb from "@/components/Breadcrumb";
 import { useUser } from "@/context/ClientContext";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const Page = ({ params }: { params: { id: string } }) => {
+const Page = ({ params }: { params: { id: string; phid: string } }) => {
     const { userData } = useUser();
     const searchParams = useSearchParams();
     // Extract the phaseTitle and sessions from the query parameters
