@@ -4,17 +4,7 @@ import Link from "next/link";
 import axios from "axios";
 import { getCurrentUser } from "@/server_functions/auth";
 import ClientsTable from "@/components/ClientsTable";
-
-// Define the Client interface
-interface Client {
-    uid: string;
-    name: string;
-    email: string;
-    phone: string;
-    trainer_name?: string; // Optional property
-    trainer_id?: string;
-    imageUrl?: string;
-}
+import { Client } from "@/configs/Interfaces";
 
 export default function MyClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
