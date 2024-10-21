@@ -5,6 +5,16 @@ import { useUser } from "@/context/ClientContext";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import BreadcrumbLoading from "@/components/BreadcrumbLoading";
+import { set } from "zod";
+import {
+    Phase,
+    PhaseRow,
+    PhaseDropdownOption,
+    MovSessionDropdownOption,
+    MovSession,
+    SessionExercise,
+} from "@/configs/Interfaces";
+import Link from "next/link";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
@@ -12,92 +22,21 @@ const Page = ({ params }: { params: { id: string } }) => {
     const page_title = ["Training Program"];
     const id = params.id;
     const [pageLoading, setPageLoading] = useState(true);
-    const [pendingOperations, setPendingOperations] = useState(0);
 
-    // State variables for dropdown options
-    const [firstDropdownOptions, setFirstDropdownOptions] = useState([
-        { value: "option1", label: "Option 1" },
-        { value: "option2", label: "Option 2" },
-        { value: "option3", label: "Option 3" },
-    ]);
-
-    const [secondDropdownOptions, setSecondDropdownOptions] = useState([
-        { value: "optionA", label: "Option A" },
-        { value: "optionB", label: "Option B" },
-        { value: "optionC", label: "Option C" },
-    ]);
-
-    // State variable for table data
-    const [phaseList, setPhaseList] = useState<PhaseRow[]>([]);
+    const [firstDropdownOptions, setFirstDropdownOptions] = useState<
+        PhaseDropdownOption[]
+    >([]);
+    const [secondDropdownOptions, setSecondDropdownOptions] = useState<
+        MovSessionDropdownOption[]
+    >([]);
+    const [exerciseList, setExerciseList] = useState<SessionExercise[]>([]);
+    const [selectedPhaseId, setSelectedPhaseId] = useState<string | null>(null);
+    const [selectedPhaseTitle, setSelectedPhaseTitle] = useState<string | null>(
+        null
+    );
+    const [phaseData, setPhaseData] = useState<Phase[]>([]);
 
     // Example useEffect to load data for dropdowns and table
-    // useEffect(() => {
-    //     let isMounted = true; // To prevent state updates on unmounted components
-    //     const fetchData = async () => {
-    //         try {
-    //             const response = await axios.get(
-    //                 `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
-    //                 {
-    //                     withCredentials: true, // Include cookies in the request
-    //                 }
-    //             );
-    //             if (isMounted) {
-    //                 setUserData(response.data); // Assuming setUserData updates the user data
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching user data:", error);
-    //         } finally {
-    //             if (isMounted) {
-    //                 console.log("USER DATA LOADING", pendingOperations);
-    //                 setPendingOperations((prev) => prev - 1); // Decrement pending operations
-    //             }
-    //         }
-    //     };
-
-    //     const performOtherAsyncOperations = async () => {
-    //         // Example of another async operation
-    //         try {
-    //             // Perform other async operations here
-    //             const response = await axios.get(
-    //                 `http://127.0.0.1:8000/mvmt/v1/client/phases?client_id=${params.id}`,
-    //                 {
-    //                     withCredentials: true, // Include cookies in the request
-    //                 }
-    //             );
-    //             console.log(response.data);
-    //             // await new Promise((resolve) => setTimeout(resolve, 1000));
-    //         } catch (error) {
-    //             console.error("Error in other async operations:", error);
-    //         } finally {
-    //             console.log(isMounted);
-    //             if (isMounted) {
-    //                 console.log("OTHER ASYNC OPERATIONS", pendingOperations);
-    //                 setPendingOperations((prev) => prev - 1); // Decrement pending operations
-    //             }
-    //         }
-    //     };
-
-    //     setPageLoading(true); // Set loading to true before fetching data
-    //     setPendingOperations(2); // Set the number of pending operations
-
-    //     if (!userData) {
-    //         fetchData();
-    //     } else {
-    //         console.log("USERDATA FOUND!", pendingOperations);
-    //         setPendingOperations((prev) => prev - 1); // Decrement pending operations if userData is already available
-    //     }
-    //     performOtherAsyncOperations();
-    //     return () => {
-    //         isMounted = false; // Cleanup function to prevent state updates on unmounted components
-    //     };
-    // }, [params.id, setUserData, userData, pendingOperations]); // Empty dependency array means this runs once on mount
-
-    // useEffect(() => {
-    //     if (pendingOperations === 0) {
-    //         setPageLoading(false); // Set loading to false when all operations are completed
-    //     }
-    // }, [pendingOperations]);
-
     useEffect(() => {
         const fetchData = async () => {
             try {
@@ -117,7 +56,103 @@ const Page = ({ params }: { params: { id: string } }) => {
                     `http://127.0.0.1:8000/mvmt/v1/client/phases?client_id=${params.id}`,
                     { withCredentials: true }
                 );
-                console.log(response.data);
+                const allPhaseData = response.data;
+                setPhaseData(allPhaseData.phases);
+
+                let phaseDropdownData: PhaseDropdownOption[];
+                let secondDropdownData: MovSessionDropdownOption[] = [];
+
+                let exerciseListData: any[] = [];
+
+                if (allPhaseData.phases.length === 0) {
+                    // If no phases are available, show "No Phases" option
+                    phaseDropdownData = [
+                        {
+                            value: "no-phases",
+                            label: "No Phases, Please Add",
+                            isActive: false,
+                        },
+                    ];
+                    // Since no phases exist, second dropdown should be empty
+                    secondDropdownData = [];
+                    // Exercise list should also be empty
+                    exerciseListData = [];
+                } else {
+                    // Otherwise, map the phases to dropdown options
+                    // phaseDropdownData = phaseData.phases.map(
+                    //     (phase: Phase) => ({
+                    //         value: phase.id,
+                    //         label: phase.phaseName,
+                    //         isActive: phase.isActive,
+                    //     })
+                    // );
+                    phaseDropdownData = mapPhasesToDropdownOptions(
+                        allPhaseData.phases
+                    );
+
+                    setSelectedPhaseId(phaseDropdownData[0].value);
+                    setSelectedPhaseTitle(phaseDropdownData[0].label);
+                    // setFirstDropdownOptions(phaseOptions);
+                    // Check if any sessions exist within the phases
+                    const hasSessions = allPhaseData.phases.some(
+                        (phase: Phase) => phase.sessions.length > 0
+                    );
+
+                    if (!hasSessions) {
+                        // If no sessions exist, show "No Sessions" option in the second dropdown
+                        secondDropdownData = [
+                            {
+                                value: "no-sessions",
+                                label: "No Sessions, Please Add",
+                            },
+                        ];
+                        // Exercise list should also be empty
+                        exerciseListData = [];
+                    } else {
+                        // Map sessions to dropdown options
+                        secondDropdownData = mapSessionsToDropdownOptions(
+                            allPhaseData.phases
+                        );
+                        // phaseData.phases.flatMap(
+                        //     (phase: Phase) =>
+                        //         phase.sessions.map((session: MovSession) => ({
+                        //             value: session.id,
+                        //             label: session.sessionName,
+                        //             // isActive: true, // Assuming sessions are always active
+                        //         }))
+                        // );
+                        // Check if any exercises exist within the sessions
+                        const hasExercises = allPhaseData.phases.some(
+                            (phase: Phase) =>
+                                phase.sessions.some(
+                                    (session: MovSession) =>
+                                        session.exercises.length > 0
+                                )
+                        );
+
+                        if (!hasExercises) {
+                            // If no exercises exist, exercise list should be empty
+                            exerciseListData = [];
+                        } else {
+                            // Map exercises to the exercise list
+                            exerciseListData = mapExercisesToList(
+                                allPhaseData.phases
+                            );
+
+                            // phaseData.phases.flatMap(
+                            //     (phase: Phase) =>
+                            //         phase.sessions.flatMap(
+                            //             (session: MovSession) =>
+                            //                 session.exercises
+                            //         )
+                            // );
+                        }
+                    }
+                }
+
+                setFirstDropdownOptions(phaseDropdownData);
+                setSecondDropdownOptions(secondDropdownData);
+                setExerciseList(exerciseListData);
             } catch (error) {
                 console.error("Error in other async operations:", error);
             }
@@ -136,6 +171,72 @@ const Page = ({ params }: { params: { id: string } }) => {
         fetchAllData();
     }, [params.id, setUserData, userData]);
 
+    const mapPhasesToDropdownOptions = (
+        phases: Phase[]
+    ): PhaseDropdownOption[] => {
+        return phases.map((phase: Phase) => ({
+            value: phase.id,
+            label: phase.phaseName,
+            isActive: phase.isActive,
+        }));
+    };
+
+    const handlePhaseChange = (selectedPhaseId: string) => {
+        const selectedPhase = phaseData.find(
+            (phase: Phase) => phase.id === selectedPhaseId
+        );
+
+        if (!selectedPhase) {
+            setSecondDropdownOptions([]);
+            setExerciseList([]);
+            return;
+        }
+        setSelectedPhaseId(selectedPhase.id);
+        setSelectedPhaseTitle(selectedPhase.phaseName);
+
+        // console.log(">>>", selectedPhase.id, selectedPhase.phaseName);
+
+        if (selectedPhase.sessions.length === 0) {
+            setSecondDropdownOptions([
+                {
+                    value: "no-sessions",
+                    label: "No Sessions, Please Add",
+                },
+            ]);
+            setExerciseList([]);
+        } else {
+            const sessionOptions = selectedPhase.sessions.map(
+                (session: MovSession) => ({
+                    value: session.id,
+                    label: session.sessionName,
+                })
+            );
+            setSecondDropdownOptions(sessionOptions);
+
+            const exercises = selectedPhase.sessions.flatMap(
+                (session: MovSession) => session.exercises
+            );
+            setExerciseList(exercises);
+        }
+    };
+
+    const mapSessionsToDropdownOptions = (
+        phases: Phase[]
+    ): MovSessionDropdownOption[] => {
+        return phases.flatMap((phase: Phase) =>
+            phase.sessions.map((session: MovSession) => ({
+                value: session.id,
+                label: session.sessionName,
+            }))
+        );
+    };
+
+    const mapExercisesToList = (phases: Phase[]): SessionExercise[] => {
+        return phases.flatMap((phase: Phase) =>
+            phase.sessions.flatMap((session: MovSession) => session.exercises)
+        );
+    };
+
     const handleAddPhase = () => {
         router.push(`/client/${id}/recommended-workouts/new-phase`);
     };
@@ -144,11 +245,11 @@ const Page = ({ params }: { params: { id: string } }) => {
         <div>
             <BreadcrumbLoading />
             <div className="flex items-center space-x-4">
-                <div className="border rounded p-2 w-1/2 animate-pulse bg-gray-300">
+                <div className="border rounded p-2 w-1/4 animate-pulse bg-gray-300">
                     <div className="h-4 bg-gray-400 rounded"></div>
                 </div>
                 <span className="text-gray-500">&gt;</span>
-                <div className="border rounded p-2 w-1/2 animate-pulse bg-gray-300">
+                <div className="border rounded p-2 w-1/4 animate-pulse bg-gray-300">
                     <div className="h-4 bg-gray-400 rounded"></div>
                 </div>
             </div>
@@ -160,11 +261,10 @@ const Page = ({ params }: { params: { id: string } }) => {
             </div>
 
             <button
-                onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded animate-pulse bg-gray-300"
                 disabled
             >
-                + Add Phase
+                + Add Session
             </button>
         </div>
     ) : (
@@ -175,25 +275,79 @@ const Page = ({ params }: { params: { id: string } }) => {
                 customTexts={page_title}
             />
 
-            <div className="flex items-center space-x-4">
-                <select className="border rounded p-2 w-1/2">
-                    {firstDropdownOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
-                <span className="text-gray-500">&gt;</span>
-                <select className="border rounded p-2 w-1/2">
-                    {secondDropdownOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                            {option.label}
-                        </option>
-                    ))}
-                </select>
+            <div className="flex flex-col space-y-4">
+                <div className="flex items-center">
+                    <div className="flex flex-col w-1/4">
+                        <select
+                            className="border rounded p-2"
+                            onChange={(e) => handlePhaseChange(e.target.value)}
+                        >
+                            {firstDropdownOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="flex items-center justify-center mt-2">
+                            {phaseData.length === 0 ? (
+                                <Link
+                                    href="#"
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    + Add Phase
+                                </Link>
+                            ) : (
+                                <Link
+                                    href="#"
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    Edit Phase
+                                </Link>
+                            )}
+                        </div>
+                    </div>
+                    <span className="text-gray-500 mx-4 self-start py-2">
+                        &gt;
+                    </span>{" "}
+                    {/* margin added for spacing */}
+                    <div className="flex flex-col w-1/4">
+                        <select className="border rounded p-2">
+                            {secondDropdownOptions.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                        <div className="flex items-center justify-center space-x-2 mt-2">
+                            <Link
+                                href={
+                                    selectedPhaseId
+                                        ? `/client/${
+                                              params.id
+                                          }/recommended-workouts/${selectedPhaseId}/new-session?phaseTitle=${encodeURIComponent(
+                                              selectedPhaseTitle || ""
+                                          )}&phaseId=${encodeURIComponent(
+                                              selectedPhaseId
+                                          )}`
+                                        : "#"
+                                }
+                                className="text-blue-500 hover:underline"
+                            >
+                                Add Session
+                            </Link>
+                            <Link
+                                href="#"
+                                className="text-blue-500 hover:underline"
+                            >
+                                Edit Session
+                            </Link>
+                        </div>
+                    </div>
+                </div>
             </div>
+
             {/* Table Component */}
-            {phaseList.length === 0 ? (
+            {exerciseList.length === 0 ? (
                 <p className="text-gray-600">
                     No Exercises added to this session yet.
                     <br />
@@ -230,10 +384,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {phaseList.map((row, index) => (
+                        {exerciseList.map((row, index) => (
                             <tr key={index}>
                                 <td className="border border-gray-300 p-2">
-                                    {row.order}
+                                    {row.exerciseOrder}
                                 </td>
                                 <td className="border border-gray-300 p-2">
                                     {row.motion}
@@ -266,6 +420,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
+                + Add Session
+            </button>
+            <button
+                onClick={handleAddPhase}
+                className="w-full mt-4 p-2 border-2 rounded"
+            >
                 + Add Phase
             </button>
         </div>
@@ -273,13 +433,3 @@ const Page = ({ params }: { params: { id: string } }) => {
 };
 
 export default Page;
-
-interface PhaseRow {
-    order: number;
-    motion: string;
-    specificDescription: string;
-    repsMin: number;
-    repsMax: number;
-    setsMin: number;
-    setsMax: number;
-}
