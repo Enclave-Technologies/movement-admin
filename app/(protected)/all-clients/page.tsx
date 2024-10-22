@@ -4,7 +4,6 @@ import Link from "next/link";
 import axios from "axios";
 import { getCurrentUser } from "@/server_functions/auth";
 import ClientsTable from "@/components/ClientsTable";
-import { Client } from "@/configs/Interfaces";
 
 export default function AllClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data

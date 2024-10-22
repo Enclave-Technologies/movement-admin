@@ -96,14 +96,9 @@ interface ExSession {
     time: string;
 }
 
-export type {
-    Field,
-    Client,
-    PhaseRow,
-    SessionExercise,
-    MovSession,
-    Phase,
-    PhaseDropdownOption,
-    MovSessionDropdownOption,
-    ExSession,
-};
+interface AddExerciseModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (data: any) => void; // Adjust the type of 'data' as needed
+}
+

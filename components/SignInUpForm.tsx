@@ -1,6 +1,5 @@
 import React, { FormEvent } from "react";
 import LoadingSpinner from "./LoadingSpinner";
-import { Field } from "@/configs/Interfaces";
 
 const LoginRegisterForm = ({
     fields,

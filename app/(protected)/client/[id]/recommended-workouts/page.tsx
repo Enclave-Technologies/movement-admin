@@ -6,14 +6,6 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import BreadcrumbLoading from "@/components/BreadcrumbLoading";
 import { set } from "zod";
-import {
-    Phase,
-    PhaseRow,
-    PhaseDropdownOption,
-    MovSessionDropdownOption,
-    MovSession,
-    SessionExercise,
-} from "@/configs/Interfaces";
 import Link from "next/link";
 
 const Page = ({ params }: { params: { id: string } }) => {

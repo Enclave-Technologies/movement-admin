@@ -1,12 +1,6 @@
 // components/AddExerciseModal.tsx
 import React, { useState } from "react";
 
-interface AddExerciseModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmit: (data: any) => void; // Adjust the type of 'data' as needed
-}
-
 const AddExerciseModal: React.FC<AddExerciseModalProps> = ({
     isOpen,
     onClose,
