@@ -139,7 +139,7 @@ export async function login(state, formData) {
         console.log("4. LOGIN");
 
         // Redirect only if login is successful
-        return NextResponse.redirect("https://movement-admin.enclave.live/");
+        // return NextResponse.redirect("https://movement-admin.enclave.live/");
     } catch (error) {
         console.error(error);
         if (
@@ -172,6 +172,8 @@ export async function login(state, formData) {
             },
         };
     }
+
+    redirect("/");
 }
 
 export async function logout() {
@@ -190,17 +192,19 @@ export async function logout() {
         cookies().delete(SESSION_COOKIE_NAME);
 
         // Return a response with a redirect
-        return NextResponse.redirect(
-            "https://movement-admin.enclave.live/login"
-        );
+        // return NextResponse.redirect(
+        //     "https://movement-admin.enclave.live/login"
+        // );
+        redirect("/login");
     } catch (error) {
         console.log(error);
 
         // Handle errors by deleting the session cookie and redirecting
         cookies().delete(SESSION_COOKIE_NAME);
-        return NextResponse.redirect(
-            "https://movement-admin.enclave.live/login"
-        );
+        // return NextResponse.redirect(
+        //     "https://movement-admin.enclave.live/login"
+        // );
+        redirect("/login");
     }
 }
 
