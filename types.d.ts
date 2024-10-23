@@ -50,6 +50,8 @@ interface SessionExercise {
     restMax?: number;
     // Order of the exercise in the session
     exerciseOrder: number;
+    motion: string;
+    specificDescription: string;
 }
 
 // Define the interface for a movement session
@@ -101,4 +103,3 @@ interface AddExerciseModalProps {
     onClose: () => void;
     onSubmit: (data: any) => void; // Adjust the type of 'data' as needed
 }
-
