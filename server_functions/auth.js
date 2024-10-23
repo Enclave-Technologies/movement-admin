@@ -131,6 +131,10 @@ export async function login(state, formData) {
             domain: "enclave.live",
         });
 
+        // Retrieve and log the cookie
+        const cookie = cookies().get(SESSION_COOKIE_NAME);
+        console.log("Cookie set:", cookie);
+
         console.log("4. LOGIN");
     } catch (error) {
         console.error(error);
