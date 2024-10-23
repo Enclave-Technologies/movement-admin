@@ -9,7 +9,6 @@ import {
 
 import { AppwriteException, ID } from "node-appwrite";
 import { redirect } from "next/navigation";
-import { NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/configs/constants";
 import {
     RegisterFormSchema,
@@ -137,9 +136,6 @@ export async function login(state, formData) {
         // console.log("Cookie set:", cookie);
 
         console.log("4. LOGIN");
-
-        // Redirect only if login is successful
-        // return NextResponse.redirect("https://movement-admin.enclave.live/");
     } catch (error) {
         console.error(error);
         if (
@@ -188,22 +184,22 @@ export async function logout() {
             await account.deleteSession("current");
         }
 
-        // Delete the session cookie
-        cookies().delete(SESSION_COOKIE_NAME);
+        // Delete the session cookie with correct attributes
+        cookies().delete(SESSION_COOKIE_NAME, {
+            path: "/", // Specify the path if necessary
+            domain: "enclave.live", // Specify the domain if necessary
+        });
 
-        // Return a response with a redirect
-        // return NextResponse.redirect(
-        //     "https://movement-admin.enclave.live/login"
-        // );
         redirect("/login");
     } catch (error) {
         console.log(error);
 
-        // Handle errors by deleting the session cookie and redirecting
-        cookies().delete(SESSION_COOKIE_NAME);
-        // return NextResponse.redirect(
-        //     "https://movement-admin.enclave.live/login"
-        // );
+        // Delete the session cookie with correct attributes
+        cookies().delete(SESSION_COOKIE_NAME, {
+            path: "/", // Specify the path if necessary
+            domain: "enclave.live", // Specify the domain if necessary
+        });
+
         redirect("/login");
     }
 }
