@@ -132,10 +132,13 @@ export async function login(state, formData) {
         });
 
         // Retrieve and log the cookie
-        const cookie = cookies().get(SESSION_COOKIE_NAME);
-        console.log("Cookie set:", cookie);
+        // const cookie = cookies().get(SESSION_COOKIE_NAME);
+        // console.log("Cookie set:", cookie);
 
         console.log("4. LOGIN");
+
+        // Redirect only if login is successful
+        redirect("/");
     } catch (error) {
         console.error(error);
         if (
@@ -155,11 +158,19 @@ export async function login(state, formData) {
                 },
             };
         }
+        // Handle other errors
+        return {
+            success: false,
+            errors: {
+                email: [
+                    "An unexpected error occurred. Please try again later.",
+                ],
+                password: [
+                    "An unexpected error occurred. Please try again later.",
+                ],
+            },
+        };
     }
-
-    console.log("5. LOGIN redirecting");
-
-    redirect("/");
 }
 
 export async function logout() {
@@ -169,12 +180,19 @@ export async function logout() {
         );
         const { account } = await createSessionClient(sessionCookie.session);
         await account.deleteSession("current");
+
+        // Delete the session cookie
+        cookies().delete(SESSION_COOKIE_NAME);
+
+        // Redirect only if the session deletion is successful
+        redirect("/login");
     } catch (error) {
         console.log(error);
-    }
-    cookies().delete(SESSION_COOKIE_NAME);
 
-    redirect("/login");
+        // Handle errors by deleting the session cookie and redirecting
+        cookies().delete(SESSION_COOKIE_NAME);
+        redirect("/login");
+    }
 }
 
 export async function getCurrentUser() {
