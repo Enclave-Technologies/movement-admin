@@ -5,7 +5,6 @@ import { useUser } from "@/context/ClientContext"; // Import the custom hook
 import { useEffect } from "react";
 import LinkTile from "@/components/LinkTile";
 
-
 const LinkTileData = [
     {
         href: (params: { id: string }) => `${params.id}/goals`,
@@ -58,13 +57,11 @@ const Page = ({ params }: { params: { id: string } }) => {
         setUserData(params); // Store the user data in Context API
     }, [params, setUserData]);
 
-   
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
             <div className="text-center mt-4 flex flex-col gap-8 w-full">
                 <div className="flex flex-col gap-4 p-4 bg-white">
                     <div className="flex flex-row gap-4 items-center">
-
                         <div className="relative">
                             <Image
                                 src={userData?.imageUrl || ""}
@@ -73,10 +70,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 width={80}
                                 alt={`${userData?.name} image`}
                                 className="rounded-full aspect-square object-cover border-2 border-gray-200 opacity-0 transition-opacity duration-300 ease-in-out"
-                                onLoad={(e) => { e.currentTarget.style.opacity = 1; }}
+                                onLoad={(e) => {
+                                    e.currentTarget.style.opacity = "1";
+                                }}
                             />
                             <div className="absolute inset-0 flex items-center justify-center bg-gray-200 rounded-full animate-pulse">
-                                <span className="text-gray-400">Loading...</span>
+                                <span className="text-gray-400">
+                                    Loading...
+                                </span>
                             </div>
                         </div>
                         <div className="flex flex-col items-start space-y-1">
@@ -100,9 +101,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             href={tile.href(params)}
                             label={tile.label}
                             stat={tile.stat}
-
                             className="flex flex-col items-center justify-between gap-0 p-4 bg-white border-2 rounded-xl border-primary w-full h-32"
-
                         />
                     ))}
                 </div>
