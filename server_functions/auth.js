@@ -55,13 +55,18 @@ export async function register(state, formData) {
         );
         cookies().set(SESSION_COOKIE_NAME, session.secret, {
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: "None",
             secure: true,
             expires: new Date(session.expire),
             path: "/",
+            domain: "enclave.live",
         });
     } catch (error) {
         console.error(error);
+        return {
+            success: false,
+            errors: { email: ["An error occurred. Please try again."] },
+        };
     }
     redirect("/");
 }
@@ -80,7 +85,7 @@ export async function login(state, formData) {
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("3. LOGIN", email, password);
+    console.log("3. LOGGING IN", email);
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {
@@ -119,10 +124,11 @@ export async function login(state, formData) {
 
         cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: "None",
             secure: true,
             expires: new Date(session.expire),
             path: "/",
+            domain: "enclave.live",
         });
 
         console.log("4. LOGIN");
