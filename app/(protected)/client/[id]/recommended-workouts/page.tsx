@@ -10,6 +10,7 @@ import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const { userData, setUserData } = useUser();
@@ -72,14 +73,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     // Exercise list should also be empty
                     exerciseListData = [];
                 } else {
-                    // Otherwise, map the phases to dropdown options
-                    // phaseDropdownData = phaseData.phases.map(
-                    //     (phase: Phase) => ({
-                    //         value: phase.id,
-                    //         label: phase.phaseName,
-                    //         isActive: phase.isActive,
-                    //     })
-                    // );
+                  
                     phaseDropdownData = mapPhasesToDropdownOptions(
                         allPhaseData.phases
                     );
@@ -107,14 +101,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         secondDropdownData = mapSessionsToDropdownOptions(
                             allPhaseData.phases
                         );
-                        // phaseData.phases.flatMap(
-                        //     (phase: Phase) =>
-                        //         phase.sessions.map((session: MovSession) => ({
-                        //             value: session.id,
-                        //             label: session.sessionName,
-                        //             // isActive: true, // Assuming sessions are always active
-                        //         }))
-                        // );
+                      
                         // Check if any exercises exist within the sessions
                         const hasExercises = allPhaseData.phases.some(
                             (phase: Phase) =>
@@ -133,13 +120,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 allPhaseData.phases
                             );
 
-                            // phaseData.phases.flatMap(
-                            //     (phase: Phase) =>
-                            //         phase.sessions.flatMap(
-                            //             (session: MovSession) =>
-                            //                 session.exercises
-                            //         )
-                            // );
                         }
                     }
                 }
@@ -188,7 +168,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         setSelectedPhaseId(selectedPhase.id);
         setSelectedPhaseTitle(selectedPhase.phaseName);
 
-        // console.log(">>>", selectedPhase.id, selectedPhase.phaseName);
 
         if (selectedPhase.sessions.length === 0) {
             setSecondDropdownOptions([
@@ -231,6 +210,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
     };
 
+
     const handleAddPhase = () => {
         router.push(`/client/${id}/recommended-workouts/new-phase`);
     };
@@ -269,6 +249,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 customTexts={page_title}
             />
 
+        
             <div className="flex flex-col space-y-4">
                 <div className="flex items-center">
                     <div className="flex flex-col w-1/4">
@@ -414,12 +395,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
+
                 + Add Session
             </button>
             <button
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
+
                 + Add Phase
             </button>
         </div>
@@ -427,3 +410,4 @@ const Page = ({ params }: { params: { id: string } }) => {
 };
 
 export default Page;
+

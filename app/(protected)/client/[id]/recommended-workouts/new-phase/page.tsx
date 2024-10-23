@@ -5,10 +5,12 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, setUserData } = useUser();
+
     const router = useRouter();
     const page_title = ["Training Program", "Untitled Phase"];
     const [phase, setPhase] = useState({
@@ -64,6 +66,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 }
             );
             setPhase((prev) => ({ ...prev, id: response.data.phaseId }));
+
             return response.data.phaseId;
         } catch (error) {
             console.error("Error fetching phaseId:", error);
@@ -76,12 +79,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             title: e.target.value,
             unchangedInput: false,
         }));
-    };
-
-    const handleTitleBlur = () => {
-        if (!phase.unchangedInput) {
-            fetchPhaseId(phase.title);
-        }
     };
 
     const addSession = async () => {
@@ -120,16 +117,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                 type="text"
                 value={phase.title}
                 onChange={handleTitleChange}
-                // onBlur={handleTitleBlur}
                 placeholder="Phase 1"
                 className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
             />
             <h3 className="text-lg font-semibold mt-4">Sessions</h3>
             <button
-                onClick={async () => {
-                    await addSession();
-                }}
-                type="submit"
+                onClick={addSession}
                 disabled={isLoading}
                 className={`mt-2 mb-4 items-center justify-center px-4 py-2 rounded-lg transition ${
                     isLoading

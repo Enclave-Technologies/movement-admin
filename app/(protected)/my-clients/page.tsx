@@ -5,6 +5,7 @@ import axios from "axios";
 import { getCurrentUser } from "@/server_functions/auth";
 import ClientsTable from "@/components/ClientsTable";
 
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function MyClients() {
@@ -51,9 +52,6 @@ export default function MyClients() {
         if (newItems.length === 0 || newItems.length < 50) {
             setHasMore(false);
         }
-        // } else {
-        //     setClients((prevItems) => [...prevItems, ...newItems]);
-        // }
         setIsFetching(false);
     };
     const debouncedFetchData = useCallback(debounce(fetchData, 300), [
