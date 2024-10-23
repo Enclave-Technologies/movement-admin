@@ -9,67 +9,68 @@ import {
 
 import { AppwriteException, ID } from "node-appwrite";
 import { redirect } from "next/navigation";
+import { NextResponse } from "next/server";
 import { SESSION_COOKIE_NAME } from "@/configs/constants";
 import {
     RegisterFormSchema,
     LoginFormSchema,
 } from "@/server_functions/formSchemas";
 
-export async function register(state, formData) {
-    // 1. Validate fields
-    const validatedResult = RegisterFormSchema.safeParse({
-        username: formData.get("username"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-        confirmPassword: formData.get("confirm-password"),
-    });
-    if (!validatedResult.success) {
-        // Handle validation errors
-        const errors = validatedResult.error.formErrors.fieldErrors;
-        return { success: false, errors };
-    }
-    const { username, email, password } = validatedResult.data;
+// export async function register(state, formData) {
+//     // 1. Validate fields
+//     const validatedResult = RegisterFormSchema.safeParse({
+//         username: formData.get("username"),
+//         email: formData.get("email"),
+//         password: formData.get("password"),
+//         confirmPassword: formData.get("confirm-password"),
+//     });
+//     if (!validatedResult.success) {
+//         // Handle validation errors
+//         const errors = validatedResult.error.formErrors.fieldErrors;
+//         return { success: false, errors };
+//     }
+//     const { username, email, password } = validatedResult.data;
 
-    // 2. Try creating with details
-    const { account } = await createAdminClient();
-    try {
-        await account.create(ID.unique(), email, password, username);
-    } catch (error) {
-        if (
-            error instanceof AppwriteException &&
-            error.code === 409 &&
-            error.type === "user_already_exists"
-        ) {
-            return {
-                success: false,
-                errors: { email: ["Email already exists, please login"] },
-            };
-        }
-    }
+//     // 2. Try creating with details
+//     const { account } = await createAdminClient();
+//     try {
+//         await account.create(ID.unique(), email, password, username);
+//     } catch (error) {
+//         if (
+//             error instanceof AppwriteException &&
+//             error.code === 409 &&
+//             error.type === "user_already_exists"
+//         ) {
+//             return {
+//                 success: false,
+//                 errors: { email: ["Email already exists, please login"] },
+//             };
+//         }
+//     }
 
-    // 3. If successful in creating account, then login
-    try {
-        const session = await account.createEmailPasswordSession(
-            email,
-            password
-        );
-        cookies().set(SESSION_COOKIE_NAME, session.secret, {
-            httpOnly: true,
-            sameSite: "None",
-            secure: true,
-            expires: new Date(session.expire),
-            path: "/",
-            domain: "enclave.live",
-        });
-    } catch (error) {
-        console.error(error);
-        return {
-            success: false,
-            errors: { email: ["An error occurred. Please try again."] },
-        };
-    }
-    redirect("/");
-}
+//     // 3. If successful in creating account, then login
+//     try {
+//         const session = await account.createEmailPasswordSession(
+//             email,
+//             password
+//         );
+//         cookies().set(SESSION_COOKIE_NAME, session.secret, {
+//             httpOnly: true,
+//             sameSite: "None",
+//             secure: true,
+//             expires: new Date(session.expire),
+//             path: "/",
+//             domain: "enclave.live",
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         return {
+//             success: false,
+//             errors: { email: ["An error occurred. Please try again."] },
+//         };
+//     }
+//     redirect("/");
+// }
 
 export async function login(state, formData) {
     console.log("1. LOGIN", formData);
@@ -138,7 +139,7 @@ export async function login(state, formData) {
         console.log("4. LOGIN");
 
         // Redirect only if login is successful
-        redirect("/");
+        return NextResponse.redirect("/");
     } catch (error) {
         console.error(error);
         if (
@@ -176,22 +177,26 @@ export async function login(state, formData) {
 export async function logout() {
     try {
         const sessionCookie = JSON.parse(
-            cookies().get(SESSION_COOKIE_NAME).value
+            cookies().get(SESSION_COOKIE_NAME)?.value
         );
-        const { account } = await createSessionClient(sessionCookie.session);
-        await account.deleteSession("current");
+        if (sessionCookie) {
+            const { account } = await createSessionClient(
+                sessionCookie.session
+            );
+            await account.deleteSession("current");
+        }
 
         // Delete the session cookie
         cookies().delete(SESSION_COOKIE_NAME);
 
-        // Redirect only if the session deletion is successful
-        redirect("/login");
+        // Return a response with a redirect
+        return NextResponse.redirect("/login");
     } catch (error) {
         console.log(error);
 
         // Handle errors by deleting the session cookie and redirecting
         cookies().delete(SESSION_COOKIE_NAME);
-        redirect("/login");
+        return NextResponse.redirect("/login");
     }
 }
 
