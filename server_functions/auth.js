@@ -186,19 +186,30 @@ export async function logout() {
 
         // Delete the session cookie with correct attributes
         cookies().delete(SESSION_COOKIE_NAME, {
-            path: "/", // Specify the path if necessary
-            domain: "enclave.live", // Specify the domain if necessary
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+            path: "/",
+            domain: "enclave.live",
         });
 
+        console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
+
+        // Redirect to the login page
         redirect("/login");
     } catch (error) {
         console.log(error);
 
-        // Delete the session cookie with correct attributes
+        // Handle errors by deleting the session cookie and redirecting
         cookies().delete(SESSION_COOKIE_NAME, {
-            path: "/", // Specify the path if necessary
-            domain: "enclave.live", // Specify the domain if necessary
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+            path: "/",
+            domain: "enclave.live",
         });
+
+        console.log(`Cookie ${SESSION_COOKIE_NAME} deleted after error`);
 
         redirect("/login");
     }
