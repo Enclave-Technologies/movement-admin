@@ -185,7 +185,7 @@ export async function logout() {
         }
 
         // Delete the session cookie with correct attributes
-        cookies().delete(SESSION_COOKIE_NAME, {
+        (await cookies()).delete(SESSION_COOKIE_NAME, {
             httpOnly: true,
             sameSite: "None",
             secure: true,
@@ -194,6 +194,8 @@ export async function logout() {
         });
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
+
+        (await cookies()).getAll().map((cookie) => console.log(cookie));
 
         // Redirect to the login page
         redirect("/login");
