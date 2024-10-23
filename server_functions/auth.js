@@ -185,7 +185,8 @@ export async function logout() {
         }
 
         // Delete the session cookie with correct attributes
-        (await cookies()).delete(SESSION_COOKIE_NAME, {
+        (await cookies()).delete({
+            name: SESSION_COOKIE_NAME,
             httpOnly: true,
             sameSite: "None",
             secure: true,
@@ -203,7 +204,8 @@ export async function logout() {
         console.log(error);
 
         // Handle errors by deleting the session cookie and redirecting
-        cookies().delete(SESSION_COOKIE_NAME, {
+        cookies().delete({
+            name: SESSION_COOKIE_NAME,
             httpOnly: true,
             sameSite: "None",
             secure: true,
