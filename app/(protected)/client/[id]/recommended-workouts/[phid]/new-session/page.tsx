@@ -7,6 +7,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AddExerciseModal from "@/components/AddExerciseModal";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const Page = ({ params }: { params: { id: string; phid: string } }) => {
     const { userData, setUserData } = useUser();
     const [pageLoading, setPageLoading] = useState(true);
@@ -36,7 +38,7 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
                     { withCredentials: true }
                 );
                 if (isMounted) {

@@ -34,6 +34,7 @@ const LinkTileData = [
         stat: "Last Updated: " + new Date().toLocaleDateString(),
     },
 ];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, setUserData } = useUser(); // Use the context to set user data
@@ -41,7 +42,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
                     {
                         withCredentials: true, // Include cookies in the request
                     }

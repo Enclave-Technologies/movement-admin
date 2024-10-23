@@ -5,6 +5,8 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, setUserData } = useUser();
     const router = useRouter();
@@ -23,7 +25,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
                     { withCredentials: true }
                 );
                 if (isMounted) {
@@ -54,7 +56,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     const fetchPhaseId = async (title: string) => {
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/mvmt/v1/client/phase",
+                "${API_BASE_URL}/mvmt/v1/client/phase",
                 { title, currentId: phase.id, userId: params.id },
                 {
                     headers: { "Content-Type": "application/json" },
