@@ -5,6 +5,7 @@ import { useUser } from "@/context/ClientContext"; // Import the custom hook
 import { useEffect } from "react";
 import LinkTile from "@/components/LinkTile";
 
+
 const LinkTileData = [
     {
         href: (params: { id: string }) => `${params.id}/goals`,
@@ -28,27 +29,42 @@ const LinkTileData = [
     },
     {
         href: (params: { id: string }) => `${params.id}/profile`,
-        stat: "Last Updated: " + new Date().toLocaleDateString(),
         label: "Profile",
+        // stat: new Date().toLocaleDateString(), // Display today's date
+        stat: "Last Updated: " + new Date().toLocaleDateString(),
     },
 ];
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const Page = ({ params }: { params: { id: string } }) => {
-    const userData = {
-        uid: "1",
-        name: "Gina Lai",
-        email: "gina@gmail.com",
-        phone: "123-456-7890",
-        trainer_id: 123,
-        trainer_name: "Jane Smith",
-        // imageUrl: "https://movementfitnesshk.com/wp-content/uploads/2024/07/Gina-Lai.png",
-    };
+    const { userData, setUserData } = useUser(); // Use the context to set user data
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    {
+                        withCredentials: true, // Include cookies in the request
+                    }
+                );
+                setUserData(response.data); // Assuming setUserData updates the user data
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
 
+        fetchData();
+
+        setUserData(params); // Store the user data in Context API
+    }, [params, setUserData]);
+
+   
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
             <div className="text-center mt-4 flex flex-col gap-8 w-full">
                 <div className="flex flex-col gap-4 p-4 bg-white">
                     <div className="flex flex-row gap-4 items-center">
+
                         <div className="relative">
                             <Image
                                 src={userData?.imageUrl || ""}
@@ -84,7 +100,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                             href={tile.href(params)}
                             label={tile.label}
                             stat={tile.stat}
+
                             className="flex flex-col items-center justify-between gap-0 p-4 bg-white border-2 rounded-xl border-primary w-full h-32"
+
                         />
                     ))}
                 </div>
