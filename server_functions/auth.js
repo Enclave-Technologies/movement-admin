@@ -71,6 +71,7 @@ import {
 //     redirect("/");
 // }
 
+
 export async function login(state, formData) {
     console.log("1. LOGIN", formData);
     // 1. Validate fields
@@ -85,7 +86,7 @@ export async function login(state, formData) {
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("3. LOGGING IN", email);
+    console.log("3. LOGIN", email, password);
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {

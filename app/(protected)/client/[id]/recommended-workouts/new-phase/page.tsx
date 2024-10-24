@@ -4,7 +4,7 @@ import { useUser } from "@/context/ClientContext";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
+import BreadcrumbLoading from "@/components/BreadcrumbLoading";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -85,7 +85,9 @@ const Page = ({ params }: { params: { id: string } }) => {
         try {
             setIsLoading(true);
             if (!phase.id) {
-                const phaseId = await fetchPhaseId(phase.title);
+                //TODO: DB CONNECTION
+                // const phaseId = await fetchPhaseId(phase.title);
+                const phaseId = "newPhase123";
                 console.log(phaseId);
 
                 router.push(
@@ -104,7 +106,9 @@ const Page = ({ params }: { params: { id: string } }) => {
     };
 
     return pageLoading ? (
-        <div>Loading...</div>
+        <div>
+            <BreadcrumbLoading />
+        </div>
     ) : (
         <div>
             <Breadcrumb
@@ -127,18 +131,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                 className={`mt-2 mb-4 items-center justify-center px-4 py-2 rounded-lg transition ${
                     isLoading
                         ? "bg-gray-400"
-                        : "bg-green-600 text-white hover:bg-green-700"
+                        : "bg-green-500 text-white hover:bg-green-900"
                 }`}
             >
                 {isLoading ? "Adding Session..." : "+ Add Session"}
-            </button>
-            <p className="text-gray-600">
-                No Exercises added to this session yet.
-                <br />
-                Click on + Add Session to add a new session.
-            </p>
-            <button className="mt-4 px-4 py-2 items-center justify-center bg-green-700 text-gray-100 rounded-lg hover:bg-green-900 transition">
-                Back
             </button>
         </div>
     );

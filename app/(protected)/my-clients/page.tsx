@@ -5,7 +5,6 @@ import axios from "axios";
 import { getCurrentUser } from "@/server_functions/auth";
 import ClientsTable from "@/components/ClientsTable";
 
-
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function MyClients() {
@@ -70,6 +69,7 @@ export default function MyClients() {
                 clients={clients}
                 fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
+                pageTitle={"My Clients"}
             />
         </div>
     );

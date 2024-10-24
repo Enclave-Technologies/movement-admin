@@ -1,5 +1,6 @@
 import Image from "next/image";
 import React from "react";
+import { defaultProfileURL } from "@/configs/constants";
 
 const TrainerInfo = ({
     userDetails,
@@ -10,8 +11,7 @@ const TrainerInfo = ({
     loading: boolean;
     error: any;
 }) => {
-    const defaultImageURL =
-        "https://cloud.appwrite.io/v1/storage/buckets/670e9315002c28a700c7/files/default-profile-webp/view?project=66cf3c92001fdce0f67d&project=66cf3c92001fdce0f67d&mode=admin";
+    const defaultImageURL = defaultProfileURL;
     const trainer: trainerSidebarInfo = {
         name: `${userDetails?.firstName || "FirstName"} ${
             userDetails?.lastName || "LastName"

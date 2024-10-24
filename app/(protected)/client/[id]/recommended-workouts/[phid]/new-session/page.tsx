@@ -6,6 +6,8 @@ import { useUser } from "@/context/ClientContext";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import AddExerciseModal from "@/components/AddExerciseModal";
+import BreadcrumbLoading from "@/components/BreadcrumbLoading";
+import EditableRow from "@/components/EditableRow";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -13,16 +15,45 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
     const { userData, setUserData } = useUser();
     const [pageLoading, setPageLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [exerciseList, setExerciseList] = useState([]);
+    const [exerciseList, setExerciseList] = useState<SessionExercise[]>([]);
+    const [allWorkouts, setAllWorkouts] = useState<WorkoutData[]>([]);
+    const [isEditing, setIsEditing] = useState(false);
 
-    const handleModalOpen = () => {
-        setIsModalOpen(true);
+    const router = useRouter();
+
+    // const handleModalOpen = () => {
+    //     setIsModalOpen(true);
+    // };
+
+    // const handleModalClose = () => {
+    //     setIsModalOpen(false);
+    // };
+    const handleAddExercise = () => {
+        const firstWorkout = allWorkouts[0];
+        setExerciseList([
+            ...exerciseList,
+            {
+                exerciseOrder: exerciseList.length + 1,
+                motion: firstWorkout.Motion,
+                specificDescription: firstWorkout.SpecificDescription,
+                repsMin: firstWorkout.RecommendedRepsMin,
+                repsMax: firstWorkout.RecommendedRepsMax,
+                setsMin: firstWorkout.RecommendedSetsMin,
+                setsMax: firstWorkout.RecommendedSetsMax,
+                exercises: firstWorkout.id,
+                id: "",
+                sessions: "",
+                restMax: firstWorkout.RecommendedRestMax,
+                restMin: firstWorkout.RecommendedRestMin,
+                tempo: firstWorkout.Tempo,
+                TUT: firstWorkout.TUT,
+            },
+        ]);
+        setIsEditing(true);
     };
-
-    const handleModalClose = () => {
-        setIsModalOpen(false);
+    const handleBack = () => {
+        router.back();
     };
-
     const handleFormSubmit = (data: any) => {
         // Handle form submission, e.g., send data to API
         console.log("Submitted data:", data);
@@ -53,11 +84,28 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
             }
         };
 
+        const getAllExercises = async () => {
+            try {
+                // TODO: DB CONNECTION
+                const response = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/trainer/workouts`,
+
+                    { withCredentials: true }
+                );
+                const allExercises: WorkoutData[] = response.data;
+                setAllWorkouts(allExercises);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
         setPageLoading(true); // Set loading to true before fetching data
 
         if (!userData) {
             fetchData();
+            getAllExercises();
         } else {
+            getAllExercises();
             setPageLoading(false); // Set loading to false if userData is already available
         }
 
@@ -67,7 +115,9 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
     }, [params.id, setUserData, userData]);
 
     return pageLoading ? (
-        <div>Loading...</div>
+        <div>
+            <BreadcrumbLoading />
+        </div>
     ) : (
         <div>
             <Breadcrumb
@@ -91,64 +141,64 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
                 />
                 <div className="flex justify-between items-center">
                     <h2 className="text-xl font-semibold mb-2">Exercises</h2>
-                    <Link
-                        href="#"
-                        className="text-green-600 mb-4 inline-block"
-                        onClick={handleModalOpen}
-                    >
-                        + Add Exercise
-                    </Link>
                 </div>
 
-                {/* <div className="bg-green-600 text-white p-4">
-                    <div className="grid grid-cols-6 gap-2">
-                        <div>Order</div>
-                        <div>Motion</div>
-                        <div>Specific Description</div>
-                        <div>Reps MIN</div>
-                        <div>Reps Max</div>
-                        <div>Sets Max</div>
-                        <div>Sets MIN</div>
-                        <div>Action</div>
-                    </div>
-                </div> */}
-                <div className="bg-green-600 text-white p-4">
-                    <table className="w-full">
-                        <thead>
+                <div className=" p-4">
+                    <table className="w-full ">
+                        <thead className="bg-green-500 text-white">
                             <tr>
                                 <th>Order</th>
                                 <th>Motion</th>
                                 <th>Specific Description</th>
-                                <th>Reps MIN</th>
+                                <th>Reps Min</th>
                                 <th>Reps Max</th>
+                                <th>Sets Min</th>
                                 <th>Sets Max</th>
-                                <th>Sets MIN</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             {exerciseList.map((exercise, index) => (
-                                <tr key={index}>
-                                    <td>{exercise.order}</td>
-                                    <td>{exercise.motion}</td>
-                                    <td>{exercise.description}</td>
-                                    <td>{exercise.repsMin}</td>
-                                    <td>{exercise.repsMax}</td>
-                                    <td>{exercise.setsMax}</td>
-                                    <td>{exercise.setsMin}</td>
-                                    <td>{exercise.action}</td>
-                                </tr>
+                                <EditableRow
+                                    key={index}
+                                    rowData={exercise}
+                                    onSave={(editedData) => {
+                                        // Handle save logic
+                                        const updatedExerciseList = [
+                                            ...exerciseList,
+                                        ];
+                                        updatedExerciseList[index] = editedData;
+                                        setExerciseList(updatedExerciseList);
+                                    }}
+                                    isEditing={isEditing}
+                                    setIsEditing={setIsEditing}
+                                    allWorkouts={allWorkouts}
+                                />
                             ))}
                         </tbody>
                     </table>
                 </div>
-                <div className="text-center my-6">
-                    <p>No Exercises added to this session yet.</p>
-                    <p>Click on + Add Exercise to start adding exercises</p>
-                </div>
+                {exerciseList.length === 0 ? (
+                    <div className="text-center my-6">
+                        <p>No Exercises added to this session yet.</p>
+                        <p>Click on + Add Exercise to start adding exercises</p>
+                    </div>
+                ) : (
+                    <></>
+                )}
+
+                <Link
+                    href="#"
+                    className="text-green-500 mb-4 inline-block w-full 
+                    border-2 p-2 rounded-lg text-center"
+                    onClick={handleAddExercise}
+                >
+                    + Add Exercise
+                </Link>
                 <div className="flex justify-between w-full items-center">
                     <Link
                         href="#"
+                        onClick={handleBack}
                         className="bg-gray-500 text-white py-2 px-4 rounded inline-block hover:bg-gray-700"
                     >
                         Back
@@ -156,18 +206,18 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
 
                     <Link
                         href="#"
-                        className="bg-green-600 text-white py-2 px-4 rounded inline-block hover:bg-green-900"
+                        className="bg-green-500 text-white py-2 px-4 rounded inline-block hover:bg-green-900"
                     >
                         Save
                     </Link>
                 </div>
             </div>
 
-            <AddExerciseModal
+            {/* <AddExerciseModal
                 isOpen={isModalOpen}
                 onClose={handleModalClose}
                 onSubmit={handleFormSubmit}
-            />
+            /> */}
         </div>
     );
 };
