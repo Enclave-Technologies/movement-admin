@@ -15,7 +15,7 @@ export default function AllClients() {
 
     useEffect(() => {
         debouncedFetchData(lastId);
-    });
+    }, [lastId]);
 
     const debounce = (func: Function, wait: number) => {
         let timeout: NodeJS.Timeout;
@@ -34,7 +34,6 @@ export default function AllClients() {
         // const userId = current_user?.$id; // Extract the $id property
         const response = await axios.get(
             `${API_BASE_URL}/mvmt/v1/trainer/clients?lastId=${lastId}&limit=50`,
-
             {
                 withCredentials: true, // Include cookies in the request
             }

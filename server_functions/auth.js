@@ -125,11 +125,16 @@ export async function login(state, formData) {
 
         cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: "None",
             secure: true,
             expires: new Date(session.expire),
             path: "/",
+            domain: "enclave.live",
         });
+
+        // Retrieve and log the cookie
+        // const cookie = cookies().get(SESSION_COOKIE_NAME);
+        // console.log("Cookie set:", cookie);
 
         console.log("4. LOGIN");
     } catch (error) {
@@ -151,9 +156,19 @@ export async function login(state, formData) {
                 },
             };
         }
+        // Handle other errors
+        return {
+            success: false,
+            errors: {
+                email: [
+                    "An unexpected error occurred. Please try again later.",
+                ],
+                password: [
+                    "An unexpected error occurred. Please try again later.",
+                ],
+            },
+        };
     }
-
-    console.log("5. LOGIN redirecting");
 
     redirect("/");
 }
@@ -161,16 +176,48 @@ export async function login(state, formData) {
 export async function logout() {
     try {
         const sessionCookie = JSON.parse(
-            cookies().get(SESSION_COOKIE_NAME).value
+            cookies().get(SESSION_COOKIE_NAME)?.value
         );
-        const { account } = await createSessionClient(sessionCookie.session);
-        await account.deleteSession("current");
+        if (sessionCookie) {
+            const { account } = await createSessionClient(
+                sessionCookie.session
+            );
+            await account.deleteSession("current");
+        }
+
+        // Delete the session cookie with correct attributes
+        (await cookies()).delete({
+            name: SESSION_COOKIE_NAME,
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+            path: "/",
+            domain: "enclave.live",
+        });
+
+        console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
+
+        (await cookies()).getAll().map((cookie) => console.log(cookie));
+
+        // Redirect to the login page
+        redirect("/login");
     } catch (error) {
         console.log(error);
-    }
-    cookies().delete(SESSION_COOKIE_NAME);
 
-    redirect("/login");
+        // Handle errors by deleting the session cookie and redirecting
+        cookies().delete({
+            name: SESSION_COOKIE_NAME,
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+            path: "/",
+            domain: "enclave.live",
+        });
+
+        console.log(`Cookie ${SESSION_COOKIE_NAME} deleted after error`);
+
+        redirect("/login");
+    }
 }
 
 export async function getCurrentUser() {
@@ -195,7 +242,6 @@ export async function fetchUserDetails() {
     if (!cookies().has(SESSION_COOKIE_NAME)) {
         return null;
     }
-
     try {
         const sessionCookie = JSON.parse(
             cookies().get(SESSION_COOKIE_NAME).value

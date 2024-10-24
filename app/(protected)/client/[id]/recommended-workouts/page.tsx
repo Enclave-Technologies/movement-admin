@@ -55,7 +55,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
-
                     { withCredentials: true }
                 );
                 setUserData(response.data);

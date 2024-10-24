@@ -28,7 +28,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
-
                     { withCredentials: true }
                 );
                 if (isMounted) {
@@ -60,7 +59,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         try {
             const response = await axios.post(
                 "${API_BASE_URL}/mvmt/v1/client/phase",
-
                 { title, currentId: phase.id, userId: params.id },
                 {
                     headers: { "Content-Type": "application/json" },

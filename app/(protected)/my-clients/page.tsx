@@ -15,7 +15,7 @@ export default function MyClients() {
 
     useEffect(() => {
         debouncedFetchData(lastId);
-    });
+    }, [lastId]);
 
     const debounce = (func: Function, wait: number) => {
         let timeout: NodeJS.Timeout;
@@ -51,7 +51,6 @@ export default function MyClients() {
         if (newItems.length === 0 || newItems.length < 50) {
             setHasMore(false);
         }
-
         setIsFetching(false);
     };
     const debouncedFetchData = useCallback(debounce(fetchData, 300), [
