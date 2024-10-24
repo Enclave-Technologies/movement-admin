@@ -7,7 +7,6 @@ import ClientsTable from "@/components/ClientsTable";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-
 export default function MyClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
     const [lastId, setLastId] = useState(""); // State to hold the last ID of the fetched clients
@@ -16,7 +15,7 @@ export default function MyClients() {
 
     useEffect(() => {
         debouncedFetchData(lastId);
-    }, [lastId]);
+    });
 
     const debounce = (func: Function, wait: number) => {
         let timeout: NodeJS.Timeout;
@@ -71,6 +70,7 @@ export default function MyClients() {
                 clients={clients}
                 fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
+                pageTitle={"My Clients"}
             />
         </div>
     );
