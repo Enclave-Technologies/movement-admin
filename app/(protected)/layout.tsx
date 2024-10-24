@@ -14,7 +14,7 @@ export default function RootLayout({
                     <TrainerProvider>
                         <Sidebar />
                     </TrainerProvider>
-                    <main className="flex-1 bg-gray-100">{children}</main>
+                    <main className="flex-1 bg-white px-4">{children}</main>
                 </div>
             </div>
         </main>

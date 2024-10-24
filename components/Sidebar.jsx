@@ -82,18 +82,20 @@ const Sidebar = () => {
                     <div className="w-16 h-40"></div>
                 )}
 
-                <nav className="flex-grow space-y-4 p-4">
+                <nav className="flex flex-col space-y-2 p-2 gap-[2px]">
                     {sidebarItems.map((item) => {
                         const isItemActive = pathname === item.href;
                         const className = isItemActive
                             ? "bg-white text-primary"
-                            : "text-white hover:bg-gray-700 transition-colors";
+                            : "text-white hover:bg-gold-500 transition-colors";
 
                         return (
                             <Link href={item.href} key={item.label}>
                                 <div
                                     className={`flex items-center ${
-                                        isCollapsed ? "px-1 pb-3" : "p-3"
+                                        isCollapsed
+                                            ? "justify-center h-12 w-12"
+                                            : "justify-start p-3"
                                     } rounded-md cursor-pointer ${className}`}
                                 >
                                     <item.icon className="w-6 h-6" />
@@ -110,7 +112,11 @@ const Sidebar = () => {
                 <div className={`${isCollapsed ? "p-2" : "p-3"}`}>
                     <button
                         type="submit"
-                        className="w-full py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                        className="w-full py-2 border border-transparent 
+                        rounded-md shadow-sm text-sm font-medium text-white
+                         bg-gold-500 hover:bg-green-500 hover:border-gold-500 
+                         focus:outline-none focus:ring-2 focus:ring-offset-2
+                          focus:ring-gold-500 transform hover:-translate-y-0.5"
                         disabled={loadingLogout}
                         onClick={handleLogout}
                     >
@@ -123,7 +129,7 @@ const Sidebar = () => {
                             </div>
                         ) : (
                             <div
-                                className={`flex items-center px-3 ${
+                                className={`flex items-center px-3 hover:underline ${
                                     isCollapsed ? "gap-0" : "gap-2"
                                 }`}
                             >
