@@ -103,3 +103,23 @@ interface AddExerciseModalProps {
     onClose: () => void;
     onSubmit: (data: any) => void; // Adjust the type of 'data' as needed
 }
+
+interface TrainerDetails {
+    auth_id: string;
+    firstName: string;
+    lastName: string;
+    imageURL: string | null;
+    jobTitle: string;
+    $id: string;
+    $createdAt: string;
+    $updatedAt: string;
+    $permissions: string[];
+    $databaseId: string;
+    $collectionId: string;
+}
+
+interface trainerSidebarInfo {
+    name: string;
+    image: string;
+    description: string;
+}
