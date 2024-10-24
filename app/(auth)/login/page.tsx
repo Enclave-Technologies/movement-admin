@@ -5,6 +5,7 @@ import SignupButton from "@/components/ResponsiveButton";
 import { login } from "@/server_functions/auth";
 import { useFormState } from "react-dom";
 import Image from "next/image";
+import Link from "next/link";
 
 const Page = () => {
     const [state, action] = useFormState(login, undefined);
