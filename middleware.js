@@ -42,6 +42,7 @@ export async function middleware(request) {
             console.log("CONSOLE LOG MIDDLEWARE", error.type);
         }
     }
+
 }
 
 // Configuration object for the middleware

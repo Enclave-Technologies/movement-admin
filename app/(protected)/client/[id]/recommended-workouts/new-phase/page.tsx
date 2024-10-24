@@ -5,8 +5,13 @@ import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, setUserData } = useUser();
+
+
     const router = useRouter();
     const page_title = ["Training Program", "Untitled Phase"];
     const [phase, setPhase] = useState({
@@ -23,7 +28,8 @@ const Page = ({ params }: { params: { id: string } }) => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+
                     { withCredentials: true }
                 );
                 if (isMounted) {
@@ -54,7 +60,8 @@ const Page = ({ params }: { params: { id: string } }) => {
     const fetchPhaseId = async (title: string) => {
         try {
             const response = await axios.post(
-                "http://127.0.0.1:8000/mvmt/v1/client/phase",
+                "${API_BASE_URL}/mvmt/v1/client/phase",
+
                 { title, currentId: phase.id, userId: params.id },
                 {
                     headers: { "Content-Type": "application/json" },
@@ -62,6 +69,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 }
             );
             setPhase((prev) => ({ ...prev, id: response.data.phaseId }));
+
             return response.data.phaseId;
         } catch (error) {
             console.error("Error fetching phaseId:", error);
@@ -74,12 +82,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             title: e.target.value,
             unchangedInput: false,
         }));
-    };
-
-    const handleTitleBlur = () => {
-        if (!phase.unchangedInput) {
-            fetchPhaseId(phase.title);
-        }
     };
 
     const addSession = async () => {
@@ -118,16 +120,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                 type="text"
                 value={phase.title}
                 onChange={handleTitleChange}
-                // onBlur={handleTitleBlur}
                 placeholder="Phase 1"
                 className="mt-2 p-2 border border-gray-300 rounded-lg w-full"
             />
             <h3 className="text-lg font-semibold mt-4">Sessions</h3>
             <button
-                onClick={async () => {
-                    await addSession();
-                }}
-                type="submit"
+                onClick={addSession}
                 disabled={isLoading}
                 className={`mt-2 mb-4 items-center justify-center px-4 py-2 rounded-lg transition ${
                     isLoading
@@ -142,6 +140,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <br />
                 Click on + Add Session to add a new session.
             </p>
+
             <button className="mt-4 px-4 py-2 items-center justify-center bg-green-500 text-gray-100 rounded-lg hover:bg-green-900 transition">
                 Back
             </button>

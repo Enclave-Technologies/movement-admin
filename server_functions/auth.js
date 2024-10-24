@@ -15,56 +15,62 @@ import {
     LoginFormSchema,
 } from "@/server_functions/formSchemas";
 
-export async function register(state, formData) {
-    // 1. Validate fields
-    const validatedResult = RegisterFormSchema.safeParse({
-        username: formData.get("username"),
-        email: formData.get("email"),
-        password: formData.get("password"),
-        confirmPassword: formData.get("confirm-password"),
-    });
-    if (!validatedResult.success) {
-        // Handle validation errors
-        const errors = validatedResult.error.formErrors.fieldErrors;
-        return { success: false, errors };
-    }
-    const { username, email, password } = validatedResult.data;
+// export async function register(state, formData) {
+//     // 1. Validate fields
+//     const validatedResult = RegisterFormSchema.safeParse({
+//         username: formData.get("username"),
+//         email: formData.get("email"),
+//         password: formData.get("password"),
+//         confirmPassword: formData.get("confirm-password"),
+//     });
+//     if (!validatedResult.success) {
+//         // Handle validation errors
+//         const errors = validatedResult.error.formErrors.fieldErrors;
+//         return { success: false, errors };
+//     }
+//     const { username, email, password } = validatedResult.data;
 
-    // 2. Try creating with details
-    const { account } = await createAdminClient();
-    try {
-        await account.create(ID.unique(), email, password, username);
-    } catch (error) {
-        if (
-            error instanceof AppwriteException &&
-            error.code === 409 &&
-            error.type === "user_already_exists"
-        ) {
-            return {
-                success: false,
-                errors: { email: ["Email already exists, please login"] },
-            };
-        }
-    }
+//     // 2. Try creating with details
+//     const { account } = await createAdminClient();
+//     try {
+//         await account.create(ID.unique(), email, password, username);
+//     } catch (error) {
+//         if (
+//             error instanceof AppwriteException &&
+//             error.code === 409 &&
+//             error.type === "user_already_exists"
+//         ) {
+//             return {
+//                 success: false,
+//                 errors: { email: ["Email already exists, please login"] },
+//             };
+//         }
+//     }
 
-    // 3. If successful in creating account, then login
-    try {
-        const session = await account.createEmailPasswordSession(
-            email,
-            password
-        );
-        cookies().set(SESSION_COOKIE_NAME, session.secret, {
-            httpOnly: true,
-            sameSite: "strict",
-            secure: true,
-            expires: new Date(session.expire),
-            path: "/",
-        });
-    } catch (error) {
-        console.error(error);
-    }
-    redirect("/");
-}
+//     // 3. If successful in creating account, then login
+//     try {
+//         const session = await account.createEmailPasswordSession(
+//             email,
+//             password
+//         );
+//         cookies().set(SESSION_COOKIE_NAME, session.secret, {
+//             httpOnly: true,
+//             sameSite: "None",
+//             secure: true,
+//             expires: new Date(session.expire),
+//             path: "/",
+//             domain: "enclave.live",
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         return {
+//             success: false,
+//             errors: { email: ["An error occurred. Please try again."] },
+//         };
+//     }
+//     redirect("/");
+// }
+
 
 export async function login(state, formData) {
     console.log("1. LOGIN", formData);
@@ -177,6 +183,35 @@ export async function getCurrentUser() {
         );
         const { account } = await createSessionClient(sessionCookie.session);
         return account.get();
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+
+    return null;
+}
+
+export async function fetchUserDetails() {
+    if (!cookies().has(SESSION_COOKIE_NAME)) {
+        return null;
+    }
+
+    try {
+        const sessionCookie = JSON.parse(
+            cookies().get(SESSION_COOKIE_NAME).value
+        );
+        const { account, database } = await createSessionClient(
+            sessionCookie.session
+        );
+        const accDetails = await account.get();
+
+        const fullDetails = await database.getDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
+            accDetails.$id
+        );
+        console.log(fullDetails);
+        return fullDetails;
     } catch (error) {
         console.log(error);
         return null;

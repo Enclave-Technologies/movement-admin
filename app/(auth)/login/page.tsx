@@ -64,18 +64,26 @@ const Page = () => {
                     <SignupButton label="Login" />
                 </form>
                 <div className="mt-4 flex justify-between items-center">
-                    <div className="text-sm text-gray-600">
+                    <div className="flex-1 text-sm text-gray-600">
                         Don&apos;t have an account?{" "}
                         <span className="text-gold-500 hover:underline cursor-pointer">
                             Register through Admin
                         </span>
                     </div>
-                    <a
-                        href="/forgot-password"
-                        className="text-sm text-gold-500 hover:underline"
-                    >
-                        Forgot Password?
-                    </a>
+                    <div className="flex-1 text-right">
+                        {/* <a
+                            href="/forgot-password"
+                            className="text-sm text-blue-500 hover:underline"
+                        >
+                            Forgot Password?
+                        </a> */}
+                        <Link
+                            href="/forgot-password"
+                            className="text-sm text-gold-500 hover:underline"
+                        >
+                            Forgot Password?
+                        </Link>
+                    </div>
                 </div>
             </div>
         </div>

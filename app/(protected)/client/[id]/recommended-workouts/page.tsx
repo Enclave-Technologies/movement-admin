@@ -8,6 +8,9 @@ import BreadcrumbLoading from "@/components/BreadcrumbLoading";
 import { set } from "zod";
 import Link from "next/link";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
     const { userData, setUserData } = useUser();
@@ -33,7 +36,8 @@ const Page = ({ params }: { params: { id: string } }) => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+
                     { withCredentials: true }
                 );
                 setUserData(response.data);
@@ -45,7 +49,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         const performOtherAsyncOperations = async () => {
             try {
                 const response = await axios.get(
-                    `http://127.0.0.1:8000/mvmt/v1/client/phases?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${params.id}`,
                     { withCredentials: true }
                 );
                 const allPhaseData = response.data;
@@ -70,14 +74,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                     // Exercise list should also be empty
                     exerciseListData = [];
                 } else {
-                    // Otherwise, map the phases to dropdown options
-                    // phaseDropdownData = phaseData.phases.map(
-                    //     (phase: Phase) => ({
-                    //         value: phase.id,
-                    //         label: phase.phaseName,
-                    //         isActive: phase.isActive,
-                    //     })
-                    // );
                     phaseDropdownData = mapPhasesToDropdownOptions(
                         allPhaseData.phases
                     );
@@ -105,14 +101,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                         secondDropdownData = mapSessionsToDropdownOptions(
                             allPhaseData.phases
                         );
-                        // phaseData.phases.flatMap(
-                        //     (phase: Phase) =>
-                        //         phase.sessions.map((session: MovSession) => ({
-                        //             value: session.id,
-                        //             label: session.sessionName,
-                        //             // isActive: true, // Assuming sessions are always active
-                        //         }))
-                        // );
                         // Check if any exercises exist within the sessions
                         const hasExercises = allPhaseData.phases.some(
                             (phase: Phase) =>
@@ -131,13 +119,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 allPhaseData.phases
                             );
 
-                            // phaseData.phases.flatMap(
-                            //     (phase: Phase) =>
-                            //         phase.sessions.flatMap(
-                            //             (session: MovSession) =>
-                            //                 session.exercises
-                            //         )
-                            // );
                         }
                     }
                 }
@@ -186,7 +167,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         setSelectedPhaseId(selectedPhase.id);
         setSelectedPhaseTitle(selectedPhase.phaseName);
 
-        // console.log(">>>", selectedPhase.id, selectedPhase.phaseName);
 
         if (selectedPhase.sessions.length === 0) {
             setSecondDropdownOptions([
@@ -412,12 +392,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
+
                 + Add Session
             </button>
             <button
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
+
                 + Add Phase
             </button>
         </div>
