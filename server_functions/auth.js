@@ -236,3 +236,31 @@ export async function getCurrentUser() {
 
     return null;
 }
+
+export async function fetchUserDetails() {
+    if (!cookies().has(SESSION_COOKIE_NAME)) {
+        return null;
+    }
+    try {
+        const sessionCookie = JSON.parse(
+            cookies().get(SESSION_COOKIE_NAME).value
+        );
+        const { account, database } = await createSessionClient(
+            sessionCookie.session
+        );
+        const accDetails = await account.get();
+
+        const fullDetails = await database.getDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
+            accDetails.$id
+        );
+        console.log(fullDetails);
+        return fullDetails;
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+
+    return null;
+}
