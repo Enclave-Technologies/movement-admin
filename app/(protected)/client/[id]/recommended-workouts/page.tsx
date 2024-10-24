@@ -7,9 +7,10 @@ import axios from "axios";
 import BreadcrumbLoading from "@/components/BreadcrumbLoading";
 import { set } from "zod";
 import Link from "next/link";
+import { IoChevronForwardOutline } from "react-icons/io5";
+import CustomSelect from "@/components/CustomSelect";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 
 const Page = ({ params }: { params: { id: string } }) => {
     const router = useRouter();
@@ -20,16 +21,27 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     const [firstDropdownOptions, setFirstDropdownOptions] = useState<
         PhaseDropdownOption[]
-    >([]);
+    >([
+        { value: "phase1", label: "Phase 1", isActive: true },
+        { value: "phase2", label: "Phase 2", isActive: false },
+    ]);
     const [secondDropdownOptions, setSecondDropdownOptions] = useState<
         MovSessionDropdownOption[]
-    >([]);
+    >([
+        { value: "upper1", label: "Session 1: Upper Body" },
+        { value: "lower1", label: "Session 2: Lower Body" },
+    ]);
     const [exerciseList, setExerciseList] = useState<SessionExercise[]>([]);
     const [selectedPhaseId, setSelectedPhaseId] = useState<string | null>(null);
     const [selectedPhaseTitle, setSelectedPhaseTitle] = useState<string | null>(
         null
     );
     const [phaseData, setPhaseData] = useState<Phase[]>([]);
+    const [defaultSelectedOption, setDefaultSelectedOption] =
+        useState<PhaseDropdownOption | null>(
+            firstDropdownOptions.find((phase) => phase.isActive) ||
+                firstDropdownOptions[0]
+        );
 
     // Example useEffect to load data for dropdowns and table
     useEffect(() => {
@@ -118,7 +130,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                             exerciseListData = mapExercisesToList(
                                 allPhaseData.phases
                             );
-
                         }
                     }
                 }
@@ -137,7 +148,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             if (!userData) {
                 await fetchData();
             }
-            await performOtherAsyncOperations();
+            // await performOtherAsyncOperations();
             setPageLoading(false);
         };
 
@@ -155,6 +166,11 @@ const Page = ({ params }: { params: { id: string } }) => {
     };
 
     const handlePhaseChange = (selectedPhaseId: string) => {
+        alert(selectedPhaseId);
+        const selectedPhaseOption = firstDropdownOptions.find(
+            (phase: PhaseDropdownOption) => phase.value === selectedPhaseId
+        );
+        setDefaultSelectedOption(selectedPhaseOption || null);
         const selectedPhase = phaseData.find(
             (phase: Phase) => phase.id === selectedPhaseId
         );
@@ -166,7 +182,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         }
         setSelectedPhaseId(selectedPhase.id);
         setSelectedPhaseTitle(selectedPhase.phaseName);
-
 
         if (selectedPhase.sessions.length === 0) {
             setSecondDropdownOptions([
@@ -220,7 +235,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <div className="border rounded p-2 w-1/4 animate-pulse bg-gray-300">
                     <div className="h-4 bg-gray-400 rounded"></div>
                 </div>
-                <span className="text-gray-500">&gt;</span>
+                <span className="text-gray-500">
+                    <IoChevronForwardOutline className="text-lg" />
+                </span>
                 <div className="border rounded p-2 w-1/4 animate-pulse bg-gray-300">
                     <div className="h-4 bg-gray-400 rounded"></div>
                 </div>
@@ -247,20 +264,16 @@ const Page = ({ params }: { params: { id: string } }) => {
                 customTexts={page_title}
             />
 
-            <div className="flex flex-col space-y-4">
+            <div className="flex flex-col space-y-4 mt-2">
                 <div className="flex items-center">
                     <div className="flex flex-col w-1/4">
-                        <select
-                            className="border rounded p-2"
-                            onChange={(e) => handlePhaseChange(e.target.value)}
-                        >
-                            {firstDropdownOptions.map((option) => (
-                                <option key={option.value} value={option.value}>
-                                    {option.label}
-                                </option>
-                            ))}
-                        </select>
-                        <div className="flex items-center justify-center mt-2">
+                        <CustomSelect
+                            options={firstDropdownOptions}
+                            onChange={handlePhaseChange}
+                            selectedOption={defaultSelectedOption}
+                        />
+
+                        <div className="flex items-center justify-start mt-2">
                             {phaseData.length === 0 ? (
                                 <Link
                                     href="#"
@@ -278,8 +291,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                             )}
                         </div>
                     </div>
-                    <span className="text-gray-500 mx-4 self-start py-2">
-                        &gt;
+                    <span className="text-gray-500 mx-4 self-start py-5">
+                        <IoChevronForwardOutline className="text-lg" />
                     </span>{" "}
                     {/* margin added for spacing */}
                     <div className="flex flex-col w-1/4">
@@ -290,30 +303,35 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 </option>
                             ))}
                         </select>
-                        <div className="flex items-center justify-center space-x-2 mt-2">
-                            <Link
-                                href={
-                                    selectedPhaseId
-                                        ? `/client/${
-                                              params.id
-                                          }/recommended-workouts/${selectedPhaseId}/new-session?phaseTitle=${encodeURIComponent(
-                                              selectedPhaseTitle || ""
-                                          )}&phaseId=${encodeURIComponent(
-                                              selectedPhaseId
-                                          )}`
-                                        : "#"
-                                }
-                                className="text-blue-500 hover:underline"
-                            >
-                                Add Session
-                            </Link>
-                            <Link
-                                href="#"
-                                className="text-blue-500 hover:underline"
-                            >
-                                Edit Session
-                            </Link>
-                        </div>
+
+                        {phaseData.length === 0 ? (
+                            <div className="h-8"></div>
+                        ) : (
+                            <div className="flex items-center justify-between space-x-2 mt-2">
+                                <Link
+                                    href={
+                                        selectedPhaseId
+                                            ? `/client/${
+                                                  params.id
+                                              }/recommended-workouts/${selectedPhaseId}/new-session?phaseTitle=${encodeURIComponent(
+                                                  selectedPhaseTitle || ""
+                                              )}&phaseId=${encodeURIComponent(
+                                                  selectedPhaseId
+                                              )}`
+                                            : "#"
+                                    }
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    Add Session
+                                </Link>
+                                <Link
+                                    href="#"
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    Edit Session
+                                </Link>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -392,14 +410,12 @@ const Page = ({ params }: { params: { id: string } }) => {
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
-
                 + Add Session
             </button>
             <button
                 onClick={handleAddPhase}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
-
                 + Add Phase
             </button>
         </div>

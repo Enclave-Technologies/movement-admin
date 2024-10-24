@@ -52,7 +52,6 @@ interface SessionExercise {
     exerciseOrder: number;
     motion: string;
     specificDescription: string;
-
 }
 
 // Define the interface for a movement session
@@ -88,6 +87,11 @@ interface PhaseDropdownOption {
     isActive: boolean;
 }
 
+interface CustomSelectProps {
+    options: PhaseDropdownOption[];
+    onChange: (value: string) => void;
+    selectedOption: PhaseDropdownOption;
+}
 interface MovSessionDropdownOption {
     value: string;
     label: string;
@@ -124,4 +128,3 @@ interface trainerSidebarInfo {
     image: string;
     description: string;
 }
-
