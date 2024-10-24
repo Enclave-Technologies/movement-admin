@@ -39,7 +39,7 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore }) => {
                 >
                     <table className="text-left">
                         <tbody>
-                            <tr className="gap-3 bg-green-800 text-white">
+                            <tr className="gap-3 bg-green-500 text-white">
                                 <th className="font-normal min-w-200 pl-5 h-12">
                                     Client Name
                                 </th>

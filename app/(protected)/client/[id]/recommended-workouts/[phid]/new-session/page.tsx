@@ -91,26 +91,14 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
                     <h2 className="text-xl font-semibold mb-2">Exercises</h2>
                     <Link
                         href="#"
-                        className="text-green-600 mb-4 inline-block"
+                        className="text-green-500 mb-4 inline-block"
                         onClick={handleModalOpen}
                     >
                         + Add Exercise
                     </Link>
                 </div>
 
-                {/* <div className="bg-green-600 text-white p-4">
-                    <div className="grid grid-cols-6 gap-2">
-                        <div>Order</div>
-                        <div>Motion</div>
-                        <div>Specific Description</div>
-                        <div>Reps MIN</div>
-                        <div>Reps Max</div>
-                        <div>Sets Max</div>
-                        <div>Sets MIN</div>
-                        <div>Action</div>
-                    </div>
-                </div> */}
-                <div className="bg-green-600 text-white p-4">
+                <div className="bg-green-500 text-white p-4">
                     <table className="w-full">
                         <thead>
                             <tr>
@@ -154,7 +142,7 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
 
                     <Link
                         href="#"
-                        className="bg-green-600 text-white py-2 px-4 rounded inline-block hover:bg-green-900"
+                        className="bg-green-500 text-white py-2 px-4 rounded inline-block hover:bg-green-900"
                     >
                         Save
                     </Link>

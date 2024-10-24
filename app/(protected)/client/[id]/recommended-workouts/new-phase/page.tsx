@@ -132,7 +132,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 className={`mt-2 mb-4 items-center justify-center px-4 py-2 rounded-lg transition ${
                     isLoading
                         ? "bg-gray-400"
-                        : "bg-green-600 text-white hover:bg-green-700"
+                        : "bg-green-500 text-white hover:bg-green-900"
                 }`}
             >
                 {isLoading ? "Adding Session..." : "+ Add Session"}
@@ -142,7 +142,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <br />
                 Click on + Add Session to add a new session.
             </p>
-            <button className="mt-4 px-4 py-2 items-center justify-center bg-green-700 text-gray-100 rounded-lg hover:bg-green-900 transition">
+            <button className="mt-4 px-4 py-2 items-center justify-center bg-green-500 text-gray-100 rounded-lg hover:bg-green-900 transition">
                 Back
             </button>
         </div>

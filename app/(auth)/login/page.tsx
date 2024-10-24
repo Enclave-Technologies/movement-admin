@@ -4,19 +4,24 @@ import React from "react";
 import SignupButton from "@/components/ResponsiveButton";
 import { login } from "@/server_functions/auth";
 import { useFormState } from "react-dom";
+import Image from "next/image";
 
 const Page = () => {
-    const loading = false;
-
     const [state, action] = useFormState(login, undefined);
     console.log(state);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-            <div className="w-full max-w-md p-6 bg-white shadow-lg rounded-lg">
-                <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-                    Sign In
-                </h1>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-green-500">
+            <div className="w-full max-w-md p-6 bg-gray-50 shadow-lg rounded-lg">
+                <div className="flex justify-center items-center w-full">
+                    <Image
+                        src={"Logo-movement.svg"}
+                        alt="Login"
+                        width={48}
+                        height={16}
+                        className="w-52"
+                    />
+                </div>
                 <form className="space-y-4" action={action}>
                     <div>
                         <label
@@ -61,13 +66,13 @@ const Page = () => {
                 <div className="mt-4 flex justify-between items-center">
                     <div className="text-sm text-gray-600">
                         Don&apos;t have an account?{" "}
-                        <span className="text-blue-500 hover:underline cursor-pointer">
+                        <span className="text-gold-500 hover:underline cursor-pointer">
                             Register through Admin
                         </span>
                     </div>
                     <a
                         href="/forgot-password"
-                        className="text-sm text-blue-500 hover:underline"
+                        className="text-sm text-gold-500 hover:underline"
                     >
                         Forgot Password?
                     </a>

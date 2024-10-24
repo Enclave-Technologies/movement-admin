@@ -7,9 +7,6 @@ export default function RootLayout({
 }>) {
     return (
         <main>
-            <h1 className="flex items-center justify-center text-lg bg-green-700 text-white">
-                Auth pages
-            </h1>
             <div>{children}</div>
         </main>
     );
