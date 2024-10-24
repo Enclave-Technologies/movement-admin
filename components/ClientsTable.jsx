@@ -10,8 +10,8 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
         return clients.filter((client) => {
             return (
                 client.name.toLowerCase().includes(search.toLowerCase()) ||
-                client.email.toLowerCase().includes(search.toLowerCase()) ||
-                client.phone.toLowerCase().includes(search.toLowerCase())
+                client.email?.toLowerCase().includes(search.toLowerCase()) ||
+                client.phone?.toLowerCase().includes(search.toLowerCase())
             );
         });
     }, [clients, search]);
