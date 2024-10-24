@@ -23,7 +23,7 @@ const Navbar = () => {
   return (
     <nav className="fixed top-0 left-0 w-full bg-white bg-opacity-100 shadow-md z-50">
       <div className="flex justify-between items-center p-4">
-        <div className="text-xl font-bold text-green-700 hover:text-green-900">
+        <div className="text-xl font-bold text-green-500 hover:text-green-900">
           {/* Placeholder for logo */}
           <Link href="/">
             <span>Logo</span>
@@ -32,7 +32,7 @@ const Navbar = () => {
         <div className="flex space-x-4">
           <button
             type="submit"
-            className="w-48 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+            className="w-48 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
             disabled={loading}
             onClick={handleLogout}
           >

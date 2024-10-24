@@ -69,14 +69,16 @@ const Page = () => {
                 <h5 className="font-bold">Next Workout</h5>
             </div>
             <br />
-            <div className="border rounded-lg p-2 mb-5 border-green-700">
+
+            <div className="border rounded-lg p-2 mb-5 border-green-500">
                 <div className="flex justify-between items-center bg-gray-50 p-2">
                     <ul className="text-left">
                         <li>PHASE 3</li>
                         <li>SESSION : UPPER BODY</li>
                     </ul>
                     <Link href="/workout-tracker/create-workout">
-                        <button className="px-4 py-2 text-white rounded-2xl bg-green-700">
+                        <button className="px-4 py-2 text-white rounded-2xl bg-green-500">
+
                             START WORKOUT
                         </button>
                     </Link>
@@ -86,7 +88,8 @@ const Page = () => {
                 <h3 className="font-bold mb-2">Workout History</h3>
                 <table className="w-full border-collapse">
                     <thead>
-                        <tr className="bg-green-700">
+
+                        <tr className="bg-green-500">
                             <th className="border p-2 text-white text-center">
                                 Date
                             </th>

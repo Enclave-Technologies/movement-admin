@@ -37,6 +37,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+
                     { withCredentials: true }
                 );
                 setUserData(response.data);
@@ -73,7 +74,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                     // Exercise list should also be empty
                     exerciseListData = [];
                 } else {
-                  
                     phaseDropdownData = mapPhasesToDropdownOptions(
                         allPhaseData.phases
                     );
@@ -101,7 +101,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                         secondDropdownData = mapSessionsToDropdownOptions(
                             allPhaseData.phases
                         );
-                      
                         // Check if any exercises exist within the sessions
                         const hasExercises = allPhaseData.phases.some(
                             (phase: Phase) =>
@@ -210,7 +209,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
     };
 
-
     const handleAddPhase = () => {
         router.push(`/client/${id}/recommended-workouts/new-phase`);
     };
@@ -249,7 +247,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                 customTexts={page_title}
             />
 
-        
             <div className="flex flex-col space-y-4">
                 <div className="flex items-center">
                     <div className="flex flex-col w-1/4">
@@ -410,4 +407,3 @@ const Page = ({ params }: { params: { id: string } }) => {
 };
 
 export default Page;
-

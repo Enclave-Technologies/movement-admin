@@ -33,7 +33,9 @@ const LinkTileData = [
         stat: "Last Updated: " + new Date().toLocaleDateString(),
     },
 ];
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, setUserData } = useUser(); // Use the context to set user data
@@ -42,6 +44,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+
                     {
                         withCredentials: true, // Include cookies in the request
                     }
@@ -57,6 +60,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         setUserData(params); // Store the user data in Context API
     }, [params, setUserData]);
 
+  
     return (
         <main className="flex flex-col min-h-screen items-center justify-between p-8 bg-white text-black w-full">
             <div className="text-center mt-4 flex flex-col gap-8 w-full">
@@ -65,7 +69,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         <div className="relative">
                             <Image
                                 src={userData?.imageUrl || ""}
-                                unoptimized
+                                // unoptimized
                                 height={80}
                                 width={80}
                                 alt={`${userData?.name} image`}
@@ -101,7 +105,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                             href={tile.href(params)}
                             label={tile.label}
                             stat={tile.stat}
-                            className="flex flex-col items-center justify-between gap-0 p-4 bg-white border-2 rounded-xl border-primary w-full h-32"
+                            className="flex flex-col items-center 
+                            justify-between gap-0 p-4 bg-white border-2 
+                            rounded-xl border-primary w-full h-32"
                         />
                     ))}
                 </div>

@@ -4,7 +4,9 @@ import { useUser } from "@/context/ClientContext";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
+
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 
 const Page = ({ params }: { params: { id: string; phid: string } }) => {
     const { userData, setUserData } = useUser();
@@ -18,6 +20,7 @@ const Page = ({ params }: { params: { id: string; phid: string } }) => {
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+
                     { withCredentials: true }
                 );
                 if (isMounted) {

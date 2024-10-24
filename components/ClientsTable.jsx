@@ -5,7 +5,7 @@ import React, { useState, useMemo } from "react";
 
 const ClientsTable = ({ clients, fetchMoreData, hasMore }) => {
     const [search, setSearch] = useState("");
-  
+
     const filteredClients = useMemo(() => {
         return clients.filter((client) => {
             return client.name.toLowerCase().includes(search.toLowerCase());
@@ -38,7 +38,7 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore }) => {
             >
                 <table className="text-left w-full h-full">
                     <thead>
-                        <tr className="gap-10 bg-green-800 text-white">
+                        <tr className="gap-10 bg-green-500 text-white">
                             <th className="font-normal min-w-200 pl-5 pr-4 h-12">Client Name</th>
                             <th className="font-normal min-w-200 pr-4 ">Email</th>
                             <th className="font-normal min-w-200 pr-4">Phone Number</th>

@@ -52,6 +52,7 @@ interface SessionExercise {
     exerciseOrder: number;
     motion: string;
     specificDescription: string;
+
 }
 
 // Define the interface for a movement session
@@ -123,3 +124,4 @@ interface trainerSidebarInfo {
     image: string;
     description: string;
 }
+

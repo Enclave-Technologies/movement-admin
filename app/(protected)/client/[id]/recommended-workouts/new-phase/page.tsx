@@ -11,6 +11,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, setUserData } = useUser();
 
+
     const router = useRouter();
     const page_title = ["Training Program", "Untitled Phase"];
     const [phase, setPhase] = useState({
@@ -28,6 +29,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+
                     { withCredentials: true }
                 );
                 if (isMounted) {
@@ -59,6 +61,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         try {
             const response = await axios.post(
                 "${API_BASE_URL}/mvmt/v1/client/phase",
+
                 { title, currentId: phase.id, userId: params.id },
                 {
                     headers: { "Content-Type": "application/json" },
@@ -127,7 +130,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 className={`mt-2 mb-4 items-center justify-center px-4 py-2 rounded-lg transition ${
                     isLoading
                         ? "bg-gray-400"
-                        : "bg-green-600 text-white hover:bg-green-700"
+                        : "bg-green-500 text-white hover:bg-green-900"
                 }`}
             >
                 {isLoading ? "Adding Session..." : "+ Add Session"}
@@ -137,7 +140,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                 <br />
                 Click on + Add Session to add a new session.
             </p>
-            <button className="mt-4 px-4 py-2 items-center justify-center bg-green-700 text-gray-100 rounded-lg hover:bg-green-900 transition">
+
+            <button className="mt-4 px-4 py-2 items-center justify-center bg-green-500 text-gray-100 rounded-lg hover:bg-green-900 transition">
                 Back
             </button>
         </div>

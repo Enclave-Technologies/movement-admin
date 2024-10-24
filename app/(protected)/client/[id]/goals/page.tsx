@@ -88,6 +88,7 @@ export default function Page() {
         onAddGoal={addGoal}
       />
 
+
       <div className="flex flex-col w-full gap-8">
         {goals.map((goal, i) => (
           <div key={i} className="flex flex-col w-full items-start gap-4">
