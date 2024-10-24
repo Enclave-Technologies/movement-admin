@@ -18,12 +18,13 @@ export async function middleware(request) {
         !request.nextUrl.pathname.startsWith("/forgot-password")
     ) {
         console.log("Trying to redirect to /login");
-        request.cookies.delete(SESSION_COOKIE_NAME,{
+        request.cookies.delete({
+            name: SESSION_COOKIE_NAME,
             httpOnly: true,
             sameSite: "None",
             secure: true,
             path: "/",
-            domain: "enclave.live",
+            // domain: "enclave.live",
         });
         return NextResponse.redirect(new URL("/login", request.url));
     }
