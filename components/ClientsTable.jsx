@@ -69,7 +69,8 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                         <tbody className="border-t-2 border-white">
                             {filteredClients.map((client, index) => (
                                 <tr
-                                    key={client.$id}
+                                    // key={client.$id}
+                                    key={index}
                                     className={`${
                                         index % 2 ? "bg-gray-50" : "bg-gray-200"
                                     } h-12`}
