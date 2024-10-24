@@ -54,6 +54,31 @@ interface SessionExercise {
     specificDescription: string;
 }
 
+interface WorkoutData {
+    id: string;
+    Motion: string;
+    SpecificDescription: string;
+    RecommendedRepsMin: number;
+    RecommendedRepsMax: number;
+    RecommendedSetsMin: number;
+    RecommendedSetsMax: number;
+    Tempo: string;
+    TUT: number;
+    RecommendedRestMin: number;
+    RecommendedRestMax: number;
+    ShortDescription: string;
+    videoURL: string;
+    approved: boolean;
+}
+
+interface EditableRowProps {
+    rowData: SessionExercise;
+    onSave: (editedData: SessionExercise) => void;
+    isEditing: boolean;
+    setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+    allWorkouts: WorkoutData[];
+}
+
 // Define the interface for a movement session
 interface MovSession {
     // Unique session ID

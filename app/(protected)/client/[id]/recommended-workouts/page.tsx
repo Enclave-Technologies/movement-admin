@@ -9,6 +9,7 @@ import { set } from "zod";
 import Link from "next/link";
 import { IoChevronForwardOutline } from "react-icons/io5";
 import CustomSelect from "@/components/CustomSelect";
+import EditableRow from "@/components/EditableRow";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -36,10 +37,12 @@ const Page = ({ params }: { params: { id: string } }) => {
     const [selectedSessionId, setSelectedSessionId] = useState<string | null>(
         null
     );
+    const [allWorkouts, setAllWorkouts] = useState<WorkoutData[]>([]);
     const [phaseData, setPhaseData] = useState<Phase[]>([]);
     const [sessionList, setSessionList] = useState<MovSessionDropdownOption[]>(
         []
     );
+    const [isEditing, setIsEditing] = useState(false);
     const [defaultSelectedOption, setDefaultSelectedOption] =
         useState<PhaseDropdownOption | null>(
             firstDropdownOptions.find((phase) => phase.isActive) ||
@@ -287,7 +290,20 @@ const Page = ({ params }: { params: { id: string } }) => {
                 console.error("Error in other async operations:", error);
             }
         };
+        const getAllWorkouts = async () => {
+            try {
+                // TODO: DB CONNECTION
+                const response = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/trainer/workouts`,
 
+                    { withCredentials: true }
+                );
+                const allExercises: WorkoutData[] = response.data;
+                setAllWorkouts(allExercises);
+            } catch (error) {
+                console.log(error);
+            }
+        };
         setPageLoading(true);
 
         const fetchAllData = async () => {
@@ -295,6 +311,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 await fetchData();
             }
             await performOtherAsyncOperations();
+            await getAllWorkouts();
             setPageLoading(false);
         };
 
@@ -385,8 +402,28 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
     };
 
-    const handleAddPhase = () => {
-        router.push(`/client/${id}/recommended-workouts/new-phase`);
+    const handleAddExercise = () => {
+        const firstWorkout = allWorkouts[0];
+        setActiveExerciseList([
+            ...activeExerciseList,
+            {
+                exerciseOrder: activeExerciseList.length + 1,
+                motion: firstWorkout.Motion,
+                specificDescription: firstWorkout.SpecificDescription,
+                repsMin: firstWorkout.RecommendedRepsMin,
+                repsMax: firstWorkout.RecommendedRepsMax,
+                setsMin: firstWorkout.RecommendedSetsMin,
+                setsMax: firstWorkout.RecommendedSetsMax,
+                exercises: firstWorkout.id,
+                id: "",
+                sessions: "",
+                restMax: firstWorkout.RecommendedRestMax,
+                restMin: firstWorkout.RecommendedRestMin,
+                tempo: firstWorkout.Tempo,
+                TUT: firstWorkout.TUT,
+            },
+        ]);
+        setIsEditing(true);
     };
 
     const handleActivatePhase = (phaseId: string) => {
@@ -439,25 +476,27 @@ const Page = ({ params }: { params: { id: string } }) => {
                         />
 
                         {phaseData.length === 0 ? (
-                            <Link
-                                href="#"
-                                className="text-blue-500 hover:underline"
-                            >
-                                Add Phase
-                            </Link>
+                            <div className="flex items-center justify-between space-x-2 mt-2">
+                                <Link
+                                    href={`/client/${id}/recommended-workouts/new-phase`}
+                                    className="text-blue-500 hover:underline"
+                                >
+                                    Add
+                                </Link>
+                            </div>
                         ) : (
                             <div className="flex items-center justify-between space-x-2 mt-2">
                                 <Link
-                                    href="#"
+                                    href={`/client/${id}/recommended-workouts/new-phase`}
                                     className="text-blue-500 hover:underline"
                                 >
-                                    Add Phase
+                                    Add
                                 </Link>
                                 <Link
                                     href="#"
                                     className="text-blue-500 hover:underline"
                                 >
-                                    Edit Phase
+                                    Delete
                                 </Link>
                             </div>
                         )}
@@ -498,13 +537,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     }
                                     className="text-blue-500 hover:underline"
                                 >
-                                    Add Session
+                                    Add
                                 </Link>
                                 <Link
                                     href="#"
                                     className="text-blue-500 hover:underline"
                                 >
-                                    Edit Session
+                                    Delete
                                 </Link>
                             </div>
                         )}
@@ -514,7 +553,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                             !defaultSelectedOption.isActive && (
                                 <>
                                     <button
-                                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mt-2"
+                                        className="bg-gold-500 text-white px-4 py-2 rounded hover:bg-green-500 mt-2"
                                         onClick={() =>
                                             handleActivatePhase(
                                                 defaultSelectedOption.value
@@ -532,76 +571,67 @@ const Page = ({ params }: { params: { id: string } }) => {
 
             {/* Table Component */}
             {activeExerciseList.length === 0 ? (
-                <p className="text-gray-600">
+                <p className="text-gray-600 w-full text-center">
                     No Exercises added to this session yet.
                     <br />
-                    Click on + Add Session to add a new session.
+                    Click on <strong>+ Add Exercise</strong> to add a new
+                    exercise.
                 </p>
             ) : (
                 <table className="w-full mt-4 border-collapse border border-gray-300">
                     <thead>
                         <tr>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Order
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Motion
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Specific Description
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Reps Min
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Reps Max
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Sets Min
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Sets Max
                             </th>
-                            <th className="border border-gray-300 p-2">
+                            <th className="bg-green-500 text-white border border-gray-300 p-2">
                                 Action
                             </th>
                         </tr>
                     </thead>
+
                     <tbody>
-                        {activeExerciseList.map((row, index) => (
-                            <tr key={index}>
-                                <td className="border border-gray-300 p-2">
-                                    {row.exerciseOrder}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {row.motion}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {row.specificDescription}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {row.repsMin}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {row.repsMax}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {row.setsMin}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {row.setsMax}
-                                </td>
-                                <td className="border border-gray-300 p-2">
-                                    {/* {row.column3} */}
-                                </td>
-                            </tr>
+                        {activeExerciseList.map((exercise, index) => (
+                            <EditableRow
+                                key={index}
+                                rowData={exercise}
+                                onSave={(editedData) => {
+                                    // Handle save logic
+                                    const updatedExerciseList = [
+                                        ...activeExerciseList,
+                                    ];
+                                    updatedExerciseList[index] = editedData;
+                                    setActiveExerciseList(updatedExerciseList);
+                                }}
+                                isEditing={isEditing}
+                                setIsEditing={setIsEditing}
+                                allWorkouts={allWorkouts}
+                            />
                         ))}
                     </tbody>
                 </table>
             )}
             {/* Button Component */}
             <button
-                onClick={handleAddPhase}
+                onClick={handleAddExercise}
                 className="w-full mt-4 p-2 border-2 rounded"
             >
                 + Add Exercise
