@@ -95,6 +95,7 @@ interface CustomSelectProps {
 interface MovSessionDropdownOption {
     value: string;
     label: string;
+    phaseId: string;
 }
 
 interface ExSession {
