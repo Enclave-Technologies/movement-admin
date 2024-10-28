@@ -4,7 +4,9 @@ import { getCurrentUser } from "@/server_functions/auth";
 import { SESSION_COOKIE_NAME } from "./configs/constants";
 
 export async function middleware(request) {
-    // Get the user information using the auth module
+
+    try {
+        // Get the user information using the auth module
     const user = await getCurrentUser();
 
     // Log a message indicating that the middleware ran successfully
@@ -18,7 +20,14 @@ export async function middleware(request) {
         !request.nextUrl.pathname.startsWith("/forgot-password")
     ) {
         console.log("Trying to redirect to /login");
-        request.cookies.delete(SESSION_COOKIE_NAME);
+        request.cookies.delete({
+            name: SESSION_COOKIE_NAME,
+            httpOnly: true,
+            sameSite: "None",
+            secure: true,
+            path: "/",
+            domain: "enclave.live",
+        });
         return NextResponse.redirect(new URL("/login", request.url));
     }
     // Check if the path is either login or register and redirect accordingly
@@ -33,6 +42,15 @@ export async function middleware(request) {
 
     // Continue with the next middleware in the pipeline
     return NextResponse.next();
+    } catch (error) {
+        if (error.type === "general_unauthorized_scope") {
+            request.cookies.delete({ name: SESSION_COOKIE_NAME, path: "/" });
+            return NextResponse.redirect(new URL("/login", request.url));
+        } else {
+            console.log("CONSOLE LOG MIDDLEWARE", error.type);
+        }
+    }
+
 }
 
 // Configuration object for the middleware

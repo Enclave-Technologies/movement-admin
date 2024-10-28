@@ -5,14 +5,7 @@ import axios from "axios";
 import { getCurrentUser } from "@/server_functions/auth";
 import ClientsTable from "@/components/ClientsTable";
 
-// Define the Client interface
-interface Client {
-    uid: string;
-    name: string;
-    email: string;
-    phone: string;
-    trainer_name?: string; // Optional property
-}
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 export default function AllClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
@@ -40,7 +33,7 @@ export default function AllClients() {
         // const current_user = await getCurrentUser();
         // const userId = current_user?.$id; // Extract the $id property
         const response = await axios.get(
-            `http://127.0.0.1:8000/mvmt/v1/trainer/clients?lastId=${lastId}&limit=50`,
+            `${API_BASE_URL}/mvmt/v1/trainer/clients?lastId=${lastId}&limit=50`,
             {
                 withCredentials: true, // Include cookies in the request
             }
@@ -79,6 +72,7 @@ export default function AllClients() {
                 clients={clients}
                 fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
+                pageTitle={"All Clients"}
             />
         </div>
     );

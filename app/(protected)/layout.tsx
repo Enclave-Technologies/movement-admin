@@ -1,5 +1,6 @@
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
+import { TrainerProvider } from "@/context/TrainerContext";
 
 export default function RootLayout({
     children,
