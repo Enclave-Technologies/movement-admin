@@ -431,7 +431,9 @@ const Page = ({ params }: { params: { id: string } }) => {
 
     return pageLoading ? (
         <div>
-            <BreadcrumbLoading />
+            <div className="ml-12">
+                <BreadcrumbLoading />
+            </div>
             <div className="flex items-center space-x-4">
                 <div className="border rounded p-2 w-1/4 animate-pulse bg-gray-300">
                     <div className="h-4 bg-gray-400 rounded"></div>
@@ -459,11 +461,13 @@ const Page = ({ params }: { params: { id: string } }) => {
         </div>
     ) : (
         <div>
-            <Breadcrumb
-                homeImage={userData?.imageUrl}
-                homeTitle={userData?.name}
-                customTexts={page_title}
-            />
+            <div className="ml-12">
+                <Breadcrumb
+                    homeImage={userData?.imageUrl}
+                    homeTitle={userData?.name}
+                    customTexts={page_title}
+                />
+            </div>
 
             <div className="flex flex-col space-y-4 mt-2">
                 <div className="flex items-center">

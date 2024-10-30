@@ -1,49 +1,50 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import Image from "next/image";
-import Sidebar from "@/components/Sidebar";
-import { defaultProfileURL } from "@/configs/constants";
-const Page = () => {
-    // Sample session data
-    const sessions = [
-        {
-            id: 1,
-            date: "Sep 2, 2024",
-            session: "Phase 1",
-            tut: "422",
-            exercises: "14",
-        },
-        {
-            id: 2,
-            date: "Aug 31, 2024",
-            session: "Phase 1",
-            tut: "422",
-            exercises: "16",
-        },
-        {
-            id: 3,
-            date: "Aug 30, 2024",
-            session: "Phase 1",
-            tut: "422",
-            exercises: "12",
-        },
-        {
-            id: 4,
-            date: "Aug 29, 2024",
-            session: "Phase 1",
-            tut: "422",
-            exercises: "16",
-        },
-        {
-            id: 5,
-            date: "Aug 27, 2024",
-            session: "Phase 1",
-            tut: "422",
-            exercises: "12",
-        },
-    ];
+import Breadcrumb from "@/components/Breadcrumb";
+import { useUser } from "@/context/ClientContext";
 
+const sessions = [
+    {
+        id: 1,
+        date: "Sep 2, 2024",
+        session: "Phase 1",
+        tut: "422",
+        exercises: "14",
+    },
+    {
+        id: 2,
+        date: "Aug 31, 2024",
+        session: "Phase 1",
+        tut: "422",
+        exercises: "16",
+    },
+    {
+        id: 3,
+        date: "Aug 30, 2024",
+        session: "Phase 1",
+        tut: "422",
+        exercises: "12",
+    },
+    {
+        id: 4,
+        date: "Aug 29, 2024",
+        session: "Phase 1",
+        tut: "422",
+        exercises: "16",
+    },
+    {
+        id: 5,
+        date: "Aug 27, 2024",
+        session: "Phase 1",
+        tut: "422",
+        exercises: "12",
+    },
+];
+
+const Page = () => {
+    const page_title = ["Tracked Workouts"];
+    const { userData, setUserData } = useUser();
     const handleViewSession = (session: any) => {
         console.log(
             `Viewing session on ${session.date}:\n\nTut:\n${session.tut}\n\nExercises:\n${session.exercises}`
@@ -51,21 +52,14 @@ const Page = () => {
     };
 
     return (
-        <div className="p-5">
-            <header className="flex items-center mb-5">
-                <div className="w-12 h-12 rounded-full overflow-hidden mr-2">
-                    <Image
-                        src={defaultProfileURL}
-                        alt="Ronald Richards"
-                        width={48} // Slightly larger to ensure no cropping issues
-                        height={48} // Slightly larger to ensure no cropping issues
-                        className="object-cover w-full h-full"
-                    />
-                </div>
-                <h1 className="text-sm">
-                    Ronald Richards {">"} Workout Tracking
-                </h1>
-            </header>
+        <div>
+            <div className="ml-12">
+                <Breadcrumb
+                    homeImage={userData?.imageUrl}
+                    homeTitle={userData?.name}
+                    customTexts={page_title}
+                />
+            </div>
             <div>
                 <h5 className="font-bold">Next Workout</h5>
             </div>

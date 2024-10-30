@@ -56,7 +56,7 @@ const Sidebar = () => {
     };
 
     return (
-        <aside
+        <div
             className={`sticky top-0 left-0 h-screen bg-primary text-white shadow-lg z-40 pt-16 ${
                 isCollapsed ? "w-16" : "w-64"
             } transition-all duration-300`}
@@ -144,7 +144,7 @@ const Sidebar = () => {
                     </button>
                 </div>
             </div>
-        </aside>
+        </div>
     );
 };
 
