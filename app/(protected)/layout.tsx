@@ -1,22 +1,40 @@
+"use client";
 import Navbar from "@/components/Navbar";
 import Sidebar from "@/components/Sidebar";
 import { TrainerProvider } from "@/context/TrainerContext";
+import { useState } from "react";
 
 export default function RootLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
+    const [isCollapsed, setIsCollapsed] = useState(false);
+
+    const toggleSidebar = () => {
+        setIsCollapsed(!isCollapsed);
+    };
     return (
-        <main>
-            <div className="flex flex-col h-screen">
-                <div className="flex flex-1 flex-row">
-                    <TrainerProvider>
-                        <Sidebar />
-                    </TrainerProvider>
-                    <main className="flex-1 bg-white px-4">{children}</main>
-                </div>
+        <div className="flex flex-col h-screen">
+            <div
+                className={`fixed bg-gray-200 ${
+                    isCollapsed ? "w-16" : "w-64"
+                } transition-all duration-300`}
+            >
+                <TrainerProvider>
+                    <Sidebar
+                        isCollapsed={isCollapsed}
+                        toggleSidebar={toggleSidebar}
+                    />
+                </TrainerProvider>
             </div>
-        </main>
+            <div
+                className={`flex-1 ${
+                    isCollapsed ? "ml-16" : "ml-64"
+                } overflow-y-auto p-4 bg-gray-100 transition-all duration-300`}
+            >
+                {children}
+            </div>
+        </div>
     );
 }

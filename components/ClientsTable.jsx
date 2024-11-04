@@ -16,14 +16,14 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
         });
     }, [clients, search]);
     return (
-        <main className="flex flex-col bg-white text-black">
+        <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full">
                 <div
                     className="border border-gray-400 rounded-2xl overflow-hidden 
-                h-12 w-full p-2 m-2"
+                h-12 w-full p-2 m-2 mt-6"
                 >
                     <input
-                        className="w-full h-full focus:outline-none"
+                        className="w-full h-full focus:outline-none bg-gray-100"
                         value={search}
                         placeholder="Search clients by name, email, or phone"
                         onChange={(e) => {

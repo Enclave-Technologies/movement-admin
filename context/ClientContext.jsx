@@ -35,9 +35,7 @@ export const UserProvider = ({ children, params }) => {
     }, [params.id]);
 
     return (
-        <UserContext.Provider
-            value={{ userData, setUserData, userLoading, userError }}
-        >
+        <UserContext.Provider value={{ userData, userLoading, userError }}>
             {children}
         </UserContext.Provider>
     );

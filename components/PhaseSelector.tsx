@@ -1,7 +1,7 @@
-import Select, { components } from "react-select";
 import React from "react";
+import Select, { components } from "react-select";
 
-const CustomSelect: React.FC<CustomSelectProps> = ({
+const PhaseSelector: React.FC<CustomSelectProps> = ({
     options,
     onChange,
     selectedOption,
@@ -56,4 +56,4 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     );
 };
 
-export default CustomSelect;
+export default PhaseSelector;
