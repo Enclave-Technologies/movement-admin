@@ -30,7 +30,7 @@ const sidebarItems = [
     },
 ];
 
-const Sidebar = () => {
+const Sidebar = ({ isCollapsed, toggleSidebar }) => {
     const pathname = usePathname();
     const {
         trainerData,
@@ -38,11 +38,6 @@ const Sidebar = () => {
         trainerError: error,
     } = useTrainer();
     const [loadingLogout, setLoadingLogout] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
-
-    const toggleSidebar = () => {
-        setIsCollapsed(!isCollapsed);
-    };
 
     const handleLogout = async () => {
         setLoadingLogout(true);
@@ -121,7 +116,7 @@ const Sidebar = () => {
                         onClick={handleLogout}
                     >
                         {loadingLogout ? (
-                            <div className="flex items-center justify-center">
+                            <div className="flex items-center justify-center select-none">
                                 <LoadingSpinner />
                                 {!isCollapsed && (
                                     <span className="ml-2">Logging Out...</span>
@@ -129,7 +124,7 @@ const Sidebar = () => {
                             </div>
                         ) : (
                             <div
-                                className={`flex items-center px-3 hover:underline ${
+                                className={`flex items-center px-3 select-none ${
                                     isCollapsed ? "gap-0" : "gap-2"
                                 }`}
                             >

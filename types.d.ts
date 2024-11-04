@@ -154,3 +154,15 @@ interface trainerSidebarInfo {
     image: string;
     description: string;
 }
+
+interface CustomSelectProps {
+    options: PhaseDropdownOption[]; //{ value: string; label: string; isActive: boolean }[];
+    onChange: (value: string) => void;
+    selectedOption: PhaseDropdownOption; //{ value: string; label: string; isActive: boolean } | null;
+}
+
+interface SessionRendererProps {
+    selectedPhase: Phase;
+    phases: Phase[];
+    setPhases: (phases: Phase[]) => void;
+}

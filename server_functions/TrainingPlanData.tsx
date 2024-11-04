@@ -1,6 +1,8 @@
 // hooks/useTrainingPlanData.ts
-"use client";
-import { useState, useEffect } from "react";
+// "use client";
+// import { useState, useEffect } from "react";
+// import axios from "axios";
+
 import axios from "axios";
 
 const emptyPhase = { phases: [] };
@@ -111,50 +113,63 @@ const filledPhase = {
     ],
 };
 
-// const returnedData = filledPhase;
+// // const returnedData = filledPhase;
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const useTrainingPlanData = (clientId: string) => {
-    const [phases, setPhases] = useState<Phase[]>([]);
-    const [sessions, setSessions] = useState<MovSession[]>([]);
-    const [exercises, setExercises] = useState<SessionExercise[]>([]);
-    const [loading, setLoading] = useState(true);
+// const useTrainingPlanData = (clientId: string, refetch: boolean) => {
+//     const [phases, setPhases] = useState<Phase[]>([]);
+//     const [sessions, setSessions] = useState<MovSession[]>([]);
+//     const [exercises, setExercises] = useState<SessionExercise[]>([]);
+//     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                // const response = await axios.get(
-                //     `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${clientId}`,
-                //     { withCredentials: true }
-                // );
-                // const allPhaseData = response.data;
-                const allPhaseData = filledPhase;
+//     useEffect(() => {
+//         const fetchData = async () => {
+//             try {
+//                 // const response = await axios.get(
+//                 //     `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${clientId}`,
+//                 //     { withCredentials: true }
+//                 // );
+//                 // const allPhaseData = response.data;
+//                 const allPhaseData = filledPhase;
 
-                const phases = allPhaseData.phases;
-                const sessions = phases.flatMap(
-                    (phase: Phase) => phase.sessions
-                );
-                const exercises = phases.flatMap((phase: Phase) =>
-                    phase.sessions.flatMap(
-                        (session: MovSession) => session.exercises
-                    )
-                );
+//                 const phases = allPhaseData.phases;
+//                 const sessions = phases.flatMap(
+//                     (phase: Phase) => phase.sessions
+//                 );
+//                 const exercises = phases.flatMap((phase: Phase) =>
+//                     phase.sessions.flatMap(
+//                         (session: MovSession) => session.exercises
+//                     )
+//                 );
 
-                setPhases(phases);
-                setSessions(sessions);
-                setExercises(exercises);
-                setLoading(false);
-            } catch (error) {
-                console.error("Error fetching data:", error);
-                setLoading(false);
-            }
-        };
+//                 setPhases(phases);
+//                 setSessions(sessions);
+//                 setExercises(exercises);
+//                 setLoading(false);
+//             } catch (error) {
+//                 console.error("Error fetching data:", error);
+//                 setLoading(false);
+//             }
+//         };
 
-        fetchData();
-    }, []);
+//         fetchData();
+//     }, [clientId, refetch]);
 
-    return { phases, sessions, exercises, loading };
+//     return { phases, sessions, exercises, loading };
+// };
+
+// export default useTrainingPlanData;
+
+const TrainingPlanData = async (clientId: string) => {
+    // const response = await axios.get(
+    //     `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${clientId}`,
+    //     { withCredentials: true }
+    // );
+    // const allPhaseData = response.data;
+    const allPhaseData = filledPhase;
+
+    return allPhaseData;
 };
 
-export default useTrainingPlanData;
+export default TrainingPlanData;
