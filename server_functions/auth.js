@@ -114,7 +114,7 @@ export async function login(state, formData) {
         const sessionData = {
             session: session.secret,
             $id: acc.$id,
-            role: "admin",
+            // role: "admin",
             email: acc.email,
             name: acc.name,
             team: team.teams[0].name,
