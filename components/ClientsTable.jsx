@@ -5,6 +5,7 @@ import React, { useState, useMemo } from "react";
 
 const ClientsTable = ({ clients, fetchMoreData, hasMore }) => {
     const [search, setSearch] = useState("");
+  
     const filteredClients = useMemo(() => {
         return clients.filter((client) => {
             return client.name.toLowerCase().includes(search.toLowerCase());
