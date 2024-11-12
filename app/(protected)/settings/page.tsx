@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+
 import { defaultProfileURL } from "@/configs/constants";
 
 const SettingsPage = () => {
@@ -227,6 +228,7 @@ const SettingsPage = () => {
                                     Forgot password?
                                 </Link>
                             </div>
+
                         </div>
 
                         <div className="mb-4">
