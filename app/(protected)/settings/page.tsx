@@ -1,144 +1,279 @@
 "use client";
-import React, { useMemo, useState } from 'react';
+import React, { useState } from "react";
+import Image from "next/image";
+import { defaultProfileURL } from "@/configs/constants";
 
-export default function Home() {
-  const MyModal = ({ show, onClose, image, setImage }) => {
-    if (!show) return null;
+const SettingsPage = () => {
+    const [formData, setFormData] = useState<TrainerDetails>({
+        auth_id: "66f67909000ad1f8c7cf",
+        firstName: "Avishek",
+        lastName: "Majumder",
+        imageURL: null,
+        jobTitle: "Personal Trainer | Body Transformation",
+        $id: "66f67909000ad1f8c7cf",
+        $createdAt: "2024-09-27T09:21:19.722+00:00",
+        $updatedAt: "2024-10-24T06:54:52.135+00:00",
+        $permissions: [],
+        $databaseId: "movement-hk-dev",
+        $collectionId: "66e420ee00296a1fd679",
+    });
 
-    const handleFileChange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const imgUrl = URL.createObjectURL(file);
-        setImage(imgUrl);
-      }
+    const [passwordForm, setPasswordForm] = useState({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+    });
+
+    const [passwordError, setPasswordError] = useState("");
+
+    const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setPasswordForm((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handlePasswordSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setPasswordError("");
+
+        if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+            setPasswordError("New passwords do not match.");
+            return;
+        }
+
+        if (passwordForm.newPassword.length < 8) {
+            setPasswordError(
+                "New password must be at least 8 characters long."
+            );
+            return;
+        }
+
+        // TODO: Implement API call to change password
+        console.log("Password form submitted:", passwordForm);
+        // Reset form after successful submission
+        setPasswordForm({
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+        });
+    };
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        // TODO: Implement API call to save account settings
+        console.log("Form submitted:", formData);
     };
 
     return (
-      <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
-        <div className='bg-white h-64 w-96 p-6 rounded-lg shadow-lg'>
-          <h2 className='text-xl font-bold text-center mb-4'>Edit Photo</h2>
-          {image && (
-            <div className='flex justify-center mb-4'>
-              <img src={image} alt="Selected" className="h-24 w-24 rounded-full" />
+        <div className="container mx-auto p-4">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-4xl font-bold">Settings</h1>
+                {/* <div>
+                    <button className="px-4 py-2 bg-gray-200 rounded-md mr-2">
+                        Reset
+                    </button>
+                    <button className="px-4 py-2 bg-green-500 text-white rounded-md">
+                        Save
+                    </button>
+                </div> */}
             </div>
-          )}
-          <div className='flex justify-around mb-4'> {/* Use justify-around to space buttons side by side */}
-            <button 
-              className="bg-[#006847] text-white p-2 rounded-xl w-36" 
-              onClick={() => document.getElementById('file-input').click()}
-            >
-              Upload Photo
-            </button>
-            <button 
-              className="bg-[#006847] text-white p-2 rounded-xl w-36" 
-              onClick={() => document.getElementById('camera-input').click()}
-            >
-              Use Camera
-            </button>
-          </div>
-          <input
-            type="file"
-            id="file-input"
-            accept="image/*"
-            style={{ display: 'none' }} // Hide input
-            onChange={handleFileChange}
-          />
-          <input
-            type="file"
-            id="camera-input"
-            accept="image/*"
-            capture="environment" // Opens the camera directly
-            style={{ display: 'none' }} // Hide input
-            onChange={handleFileChange}
-          />
-          <div className='flex justify-end mt-4'>
-            <button className="bg-gray-300 text-black p-2 rounded-xl w-24" onClick={onClose}>
-              Cancel
-            </button>
-          </div>
+
+            <p className="text-gray-600 mb-6">
+                Update your photo and personal details here
+            </p>
+
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-2 bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-semibold mb-4">
+                        Account Settings
+                    </h2>
+
+                    <div className="flex flex-col items-center mb-4">
+                        <div className="relative w-24 h-24 mb-2">
+                            <Image
+                                src={formData.imageURL || defaultProfileURL}
+                                alt="Profile Picture"
+                                // width={100}
+                                // height={100}
+                                layout="fill"
+                                objectFit="cover"
+                                className="rounded-full"
+                            />
+                        </div>
+                        <button className="mt-2 px-4 py-2 w-1/2 bg-green-500 text-white rounded-md">
+                            Edit Photo
+                        </button>
+                    </div>
+
+                    <form onSubmit={handleSubmit}>
+                        <div className="mb-4">
+                            <label
+                                htmlFor="firstName"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                First Name
+                            </label>
+                            <input
+                                type="text"
+                                id="firstName"
+                                name="firstName"
+                                value={formData.firstName}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label
+                                htmlFor="lastName"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Last Name
+                            </label>
+                            <input
+                                type="text"
+                                id="lastName"
+                                name="lastName"
+                                value={formData.lastName}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label
+                                htmlFor="jobTitle"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Role
+                            </label>
+                            <input
+                                type="text"
+                                id="jobTitle"
+                                name="jobTitle"
+                                value={formData.jobTitle}
+                                onChange={handleInputChange}
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label
+                                htmlFor="email"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Email ID
+                            </label>
+                            <input
+                                type="text"
+                                id="email"
+                                name="email"
+                                value={formData.auth_id}
+                                readOnly
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                            />
+                        </div>
+
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                className="px-4 py-2 bg-green-500 text-white rounded-md"
+                            >
+                                Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div className=" bg-white p-6 rounded-lg shadow">
+                    <h2 className="text-xl font-semibold mb-4">
+                        Change Password
+                    </h2>
+                    <form>
+                        <div className="mb-4">
+                            <label
+                                htmlFor="currentPassword"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Current Password
+                            </label>
+                            <input
+                                type="password"
+                                id="currentPassword"
+                                name="currentPassword"
+                                value={passwordForm.currentPassword}
+                                onChange={handlePasswordChange}
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                                required
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label
+                                htmlFor="newPassword"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                New Password
+                            </label>
+                            <input
+                                type="password"
+                                id="newPassword"
+                                name="newPassword"
+                                value={passwordForm.newPassword}
+                                onChange={handlePasswordChange}
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                                required
+                                minLength={8}
+                            />
+                        </div>
+
+                        <div className="mb-4">
+                            <label
+                                htmlFor="confirmPassword"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Re-enter New Password
+                            </label>
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="confirmPassword"
+                                value={passwordForm.confirmPassword}
+                                onChange={handlePasswordChange}
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                                required
+                            />
+                        </div>
+
+                        {passwordError && (
+                            <div className="mb-4 text-red-500 text-sm">
+                                {passwordError}
+                            </div>
+                        )}
+
+                        <button
+                            type="submit"
+                            className="px-4 py-2 bg-green-500 w-full text-white rounded-md"
+                        >
+                            Confirm New Password
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     );
-  };
+};
 
-  const [form, setForm] = useState({
-    password: "",
-    confirmPassword: ""
-  });
-
-  const buttonState = useMemo(() => {
-    if (form.password === "" || form.confirmPassword === "") {
-      return {
-        bgcolor: "bg-state-500",
-        disabled: true,
-      };
-    } else if (form.password !== form.confirmPassword) {
-      return {
-        bgcolor: "bg-red-400",
-        disabled: true,
-      };
-    } else {
-      return {
-        bgcolor: "bg-green-900",
-        disabled: false,
-      };
-    }
-  }, [form]);
-
-  const [showModal, setShowModal] = useState(false);
-  const [image, setImage] = useState(null); // State to hold the selected image
-
-  return (
-    <div className='mt-2 ml-6'>
-      <div className='flex flex-row justify-between items-center'>
-        <div className='flex flex-col'>
-          <h1 className='font-bold text-2xl'>Settings</h1>
-          <p>Update your photo and personal details here</p>
-        </div>
-        <div className='flex flex-row space-x-2'>
-          <button className='bg-white w-24 h-8 rounded-xl text-black'>Reset</button>
-          <button className='bg-[#006847] w-24 h-8 rounded-xl text-white'>Save</button>
-        </div>
-      </div>
-
-      <div className='flex flex-col md:flex-row md:justify-between'>
-        {/* Left div (Account Settings) */}
-        <div className='border-2 border-gray-300 h-auto m-4 p-4 rounded-xl bg-white left-div space-y-4'>
-          <h1 className='font-bold text-2xl ml-6'>Account Settings</h1>
-          <p className='ml-6'>Profile Picture</p>
-          <div className='flex justify-center'>
-            <img className='w-24 h-24 rounded-full' src={image || "default-image-url"} alt="Profile" />
-          </div>
-          <div className='flex justify-center'>
-            <button className='bg-[#006847] w-36 h-8 rounded-xl text-white' onClick={() => setShowModal(true)}>Edit Photo</button>
-          </div>
-          <div className='ml-6'>
-            <label className='block ml-4' htmlFor="name">Name</label>
-            <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl' type="text" placeholder='Name' />
-            <label className='block ml-4' htmlFor="email">Email</label>
-            <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl' type="email" placeholder='Email' />
-            <label className='block ml-4' htmlFor="phone">Phone</label>
-            <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl' type="tel" placeholder='Phone' />
-            <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl' type="text" placeholder='Personal Trainer | Body Transformation' />
-          </div>
-        </div>
-
-        {/* Right div (Password Settings) */}
-        <div className='border-2 border-gray-300 h-auto m-4 p-4 rounded-xl bg-white right-div space-y-4 flex flex-col'>
-          <h1 className='font-bold text-2xl ml-4'>Change Password</h1>
-          <label className='ml-4' htmlFor="current-password">Current Password</label>
-          <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl' type="password" placeholder='Current password' />
-          <label className='ml-4' htmlFor="password">Password</label>
-          <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl' id="password" type="password" value={form.password} placeholder='Password' onChange={(e) => setForm({ ...form, password: e.target.value })} />
-          <label className='ml-4' htmlFor="confirm-password">Confirm Password</label>
-          <input className='h-7 w-96 m-4 border-2 border-gray-300 rounded-xl focus:border-blue-500' id="confirm-password" type="password" value={form.confirmPassword} placeholder='Confirm Password' onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} />
-          <button className={`h-8 w-96 rounded-xl text-white ${buttonState.bgcolor} border-2 border-gray-300`} disabled={buttonState.disabled}>
-            Confirm Your Password
-          </button>
-        </div>
-      </div>
-
-      <MyModal show={showModal} onClose={() => setShowModal(false)} image={image} setImage={setImage} />
-    </div>
-  );
-}
+export default SettingsPage;
