@@ -101,6 +101,56 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                     </table>
                 </InfiniteScroll>
             </div>
+            <h1 className="text-4xl font-bold text-black mt-5 mb-5 ml-2">
+                My Clients
+            </h1>
+            <InfiniteScroll
+                dataLength={clients.length}
+                next={fetchMoreData}
+                hasMore={hasMore}
+                loader={<h4>Loading...</h4>}
+                endMessage={<p>No more data to load.</p>}
+            >
+                <table className="text-left w-full h-full">
+                    <thead>
+                        <tr className="gap-10 bg-green-800 text-white">
+                            <th className="font-normal min-w-200 pl-5 pr-4 h-12">
+                                Client Name
+                            </th>
+                            <th className="font-normal min-w-200 pr-4 ">
+                                Email
+                            </th>
+                            <th className="font-normal min-w-200 pr-4">
+                                Phone Number
+                            </th>
+                            <th className="font-normal min-w-200 pr-4">
+                                Trainer Name
+                            </th>
+                            <th className="font-normal min-w-200 pr-4">More</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filteredClients.map((client, index) => (
+                            <tr
+                                key={client.$id}
+                                className={`${
+                                    index % 2 ? "bg-gray-200" : "bg-white"
+                                } h-12`}
+                            >
+                                <td className="pl-5">{client.name}</td>
+                                <td>{client.email}</td>
+                                <td>{client.phone}</td>
+                                <td>{client.trainer_name}</td>
+                                <td>
+                                    <Link href={`client/${client.uid}`}>
+                                        <p>View Details</p>
+                                    </Link>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </InfiniteScroll>
         </main>
     );
 };
