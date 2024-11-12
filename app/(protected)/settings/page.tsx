@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
+
 import { defaultProfileURL } from "@/configs/constants";
 
 const SettingsPage = () => {
@@ -218,6 +220,15 @@ const SettingsPage = () => {
                                 className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
                                 required
                             />
+                            <div className="mt-1 text-right">
+                                <Link
+                                    href="/forgot-password"
+                                    className="text-sm text-green-500 hover:text-green-900"
+                                >
+                                    Forgot password?
+                                </Link>
+                            </div>
+
                         </div>
 
                         <div className="mb-4">
