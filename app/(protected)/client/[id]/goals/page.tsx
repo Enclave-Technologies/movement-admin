@@ -1,46 +1,55 @@
 "use client";
 
-import { GoalTile } from "@/components/GoalTile";
-import { goals } from "./dummyData";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useUser } from "@/context/ClientContext";
+import GoalList from "@/components/GoalList";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { TrainerProvider } from "@/context/TrainerContext";
 
-const Page = () => {
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser();
+    const [goals, setGoals] = useState();
+    const [pageLoading, setPageLoading] = useState(true);
 
-    const page_title = ["Goals"];
+    const page_title = ["Personal Goals"];
+
+    useEffect(() => {
+        async function fetchData() {
+            setPageLoading(true);
+            const response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/client/goals?client_id=${params.id}`,
+                { withCredentials: true }
+            );
+            const data = response.data;
+            console.log(data);
+            setGoals(data);
+            setPageLoading(false);
+        }
+        fetchData();
+        
+    }, []);
 
     return (
-        <div className="text-center flex flex-col gap-8 w-full">
-            <div className="ml-12">
-                <Breadcrumb
-                    homeImage={userData?.imageUrl}
-                    homeTitle={userData?.name}
-                    customTexts={page_title}
+        <TrainerProvider>
+            <div className="text-center flex flex-col gap-8 w-full">
+                <div className="ml-12">
+                    <Breadcrumb
+                        homeImage={userData?.imageUrl}
+                        homeTitle={userData?.name}
+                        customTexts={page_title}
+                    />
+                </div>
+                <GoalList
+                    pageLoading={pageLoading}
+                    goals={goals}
+                    setGoals={setGoals}
+                    clientData={userData}
                 />
             </div>
-            <div className="w-full flex flex-row justify-end gap-4">
-                <button className="primary-btn">Add Goal</button>
-                <button className="secondary-btn">Edit Goals</button>
-            </div>
-            <div className="flex flex-col w-full gap-8">
-                {goals.map((goal, i) => (
-                    <div
-                        key={i}
-                        className="flex flex-col w-full items-start gap-4"
-                    >
-                        <h1 className="uppercase text-xl font-bold">
-                            {goal.type}
-                        </h1>
-                        <div className="flex flex-col gap-1 w-full">
-                            {goal.goals.map((goal, index) => (
-                                <GoalTile key={index} goal={goal} />
-                            ))}
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+        </TrainerProvider>
     );
 };
 

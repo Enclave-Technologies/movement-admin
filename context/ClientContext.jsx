@@ -17,7 +17,7 @@ export const UserProvider = ({ children, params }) => {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    `${API_BASE_URL}/mvmt/v1/trainer/client?client_id=${params.id}`,
+                    `${API_BASE_URL}/mvmt/v1/trainer/clients/${params.id}`,
 
                     {
                         withCredentials: true, // Include cookies in the request
