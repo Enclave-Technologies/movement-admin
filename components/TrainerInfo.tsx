@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React from "react";
 import { defaultProfileURL } from "@/configs/constants";
+import Link from "next/link";
 
 const TrainerInfo = ({
     userDetails,
@@ -38,22 +39,24 @@ const TrainerInfo = ({
     }
 
     return (
-        <div className="flex flex-col items-center gap-1">
-            <Image
-                src={trainer.image}
-                className="aspect-square object-cover rounded-full"
-                alt={trainer.name}
-                // unoptimized
-                width={80}
-                height={80}
-            />
-            <div className="flex flex-col items-center gap-0.5">
-                <h2>{trainer.name}</h2>
-                <span className="text-center text-gray-300 text-sm">
-                    {trainer.description}
-                </span>
+        <Link href="/" className="cursor-pointer">
+            <div className="flex flex-col items-center gap-1">
+                <Image
+                    src={trainer.image}
+                    className="aspect-square object-cover rounded-full"
+                    alt={trainer.name}
+                    // unoptimized
+                    width={80}
+                    height={80}
+                />
+                <div className="flex flex-col items-center gap-0.5">
+                    <h2>{trainer.name}</h2>
+                    <span className="text-center text-gray-300 text-sm">
+                        {trainer.description}
+                    </span>
+                </div>
             </div>
-        </div>
+        </Link>
     );
 };
 
