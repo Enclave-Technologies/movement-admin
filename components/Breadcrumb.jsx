@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { IoIosArrowForward } from "react-icons/io";
+import { defaultProfileURL } from "@/configs/constants";
 
 const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
     const pathname = usePathname();
@@ -13,7 +14,7 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
     const basePath = `/client/${segments[1]}`;
 
     return (
-        <nav className="flex" aria-label="Breadcrumb">
+        <nav className="flex p-2" aria-label="Breadcrumb">
             <ol className="inline-flex items-center space-x-1 md:space-x-3">
                 <li>
                     <Link
@@ -21,12 +22,11 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
                         className="flex items-center text-gray-700 hover:text-blue-600"
                     >
                         <Image
-                            unoptimized
-                            src={homeImage || ""}
+                            src={homeImage || defaultProfileURL}
                             alt="Home"
                             width={20}
                             height={20}
-                            className="mr-2 rounded-full" // Add margin and round the image
+                            className="mr-2 rounded-full w-10" // Add margin and round the image
                         />
                         <span className="font-medium">{homeTitle}</span>
                     </Link>

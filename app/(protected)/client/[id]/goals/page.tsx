@@ -1,206 +1,55 @@
 "use client";
-import { useState } from "react";
-import { GoalTile } from "@/components/GoalTile"; // Import GoalTile
-import { goals as dummyGoals } from "./dummyData";
 
-// AddGoalModal Component
-const AddGoalModal = ({ isOpen, onClose, onAddGoal }) => {
-  const [newGoal, setNewGoal] = useState("");
-  const [selectedGoalType, setSelectedGoalType] = useState("");
+import Breadcrumb from "@/components/Breadcrumb";
+import { useUser } from "@/context/ClientContext";
+import GoalList from "@/components/GoalList";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { TrainerProvider } from "@/context/TrainerContext";
 
-  const handleAddGoal = () => {
-    if (newGoal.trim() && selectedGoalType) {
-      onAddGoal(selectedGoalType, newGoal);
-      setNewGoal("");
-      setSelectedGoalType("");
-      onClose(); // Close the modal after adding
-    }
-  };
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  if (!isOpen) return null;
+const Page = ({ params }: { params: { id: string } }) => {
+    const { userData } = useUser();
+    const [goals, setGoals] = useState();
+    const [pageLoading, setPageLoading] = useState(true);
 
-  return (
-    <>
-      <div className="fixed inset-0 bg-gray-900 bg-opacity-90"></div>
-      <div className="fixed max-w-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded shadow-lg">
-        <h1 className="text-lg font-bold">Add Goal</h1>
-        <label htmlFor="goalType" className="block text-left mt-4 font-semibold">Goal Type</label>
-        <select
-          name="goalType"
-          value={selectedGoalType}
-          onChange={(e) => setSelectedGoalType(e.target.value)}
-          className="border rounded px-2 py-1 mt-2 w-full"
-        >
-          <option value="">Select Goal Type</option>
-          {dummyGoals.map((goal, index) => (
-            <option key={index} value={goal.type}>
-              {goal.type}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          value={newGoal}
-          onChange={(e) => setNewGoal(e.target.value)}
-          placeholder="New Goal"
-          className="border rounded px-2 py-1 mt-2 w-full"
-        />
-        <button className="secondary-btn mt-2 ml-3 w-36" onClick={onClose}>
-          Cancel
-        </button>
-        <button className="primary-btn mt-4 ml-3 w-36" onClick={handleAddGoal}>
-          Add Goal
-        </button>
-      </div>
-    </>
-  );
-};
+    const page_title = ["Personal Goals"];
 
-// EditGoalModal Component
-const EditGoalModal = ({ isOpen, onClose, onEditGoal, goalToEdit }) => {
-  const [editedGoal, setEditedGoal] = useState(goalToEdit ? goalToEdit.goal : "");
-  const [selectedGoalType, setSelectedGoalType] = useState(goalToEdit ? goalToEdit.type : "");
+    useEffect(() => {
+        async function fetchData() {
+            setPageLoading(true);
+            const response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/client/goals?client_id=${params.id}`,
+                { withCredentials: true }
+            );
+            const data = response.data;
+            console.log(data);
+            setGoals(data);
+            setPageLoading(false);
+        }
+        fetchData();
+    }, []);
 
-  const handleEditGoal = () => {
-    if (editedGoal.trim()) {
-      onEditGoal(selectedGoalType, editedGoal);
-      setEditedGoal("");
-      setSelectedGoalType("");
-      onClose(); // Close the modal after editing
-    }
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <>
-      <div className="fixed inset-0 bg-gray-900 bg-opacity-90"></div>
-      <div className="fixed max-w-lg top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white p-6 rounded shadow-lg">
-        <h1 className="text-lg font-bold">Edit Goal</h1>
-        <label htmlFor="goalType" className="block text-left mt-4 font-semibold">Goal Type</label>
-        <select
-          name="goalType"
-          value={selectedGoalType}
-          onChange={(e) => setSelectedGoalType(e.target.value)}
-          className="border rounded px-2 py-1 mt-2 w-full"
-        >
-          <option value="">Select Goal Type</option>
-          {dummyGoals.map((goal, index) => (
-            <option key={index} value={goal.type}>
-              {goal.type}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="text"
-          value={editedGoal}
-          onChange={(e) => setEditedGoal(e.target.value)}
-          placeholder="Edit Goal"
-          className="border rounded px-2 py-1 mt-2 w-full"
-        />
-        <button className="secondary-btn mt-2 ml-3 w-36" onClick={onClose}>
-          Cancel
-        </button>
-        <button className="primary-btn mt-4 ml-3 w-36" onClick={handleEditGoal}>
-          Save Changes
-        </button>
-      </div>
-    </>
-  );
-};
-
-// Main Page Component
-export default function Page() {
-  const [goals, setGoals] = useState(dummyGoals);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [goalToEdit, setGoalToEdit] = useState(null);
-  const [checkedGoals, setCheckedGoals] = useState({});
-
-  const addGoal = (goalType, newGoal) => {
-    const updatedGoals = goals.map((goal) => {
-      if (goal.type === goalType) {
-        return { ...goal, goals: [...goal.goals, newGoal] };
-      }
-      return goal;
-    });
-    setGoals(updatedGoals);
-  };
-
-  const editGoal = (goalType, editedGoal) => {
-    const updatedGoals = goals.map((goal) => {
-      if (goal.type === goalType) {
-        return {
-          ...goal,
-          goals: goal.goals.map((g) => (g === goalToEdit.goal ? editedGoal : g)),
-        };
-      }
-      return goal;
-    });
-    setGoals(updatedGoals);
-  };
-
-  const toggleGoal = (goalType, goal) => {
-    setCheckedGoals((prev) => ({
-      ...prev,
-      [`${goalType}-${goal}`]: !prev[`${goalType}-${goal}`],
-    }));
-  };
-
-  const handleEditClick = (goal) => {
-    setGoalToEdit(goal);
-    setIsEditModalOpen(true);
-  };
-
-  return (
-    <div className="text-center mt-4 flex flex-col gap-8 w-full">
-      <div className="w-full flex flex-row justify-end gap-4">
-        <button className="primary-btn" onClick={() => setIsModalOpen(true)}>
-          Add Goal
-        </button>
-        <button className="secondary-btn" onClick={() => {
-          if (goals[0].goals.length > 0) {
-            const goal = goals[0].goals[0]; // Change this logic as needed
-            setGoalToEdit({ type: goals[0].type, goal });
-            setIsEditModalOpen(true);
-          }
-        }}>
-          Edit Goals
-        </button>
-      </div>
-
-      <AddGoalModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onAddGoal={addGoal}
-      />
-
-      <EditGoalModal
-        isOpen={isEditModalOpen}
-        onClose={() => setIsEditModalOpen(false)}
-        onEditGoal={editGoal}
-        goalToEdit={goalToEdit}
-      />
-
-      <div className="flex flex-col w-full gap-8">
-        {goals.map((goal, i) => (
-          <div key={i} className="flex flex-col w-full items-start gap-4">
-            <h1 className="uppercase text-xl font-bold">{goal.type}</h1>
-            <div className="flex flex-col gap-1 w-full">
-              {goal.goals.map((goalItem, index) => (
-                <GoalTile
-                  key={index}
-                  goal={goalItem}
-                  onEdit={() => handleEditClick({ type: goal.type, goal: goalItem })}
-                  checked={checkedGoals[`${goal.type}-${goalItem}`] || false}
-                  onToggle={() => toggleGoal(goal.type, goalItem)}
+    return (
+        <TrainerProvider>
+            <div className="text-center flex flex-col gap-8 w-full">
+                <div className="ml-12">
+                    <Breadcrumb
+                        homeImage={userData?.imageUrl}
+                        homeTitle={userData?.name}
+                        customTexts={page_title}
+                    />
+                </div>
+                <GoalList
+                    pageLoading={pageLoading}
+                    goals={goals}
+                    setGoals={setGoals}
+                    clientData={userData}
                 />
-              ))}
             </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+        </TrainerProvider>
+    );
+};
+
+export default Page;

@@ -72,6 +72,7 @@ export default function AllClients() {
                 clients={clients}
                 fetchMoreData={fetchMoreData}
                 hasMore={hasMore}
+                pageTitle={"All Clients"}
             />
         </div>
     );
