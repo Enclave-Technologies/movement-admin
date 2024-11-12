@@ -20,7 +20,7 @@ export default function Page() {
             </div>
             <div className="flex flex-col gap-4">
                 {goals.map((goal, index) => (
-                    <div key={index} className="flex flex-row gap-2">
+                    <div className="flex flex-row gap-2" key={index}>
                         <div className="p-2 border border-gray-300 rounded-lg">
                             <select
                                 onChange={(e) => {

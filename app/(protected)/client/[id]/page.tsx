@@ -1,41 +1,64 @@
 "use client";
-import Image from "next/image";
-import axios from "axios";
-import { useUser } from "@/context/ClientContext"; // Import the custom hook
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import { useUser } from "@/context/ClientContext";
 import LinkTile from "@/components/LinkTile";
 import { defaultProfileURL } from "@/configs/constants";
+import axios from "axios";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const LinkTileData = [
     {
         href: (params: { id: string }) => `${params.id}/goals`,
         label: "Personal Goals",
-        stat: "Completed 9/15",
+        statKey: "goals",
     },
     {
         href: (params: { id: string }) => `${params.id}/body-mass-composition`,
         label: "Body Mass Composition",
-        stat: "24 Entries",
+        statKey: "bmc",
     },
     {
         href: (params: { id: string }) => `${params.id}/recommended-workouts`,
         label: "Recommended Workouts",
-        stat: "4 Phases / 18 Sessions",
+        statKey: "recommendedWorkouts",
     },
     {
         href: (params: { id: string }) => `${params.id}/tracked-workouts`,
         label: "Tracked Workouts",
-        stat: "76 Entries",
+        statKey: "trackedWorkouts",
     },
     {
         href: (params: { id: string }) => `${params.id}/profile`,
         label: "Profile",
-        stat: "Last Updated: " + new Date().toLocaleDateString(),
+        statKey: "profile",
     },
 ];
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, userLoading, userError } = useUser(); // Use the context to set user data
+    const [stats, setStats] = useState({});
+    const [statsLoading, setStatsLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            setStatsLoading(true);
+            try {
+                const response = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/client/all-stats?client_id=${params.id}`,
+                    { withCredentials: true }
+                );
+                setStats(response.data);
+            } catch (error) {
+                console.error("Failed to fetch stats:", error);
+            } finally {
+                setStatsLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, [params.id]);
 
     return (
         <div className="flex flex-col min-h-screen items-center justify-between p-8 mt-4 bg-gray-100 text-black w-full">
@@ -91,10 +114,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                             key={index}
                             href={tile.href(params)}
                             label={tile.label}
-                            stat={tile.stat}
-                            className="flex flex-col items-center 
-                            justify-between gap-0 p-4 bg-gray-200 border-2 
-                            rounded-xl border-primary w-full h-32"
+                            stat={
+                                statsLoading
+                                    ? "Loading..."
+                                    : stats[tile.statKey] || "N/A"
+                            }
+                            isLoading={statsLoading}
+                            className="flex flex-col items-center justify-between gap-0 p-4 bg-gray-200 border-2 rounded-xl border-primary w-full h-32"
                         />
                     ))}
                 </div>

@@ -166,3 +166,15 @@ interface SessionRendererProps {
     phases: Phase[];
     setPhases: (phases: Phase[]) => void;
 }
+
+interface GoalTileProps {
+    goal: {
+        id: string;
+        description: string;
+        completed: boolean;
+    };
+    onUpdateGoal: (id: string, completed: boolean) => Promise<void>;
+    isEditMode: boolean;
+    onEdit: () => void;
+    onDelete: () => void;
+}
