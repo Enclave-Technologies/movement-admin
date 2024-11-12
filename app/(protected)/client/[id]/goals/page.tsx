@@ -29,7 +29,6 @@ const Page = ({ params }: { params: { id: string } }) => {
             setPageLoading(false);
         }
         fetchData();
-        
     }, []);
 
     return (

@@ -5,4 +5,5 @@ export const goalTypes = [
     { name: "Physique Goal", value: "physique" },
     { name: "Performance Goal", value: "performance" },
     { name: "Skill Goal", value: "skill" },
+    { name: "Lifestyle Goal", value: "lifestyle" },
 ];

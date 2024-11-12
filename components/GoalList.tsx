@@ -5,13 +5,14 @@ import { useTrainer } from "@/context/TrainerContext";
 import { goalTypes } from "@/configs/constants";
 import axios from "axios";
 import { GoalListSkeleton } from "./GoalListSkeleton";
+import EditGoalModal from "./EditGoalModal";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [goalToEdit, setGoalToEdit] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [editingGoal, setEditingGoal] = useState(null);
     const {
         trainerData,
         trainerLoading: loading,
@@ -46,6 +47,24 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         []
     );
 
+    const deleteGoal = async (goalId, goalType) => {
+        if (window.confirm("Are you sure you want to delete this goal?")) {
+            try {
+                await axios.delete(
+                    `${API_BASE_URL}/mvmt/v1/client/goals/${goalId}`,
+                    { withCredentials: true }
+                );
+                const updatedGoals = goals.map((category) => ({
+                    ...category,
+                    goals: category.goals.filter((goal) => goal.id !== goalId),
+                }));
+                setGoals(updatedGoals);
+            } catch (error) {
+                console.error("Failed to delete goal:", error);
+            }
+        }
+    };
+
     const addGoal = (goalType, newGoal) => {
         async function addGoalToDatabase() {
             const response = await axios.post(
@@ -61,7 +80,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
             );
             const data = response.data;
             let updatedGoals = goalTypes.map(({ value }) => ({
-                type: `${value} Goals`.toUpperCase(),
+                type: `${value}`.toLowerCase(),
                 goals: [],
             }));
 
@@ -69,15 +88,15 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 updatedGoals = updatedGoals.map((updatedGoal) => {
                     const existingGoal = goals.find(
                         (g) =>
-                            g.type.toUpperCase() ===
-                            updatedGoal.type.toUpperCase()
+                            g.type.toLowerCase() ===
+                            updatedGoal.type.toLowerCase()
                     );
                     if (existingGoal) {
                         return {
                             ...existingGoal,
                             goals:
-                                existingGoal.type.toUpperCase() ===
-                                `${goalType} Goals`.toUpperCase()
+                                existingGoal.type.toLowerCase() ===
+                                `${goalType}`.toLowerCase()
                                     ? [
                                           ...existingGoal.goals,
                                           {
@@ -93,8 +112,8 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 });
             } else {
                 updatedGoals = updatedGoals.map((updatedGoal) =>
-                    updatedGoal.type.toUpperCase() ===
-                    `${goalType} Goals`.toUpperCase()
+                    updatedGoal.type.toLowerCase() ===
+                    `${goalType}`.toLowerCase()
                         ? {
                               ...updatedGoal,
                               goals: [
@@ -113,6 +132,67 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         }
         addGoalToDatabase();
     };
+
+    const editGoal = (goal, goalType) => {
+        setEditingGoal({ ...goal, type: goalType });
+        setIsModalOpen(true);
+    };
+
+    const saveEditedGoal = async (editedGoal) => {
+        try {
+            const response = await axios.put(
+                `${API_BASE_URL}/mvmt/v1/client/goals/${editedGoal.id}`,
+                {
+                    description: editedGoal.description,
+                    goal_type: editedGoal.type,
+                },
+                { withCredentials: true }
+            );
+            console.log("SAVING EDITED GOALS");
+            console.log(goals);
+
+            // Create a new array of categories
+            const updatedGoals = goalTypes.map((goalType) => ({
+                type: `${goalType.value}`.toLowerCase(),
+                goals: [],
+            }));
+
+            // Distribute goals to their respective categories
+            goals.forEach((category) => {
+                category.goals.forEach((goal) => {
+                    if (goal.id === editedGoal.id) {
+                        // This is the edited goal, put it in its new category
+                        const targetCategory = updatedGoals.find(
+                            (cat) =>
+                                cat.type.toLowerCase() === `${editedGoal.type}`
+                        );
+                        if (targetCategory) {
+                            targetCategory.goals.push({
+                                ...goal,
+                                description: editedGoal.description,
+                            });
+                        }
+                    } else {
+                        // This is not the edited goal, keep it in its original category
+                        const targetCategory = updatedGoals.find(
+                            (cat) =>
+                                cat.type.toLowerCase() ===
+                                category.type.toLowerCase()
+                        );
+                        if (targetCategory) {
+                            targetCategory.goals.push(goal);
+                        }
+                    }
+                });
+            });
+
+            setGoals(updatedGoals);
+            setIsModalOpen(false);
+        } catch (error) {
+            console.error("Failed to update goal:", error);
+        }
+    };
+
     if (goals?.length == 0) {
         return (
             <div className="flex flex-col items-center justify-center h-full text-center py-8">
@@ -152,18 +232,49 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         <div>
             <div className="w-full flex flex-row justify-end gap-4">
                 <button
-                    className="primary-btn"
+                    className={`
+        px-4 py-2 rounded-md font-semibold text-sm
+        transition-all duration-200 ease-in-out
+        focus:outline-none focus:ring-2 focus:ring-offset-2
+        ${
+            isEditMode
+                ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                : "secondary-btn"
+        }
+    `}
                     onClick={() => setIsModalOpen(true)}
+                    disabled={isEditMode}
                 >
-                    Add Goal
+                    {isEditMode ? "Exit Edit Mode to Add" : "Add Goal"}
                 </button>
-                <button className="secondary-btn">Edit Goals</button>
+
+                <button
+                    className="secondary-btn px-4 py-2 rounded-md font-semibold text-sm
+        transition-all duration-200 ease-in-out
+        focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    // {`secondary-btn ${
+                    //     isEditMode ? "bg-gold-500 text-white" : ""
+                    // }`}
+                    onClick={() => setIsEditMode(!isEditMode)}
+                >
+                    {isEditMode ? "Done Editing" : "Edit Goals"}
+                </button>
             </div>
             <AddGoalModal
                 goalTypes={goalTypes}
-                isOpen={isModalOpen}
+                isOpen={isModalOpen && !editingGoal}
                 onAddGoal={addGoal}
                 onClose={() => setIsModalOpen(false)}
+            />
+            <EditGoalModal
+                goalTypes={goalTypes}
+                isOpen={isModalOpen && editingGoal}
+                onSaveGoal={saveEditedGoal}
+                onClose={() => {
+                    setIsModalOpen(false);
+                    setEditingGoal(null);
+                }}
+                goal={editingGoal}
             />
             <div className="flex flex-col w-full gap-8">
                 {goals?.map((goal) => (
@@ -172,16 +283,35 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                         className="flex flex-col w-full items-start gap-4"
                     >
                         <h1 className="uppercase text-xl font-bold">
-                            {goal.type}
+                            {goal.type} Goals
                         </h1>
                         <div className="flex flex-col gap-1 w-full">
-                            {goal.goals.map((goalItem) => (
-                                <GoalTile
-                                    key={goalItem.id}
-                                    goal={goalItem}
-                                    onUpdateGoal={updateGoalInBackend}
-                                />
-                            ))}
+                            {goal.goals.length > 0 ? (
+                                goal.goals.map((goalItem) => (
+                                    <GoalTile
+                                        key={goalItem.id}
+                                        goal={goalItem}
+                                        onUpdateGoal={updateGoalInBackend}
+                                        isEditMode={isEditMode}
+                                        onEdit={() =>
+                                            editGoal(goalItem, goal.type)
+                                        }
+                                        onDelete={() =>
+                                            deleteGoal(goalItem.id, goal.type)
+                                        }
+                                    />
+                                ))
+                            ) : (
+                                <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
+                                    <p className="text-gray-500 text-sm font-medium uppercase">
+                                        No goals added yet for {goal.type}
+                                    </p>
+                                    <p className="text-gray-400 text-xs mt-1 uppercase">
+                                        Click &ldquo;Add Goal&rdquo; to get
+                                        started
+                                    </p>
+                                </div>
+                            )}
                         </div>
                     </div>
                 ))}
