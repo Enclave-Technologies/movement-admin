@@ -265,4 +265,39 @@ export async function fetchUserDetails() {
     return null;
 }
 
-export async function resetPassword() {}
+export async function resetPassword(state, formData) {
+    try {
+        const { account } = await createAdminClient();
+        const email = formData.get("email");
+        // TODO: Change the url
+        const result = await account.createRecovery(
+            email, // email
+            "http://localhost:3001/confirm-password" // url
+        );
+
+        console.log(result);
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
+
+export async function updatePassword(state, formData) {
+    if (!cookies().has(SESSION_COOKIE_NAME)) {
+        return null;
+    }
+    try {
+        const { account } = await createAdminClient();
+        const email = formData.get("email");
+        // TODO: Change the url
+        const result = await account.createRecovery(
+            email, // email
+            "http://127.0.0.1:3001/confirm-password" // url
+        );
+
+        console.log(result);
+    } catch (error) {
+        console.log(error);
+        return null;
+    }
+}
