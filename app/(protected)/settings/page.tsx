@@ -1,24 +1,36 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { defaultProfileURL } from "@/configs/constants";
+import axios from "axios";
+import ImageUploadModal from "@/components/ImageUploadModal";
+import Spinner from "@/components/Spinner";
+import PageLoading from "@/components/PageLoading";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const SettingsPage = () => {
-    const [formData, setFormData] = useState<TrainerDetails>({
-        auth_id: "66f67909000ad1f8c7cf",
-        firstName: "Avishek",
-        lastName: "Majumder",
+    const [pageLoading, setPageLoading] = useState(true);
+    const [uploading, setUploading] = useState(false);
+    const [formData, setFormData] = useState<TrainerSettings>({
+        $id: "",
+        auth_id: "",
+        firstName: "",
+        lastName: "",
         imageURL: null,
-        jobTitle: "Personal Trainer | Body Transformation",
-        $id: "66f67909000ad1f8c7cf",
-        $createdAt: "2024-09-27T09:21:19.722+00:00",
-        $updatedAt: "2024-10-24T06:54:52.135+00:00",
-        $permissions: [],
-        $databaseId: "movement-hk-dev",
-        $collectionId: "66e420ee00296a1fd679",
+        jobTitle: "",
+        email: "",
+        phone: "",
+        emailVerification: false,
+        phoneVerification: false,
+        $createdAt: "",
+        $updatedAt: "",
+        accessedAt: "",
     });
+    const [showImageUploadModal, setShowImageUploadModal] = useState(false);
+    const [imageUploadError, setImageUploadError] = useState("");
 
     const [passwordForm, setPasswordForm] = useState({
         currentPassword: "",
@@ -27,6 +39,25 @@ const SettingsPage = () => {
     });
 
     const [passwordError, setPasswordError] = useState("");
+
+    useEffect(() => {
+        async function loadData() {
+            setPageLoading(true);
+            try {
+                const response = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/trainer/settings`,
+                    { withCredentials: true }
+                );
+
+                setFormData(response.data);
+            } catch (error) {
+                console.log(error);
+            } finally {
+                setPageLoading(false);
+            }
+        }
+        loadData();
+    }, []);
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
@@ -68,15 +99,136 @@ const SettingsPage = () => {
             ...prevData,
             [name]: value,
         }));
+
+        console.log(`${name} : ${value}`);
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // TODO: Implement API call to save account settings
-        console.log("Form submitted:", formData);
+        try {
+            await axios.put(
+                `${API_BASE_URL}/mvmt/v1/trainer/settings`,
+                formData,
+                {
+                    withCredentials: true,
+                }
+            );
+            // Handle success case
+            console.log("Settings saved successfully");
+            // Reload the page on successful submission
+            window.location.reload(); // This will refresh the page
+        } catch (error) {
+            console.error("Error saving settings:", error);
+        }
     };
 
-    return (
+    // const handleUploadChange = async (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         setUploading(true); // Start loading
+    //         // Create FormData to send the file to the backend
+    //         const formData = new FormData();
+    //         formData.append("file", file);
+
+    //         try {
+    //             const response = await axios.post(
+    //                 `${API_BASE_URL}/mvmt/v1/file/image-upload`,
+    //                 formData,
+    //                 {
+    //                     headers: {
+    //                         "Content-Type": "multipart/form-data",
+    //                     },
+    //                     withCredentials: true,
+    //                 }
+    //             );
+    //             const imageUrl = response.data.url; // Assuming your backend returns the URL
+    //             // Update the existing formData with the new imageURL
+    //             setFormData((prevData) => ({
+    //                 ...prevData,
+    //                 imageURL: imageUrl,
+    //             }));
+    //         } catch (error) {
+    //             console.error("Image upload failed:", error);
+    //             setImageUploadError("Image upload failed. Please try again.");
+    //         } finally {
+    //             setUploading(false); // Start loading
+    //         }
+    //     }
+    //     setShowImageUploadModal(false);
+    // };
+
+    // const handleCaptureChange = async (e) => {
+    //     const file = e.target.files[0];
+    //     if (file) {
+    //         setUploading(true); // Start loading
+    //         // Create FormData to send the file to the backend
+    //         const formData = new FormData();
+    //         formData.append("file", file);
+
+    //         try {
+    //             const response = await axios.post(
+    //                 `${API_BASE_URL}/mvmt/v1/file/image-upload`,
+    //                 formData,
+    //                 {
+    //                     headers: {
+    //                         "Content-Type": "multipart/form-data",
+    //                     },
+    //                     withCredentials: true,
+    //                 }
+    //             );
+    //             const imageUrl = response.data.url; // Assuming your backend returns the URL
+    //             // Update the existing formData with the new imageURL
+    //             setFormData((prevData) => ({
+    //                 ...prevData,
+    //                 imageURL: imageUrl,
+    //             }));
+    //         } catch (error) {
+    //             console.error("Image upload failed:", error);
+    //             setImageUploadError("Image upload failed. Please try again.");
+    //         } finally {
+    //             setUploading(false); // Start loading
+    //         }
+    //     }
+    //     setShowImageUploadModal(false);
+    // };
+
+    const handleImageChange = async (e, isCapture) => {
+        const file = e.target.files[0];
+        if (file) {
+            setUploading(true);
+            setShowImageUploadModal(false);
+            const formData = new FormData();
+            formData.append("file", file);
+
+            try {
+                const response = await axios.post(
+                    `${API_BASE_URL}/mvmt/v1/file/image-upload`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                        withCredentials: true,
+                    }
+                );
+                const imageUrl = response.data.url; // Assuming your backend returns the URL
+                setFormData((prevData) => ({
+                    ...prevData,
+                    imageURL: imageUrl,
+                }));
+            } catch (error) {
+                console.error("Image upload failed:", error);
+                setImageUploadError("Image upload failed. Please try again.");
+            } finally {
+                setUploading(false);
+            }
+        }
+    };
+
+    return pageLoading ? (
+        <PageLoading />
+    ) : (
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-4xl font-bold">Settings</h1>
@@ -108,16 +260,47 @@ const SettingsPage = () => {
                                 // width={100}
                                 // height={100}
                                 layout="fill"
-                                objectFit="cover"
-                                className="rounded-full"
+                                className="rounded-full object-cover"
                             />
                         </div>
-                        <button className="mt-2 px-4 py-2 w-1/2 bg-green-500 text-white rounded-md">
+                        <button
+                            onClick={() => setShowImageUploadModal(true)}
+                            className="mt-2 px-4 py-2 w-1/2 bg-green-500 text-white rounded-md"
+                        >
                             Edit Photo
                         </button>
+                        {imageUploadError && (
+                            <div className="mt-2 text-red-500 text-sm text-center">
+                                {imageUploadError}
+                            </div>
+                        )}
+                        {uploading && <Spinner />}
+                        {showImageUploadModal && (
+                            <ImageUploadModal
+                                handleImageChange={handleImageChange}
+                                setShowModal={setShowImageUploadModal}
+                            />
+                        )}
                     </div>
 
                     <form onSubmit={handleSubmit}>
+                        <div className="mb-4">
+                            <label
+                                htmlFor="email"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Email ID
+                            </label>
+                            <input
+                                type="text"
+                                id="email"
+                                name="email"
+                                value={formData.email}
+                                readOnly
+                                className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm cursor-not-allowed bg-gray-200 focus:outline-none"
+                            />
+                        </div>
+
                         <div className="mb-4">
                             <label
                                 htmlFor="firstName"
@@ -173,17 +356,17 @@ const SettingsPage = () => {
 
                         <div className="mb-4">
                             <label
-                                htmlFor="email"
+                                htmlFor="phone"
                                 className="block text-sm font-medium text-gray-700"
                             >
-                                Email ID
+                                Phone Number
                             </label>
                             <input
                                 type="text"
-                                id="email"
-                                name="email"
-                                value={formData.auth_id}
-                                readOnly
+                                id="phone"
+                                name="phone"
+                                value={formData.phone ?? ""} // Using nullish coalescing operator
+                                onChange={handleInputChange}
                                 className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
                             />
                         </div>
@@ -228,7 +411,6 @@ const SettingsPage = () => {
                                     Forgot password?
                                 </Link>
                             </div>
-
                         </div>
 
                         <div className="mb-4">
