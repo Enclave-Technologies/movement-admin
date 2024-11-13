@@ -1,57 +1,68 @@
-// Importing the necessary modules and constants
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/server_functions/auth";
 import { SESSION_COOKIE_NAME } from "./configs/constants";
 
+const publicPaths = ["/login", "/register"];
+const alwaysAccessiblePaths = ["/forgot-password"];
+
 export async function middleware(request) {
+    const { pathname } = request.nextUrl;
+
     try {
-        // Get the user information using the auth module
         const user = await getCurrentUser();
 
-        // Log a message indicating that the middleware ran successfully
-        // console.log("Middleware Ran with user ", user);
+        // Check if the path is always accessible
+        if (alwaysAccessiblePaths.some((path) => pathname.startsWith(path))) {
+            return NextResponse.next();
+        }
 
-        // If user is not authenticated and the path is not /login or /register, remove session cookie and redirect to login page
-        if (
-            !user &&
-            !request.nextUrl.pathname.startsWith("/login") &&
-            !request.nextUrl.pathname.startsWith("/register") &&
-            !request.nextUrl.pathname.startsWith("/forgot-password")
-        ) {
-            console.log("Trying to redirect to /login");
+        // Check if the path is public
+        if (publicPaths.some((path) => pathname.startsWith(path))) {
+            // If user is logged in and trying to access a public path, redirect to home
+            if (user) {
+                return NextResponse.redirect(new URL("/", request.url));
+            }
+            // If not logged in, allow access to public paths
+            return NextResponse.next();
+        }
+
+        // For all other paths (protected routes)
+        if (!user) {
+            // If not logged in, redirect to login
+            console.log("Redirecting to /login");
             request.cookies.delete({
                 name: SESSION_COOKIE_NAME,
                 httpOnly: true,
                 sameSite: "None",
                 secure: true,
                 path: "/",
-                // domain: "enclave.live",
+                // domain: "enclave.live"
             });
             return NextResponse.redirect(new URL("/login", request.url));
         }
-        // Check if the path is either login or register and redirect accordingly
-        if (
-            user &&
-            (request.nextUrl.pathname === "/login" ||
-                request.nextUrl.pathname === "/register")
-        ) {
-            console.log("REDIRECTING TO HOME", user);
-            return NextResponse.redirect(new URL("/", request.url));
-        }
 
-        // Continue with the next middleware in the pipeline
+        // User is logged in and accessing a protected route
         return NextResponse.next();
     } catch (error) {
         if (error.type === "general_unauthorized_scope") {
-            request.cookies.delete({ name: SESSION_COOKIE_NAME, path: "/" });
+            request.cookies.delete({
+                name: SESSION_COOKIE_NAME,
+                httpOnly: true,
+                sameSite: "None",
+                secure: true,
+                path: "/",
+                // domain: "enclave.live"
+            });
             return NextResponse.redirect(new URL("/login", request.url));
         } else {
-            console.log("CONSOLE LOG MIDDLEWARE", error.type);
+            console.error("Middleware error:", error.type);
+            // You might want to add some error handling here
+            return NextResponse.next();
         }
     }
 }
 
 // Configuration object for the middleware
 export const config = {
-    matcher: ["/", "/login", "/register"], // Specifies the URL path that this middleware should run on
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

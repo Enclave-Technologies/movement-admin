@@ -149,6 +149,21 @@ interface TrainerDetails {
     $collectionId: string;
 }
 
+interface TrainerSettings {
+    $id: string;
+    auth_id: string;
+    firstName: string;
+    lastName: string;
+    imageURL: string | null;
+    jobTitle: string;
+    email: string;
+    phone: string;
+    emailVerification: boolean;
+    phoneVerification: boolean;
+    $createdAt: string;
+    $updatedAt: string;
+    accessedAt: string;
+}
 interface trainerSidebarInfo {
     name: string;
     image: string;

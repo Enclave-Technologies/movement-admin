@@ -2,6 +2,7 @@
 import { useUser } from "@/context/ClientContext";
 import { useRouter } from "next/navigation";
 import { IoIosArrowBack } from "react-icons/io";
+import PageLoading from "./PageLoading";
 
 const ClientLayoutContent = ({ children }: { children: React.ReactNode }) => {
     const { userError, userLoading } = useUser();
@@ -28,15 +29,7 @@ const ClientLayoutContent = ({ children }: { children: React.ReactNode }) => {
     }
 
     if (userLoading) {
-        return (
-            <div className="flex flex-col min-h-screen items-center justify-center p-8 bg-gray-100 text-black w-full">
-                <div className="text-center">
-                    <h2 className="text-2xl font-bold text-gray-700 mb-4">
-                        Loading...
-                    </h2>
-                </div>
-            </div>
-        );
+        return <PageLoading />;
     }
 
     return (
