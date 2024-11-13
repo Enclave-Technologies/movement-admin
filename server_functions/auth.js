@@ -264,3 +264,5 @@ export async function fetchUserDetails() {
 
     return null;
 }
+
+export async function resetPassword() {}
