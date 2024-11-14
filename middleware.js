@@ -3,7 +3,11 @@ import { getCurrentUser } from "@/server_functions/auth";
 import { SESSION_COOKIE_NAME } from "./configs/constants";
 
 const publicPaths = ["/login", "/register"];
-const alwaysAccessiblePaths = ["/forgot-password"];
+const alwaysAccessiblePaths = [
+    "/forgot-password",
+    "/confirm-password",
+    "/images",
+];
 
 export async function middleware(request) {
     const { pathname } = request.nextUrl;
@@ -11,6 +15,8 @@ export async function middleware(request) {
     try {
         const user = await getCurrentUser();
 
+        console.log("Requested path:", pathname);
+        console.log("Current user:", user);
         // Check if the path is always accessible
         if (alwaysAccessiblePaths.some((path) => pathname.startsWith(path))) {
             return NextResponse.next();
@@ -64,7 +70,5 @@ export async function middleware(request) {
 
 // Configuration object for the middleware
 export const config = {
-    matcher: [
-        "/((?!api|_next/static|_next/image|favicon.ico|\\.svg|\\.jpg|\\.jpeg|\\.png|\\.gif).*)",
-    ],
+    matcher: ["/((?!_next/static|_next/image|favicon.ico|/public/.*).*)"],
 };
