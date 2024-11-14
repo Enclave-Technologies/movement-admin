@@ -15,8 +15,6 @@ export async function middleware(request) {
     try {
         const user = await getCurrentUser();
 
-        console.log("Requested path:", pathname);
-        console.log("Current user:", user);
         // Check if the path is always accessible
         if (alwaysAccessiblePaths.some((path) => pathname.startsWith(path))) {
             return NextResponse.next();
@@ -70,5 +68,5 @@ export async function middleware(request) {
 
 // Configuration object for the middleware
 export const config = {
-    matcher: ["/((?!_next/static|_next/image|favicon.ico|/public/.*).*)"],
+    matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
