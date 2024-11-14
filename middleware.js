@@ -3,7 +3,11 @@ import { getCurrentUser } from "@/server_functions/auth";
 import { SESSION_COOKIE_NAME } from "./configs/constants";
 
 const publicPaths = ["/login", "/register"];
-const alwaysAccessiblePaths = ["/forgot-password"];
+const alwaysAccessiblePaths = [
+    "/forgot-password",
+    "/confirm-password",
+    "/images",
+];
 
 export async function middleware(request) {
     const { pathname } = request.nextUrl;
@@ -51,7 +55,7 @@ export async function middleware(request) {
                 sameSite: "None",
                 secure: true,
                 path: "/",
-                domain: "enclave.live"
+                domain: "enclave.live",
             });
             return NextResponse.redirect(new URL("/login", request.url));
         } else {

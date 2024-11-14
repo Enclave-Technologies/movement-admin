@@ -16,7 +16,7 @@ const ConfirmPasswordPage = () => {
             <div className="w-full max-w-md p-6 bg-gray-50 shadow-lg rounded-lg">
                 <div className="flex justify-center items-center w-full">
                     <Image
-                        src={"Logo-movement.svg"}
+                        src="/images/Logo-movement.svg"
                         alt="Confirm Password"
                         width={48}
                         height={16}

@@ -272,7 +272,7 @@ export async function resetPassword(state, formData) {
         // TODO: Change the url
         const result = await account.createRecovery(
             email, // email
-            "http://localhost:3001/confirm-password" // url
+            "http://movement-admin.enclave.live/confirm-password" // url
         );
 
         console.log(result);
