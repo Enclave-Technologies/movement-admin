@@ -117,3 +117,43 @@ body {
     @apply border border-black;
     @apply rounded-lg;
 }
+
+@keyframes outline-animation {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 0 8px rgba(59, 130, 246, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+.outline-animation {
+    position: relative;
+    animation: outline-animation 2s infinite;
+}
+
+@keyframes gradient-animation {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.gradient-animation {
+    position: relative;
+    background: radial-gradient(circle, #006747, #e8b650);
+    background-size: 400% 400%;
+    background-position: 0% 50%;
+    animation: gradient-animation 5s ease infinite;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+}
