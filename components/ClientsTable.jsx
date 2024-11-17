@@ -2,9 +2,13 @@
 import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
+import { defaultProfileURL } from "@/configs/constants";
+import { useRouter } from "next/navigation";
 
 const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
     const [search, setSearch] = useState("");
+    const router = useRouter();
 
     const filteredClients = useMemo(() => {
         return clients.filter((client) => {
@@ -15,6 +19,15 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
             );
         });
     }, [clients, search]);
+
+    const handleRowClick = (client) => {
+        // Implement the action you want to execute on double-click
+        console.log("Client clicked:", client);
+        // For example, you can redirect to the client details page
+        // window.location.href = `client/${client.uid}`;
+        router.push(`client/${client.uid}`);
+    };
+
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full">
@@ -53,6 +66,7 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-green-500 text-white">
+                                <th className="font-normal pl-5 pr-4 h-12"></th>
                                 <th className="font-normal pl-5 pr-4 h-12">
                                     Client Name
                                 </th>
@@ -63,7 +77,9 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                 <th className="font-normal pl-5 pr-4">
                                     Trainer Name
                                 </th>
-                                <th className="font-normal pl-5 pr-4">More</th>
+                                <th className="font-normal pl-5 pr-4">
+                                    Action
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="border-t-2 border-white">
@@ -73,8 +89,21 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                     key={index}
                                     className={`${
                                         index % 2 ? "bg-gray-50" : "bg-gray-200"
-                                    } h-12`}
+                                    } h-12 touch-action-none`}
+                                    onClick={() => handleRowClick(client)}
                                 >
+                                    <td className="pl-5">
+                                        <Image
+                                            src={
+                                                client.imageUrl ||
+                                                defaultProfileURL
+                                            } // Provide a default placeholder
+                                            width={30}
+                                            height={30}
+                                            alt={`Image of ${client.name}`}
+                                            className="w-10 h-10 rounded-full"
+                                        />
+                                    </td>
                                     <td className="pl-5">{client.name}</td>
                                     <td className="pl-5">
                                         {client.email || "-"}
@@ -89,7 +118,7 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                         <Link href={`client/${client.uid}`}>
                                             <p
                                                 className="text-sm underline
-                                             text-gold-500 hover:text-green-500"
+                                             text-green-500 hover:text-gold-500"
                                             >
                                                 View Details
                                             </p>
