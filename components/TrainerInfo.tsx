@@ -12,8 +12,6 @@ const TrainerInfo = ({
     loading: boolean;
     error: any;
 }) => {
-    console.log(userDetails);
-
     const defaultImageURL = defaultProfileURL;
     const trainer: trainerSidebarInfo = {
         name: `${userDetails?.firstName || "FirstName"} ${

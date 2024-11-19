@@ -44,6 +44,14 @@ const config: Config = {
             },
         },
     },
-    plugins: [],
+    plugins: [
+        function ({ addUtilities }) {
+            addUtilities({
+                ".touch-action-none": {
+                    "touch-action": "none",
+                },
+            });
+        },
+    ],
 };
 export default config;
