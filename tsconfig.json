@@ -27,6 +27,6 @@
         "**/*.tsx",
         ".next/types/**/*.ts",
         "app/(protected)/client/[id]"
-    ],
+, "app/(protected)/body-mass-composition"    ],
     "exclude": ["node_modules"]
 }
