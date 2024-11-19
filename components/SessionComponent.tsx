@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 import SessionExerciseComponent from "./SessionExerciseComponent";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
 const SessionComponent: FC<SessionProps> = ({
     phaseId,
@@ -18,6 +19,8 @@ const SessionComponent: FC<SessionProps> = ({
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [sessionName, setSessionName] = useState(session.sessionName);
+    const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
+        useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -38,8 +41,18 @@ const SessionComponent: FC<SessionProps> = ({
     };
 
     const handleSessionDelete = () => {
-        onSessionDelete(session.sessionId);
+        setShowSessionDeleteConfirm(true); // Show confirmation dialog
     };
+
+    const confirmSessionDelete = () => {
+        onSessionDelete(session.sessionId); // Perform delete
+        setShowSessionDeleteConfirm(false); // Close dialog
+    };
+
+    const cancelSessionDelete = () => {
+        setShowSessionDeleteConfirm(false); // Just close the dialog
+    };
+
     return (
         <div className="bg-white rounded-md shadow-sm border border-gray-200 p-4 mb-4 ">
             <div className="flex items-center justify-between container-class relative">
@@ -70,6 +83,13 @@ const SessionComponent: FC<SessionProps> = ({
                             >
                                 <FaTrash />
                             </button>
+                            {showSessionDeleteConfirm && (
+                                <DeleteConfirmationDialog
+                                    title={`Session: ${session.sessionName}`}
+                                    confirmDelete={confirmSessionDelete}
+                                    cancelDelete={cancelSessionDelete}
+                                />
+                            )}
                         </div>
                     )}
                 </div>

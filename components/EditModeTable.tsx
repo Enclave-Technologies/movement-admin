@@ -1,8 +1,9 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import { FaEdit, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { TiCancel } from "react-icons/ti";
 import { InputActionMeta } from "react-select";
 import Select from "react-select";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
 const EditModeTable: FC<EditableTableProps> = ({
     phaseId,
@@ -15,6 +16,25 @@ const EditModeTable: FC<EditableTableProps> = ({
     onExerciseUpdate,
     onExerciseDelete,
 }) => {
+    const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(
+        null
+    ); // Store the exercise ID for deletion
+
+    const handleDeleteExercise = (exerciseId: string) => {
+        setExerciseToDelete(exerciseId); // Set the ID of the exercise to delete
+    };
+
+    const confirmExerciseDelete = () => {
+        if (exerciseToDelete) {
+            onExerciseDelete(phaseId, sessionId, exerciseToDelete); // Perform delete
+            setExerciseToDelete(null); // Reset the state after confirmation
+        }
+    };
+
+    const cancelExerciseDelete = () => {
+        setExerciseToDelete(null); // Close dialog
+    };
+
     return (
         <div>
             {exercises.length === 0 ? (
@@ -43,7 +63,9 @@ const EditModeTable: FC<EditableTableProps> = ({
                     </colgroup>
                     <thead className="bg-green-500 text-white">
                         <tr>
-                            <th className="px-2 py-2 text-xs">Actions</th>
+                            <th className="sticky left-0 bg-green-500 z-20 px-2 py-2 text-xs">
+                                Actions
+                            </th>
                             <th className="px-2 py-2 text-xs">Order</th>
                             <th className="px-2 py-2 text-xs">Motion</th>
                             <th className="px-2 py-2 text-xs">Description</th>
@@ -55,7 +77,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                             <th className="px-2 py-2 text-xs">TUT</th>
                             <th className="px-2 py-2 text-xs">Tempo</th>
                             <th className="px-2 py-2 text-xs">Rest</th>
-                            <th className="px-2 py-2 text-xs">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,17 +87,26 @@ const EditModeTable: FC<EditableTableProps> = ({
                                     {/* <td className="px-1 py-2">
                                         {exercise.exerciseOrder}
                                     </td> */}
+                                    {exerciseToDelete === exercise.id && ( // Show confirmation only for the selected exercise
+                                        <DeleteConfirmationDialog
+                                            title={`Exercise: ${exercise.exerciseDescription}`}
+                                            confirmDelete={
+                                                confirmExerciseDelete
+                                            }
+                                            cancelDelete={cancelExerciseDelete}
+                                        />
+                                    )}
                                     {editingExerciseId === exercise.id ? (
                                         <>
-                                            <td className="px-0 py-2 items-center justify-between">
-                                                <button
+                                            <td className="sticky left-0 bg-white z-10 px-2 py-2 items-center justify-center">
+                                                {/* <button
                                                     onClick={() =>
                                                         onCancelEdit()
                                                     }
                                                     className="text-red-500 hover:text-red-700 mr-2"
                                                 >
                                                     <TiCancel className="text-xl" />
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     onClick={() =>
                                                         onEditExercise(null)
@@ -109,7 +139,8 @@ const EditModeTable: FC<EditableTableProps> = ({
                                             </td>
                                             <td className="px-1 py-2">
                                                 <input
-                                                    className="w-full px-0 text-center py-1 border rounded"
+                                                    className="w-full px-0 text-center py-1 border rounded cursor-not-allowed bg-gray-100"
+                                                    readOnly
                                                     value={
                                                         exercise.exerciseMotion
                                                     }
@@ -175,10 +206,8 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                         }
                                                     }}
                                                     styles={{
-                                                        control: (
-                                                            provided
-                                                        ) => ({
-                                                            ...provided,
+                                                        control: (base) => ({
+                                                            ...base,
                                                             backgroundColor:
                                                                 "white",
                                                             border: "1px solid #e5e7eb",
@@ -186,7 +215,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                 "0.375rem",
                                                             minHeight: "36px",
                                                             height: "36px",
-                                                            padding: "0 0.5rem",
                                                             display: "flex",
                                                             alignItems:
                                                                 "center",
@@ -196,29 +224,18 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     "#9ca3af",
                                                             },
                                                         }),
-                                                        valueContainer: (
-                                                            provided
-                                                        ) => ({
-                                                            ...provided,
-                                                            padding:
-                                                                "0.25rem 0",
-                                                        }),
-                                                        singleValue: (
-                                                            provided
-                                                        ) => ({
-                                                            ...provided,
-                                                            color: "#374151",
-                                                            fontSize:
-                                                                "0.875rem",
-                                                            lineHeight:
-                                                                "1.25rem",
-                                                            fontWeight: "400",
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            zIndex: 1000,
+                                                            marginTop:
+                                                                "0.25rem",
+                                                            width: "100%", // Ensure menu is width of the control
                                                         }),
                                                         option: (
-                                                            provided,
+                                                            base,
                                                             state
                                                         ) => ({
-                                                            ...provided,
+                                                            ...base,
                                                             backgroundColor:
                                                                 state.isSelected
                                                                     ? "#e5e7eb"
@@ -233,22 +250,16 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     "#f3f4f6",
                                                             },
                                                         }),
-                                                        menu: (provided) => ({
-                                                            ...provided,
-                                                            position:
-                                                                "absolute",
-                                                            width: "100%",
-                                                            zIndex: 1000,
-                                                            marginTop:
-                                                                "0.25rem",
-                                                        }),
-                                                        menuList: (
-                                                            provided
+                                                        singleValue: (
+                                                            base
                                                         ) => ({
-                                                            ...provided,
-                                                            maxHeight: "200px",
-                                                            zIndex: 1000,
-                                                            overflowY: "auto",
+                                                            ...base,
+                                                            color: "#374151",
+                                                            fontSize:
+                                                                "0.875rem",
+                                                            lineHeight:
+                                                                "1.25rem",
+                                                            fontWeight: "400",
                                                         }),
                                                     }}
                                                 />
@@ -256,7 +267,8 @@ const EditModeTable: FC<EditableTableProps> = ({
 
                                             <td className="px-1 py-2">
                                                 <input
-                                                    className="w-full px-0 text-center py-1 border rounded"
+                                                    className="w-full px-0 text-center py-1 border rounded  cursor-not-allowed bg-gray-100"
+                                                    readOnly
                                                     value={
                                                         exercise.exerciseShortDescription ||
                                                         ""
@@ -275,70 +287,131 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     }
                                                 />
                                             </td>
-                                            <td className="px-1 py-2 flex items-center text-center justify-center gap-1">
-                                                <input
-                                                    className="w-12 px-0 py-1 text-center border rounded"
-                                                    type="number"
-                                                    value={exercise.setsMin}
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                setsMin:
-                                                                    parseInt(
-                                                                        e.target
-                                                                            .value
-                                                                    ) || 0,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                                <span className="text-xs">
-                                                    -
-                                                </span>
-                                                <input
-                                                    className="w-12 px-0 py-1 text-center border rounded"
-                                                    type="number"
-                                                    value={exercise.setsMax}
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                setsMax:
-                                                                    parseInt(
-                                                                        e.target
-                                                                            .value
-                                                                    ) || 0,
-                                                            }
-                                                        )
-                                                    }
-                                                />
+                                            <td className="px-1 py-2">
+                                                <div className="flex items-center text-center justify-center gap-1">
+                                                    <input
+                                                        className="w-12 px-0 py-1 text-center border rounded"
+                                                        type="number"
+                                                        value={
+                                                            exercise.setsMin ||
+                                                            ""
+                                                        } // Ensure it's a controlled input
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                e.target.value;
+                                                            const newValue =
+                                                                value === ""
+                                                                    ? 0
+                                                                    : parseInt(
+                                                                          value
+                                                                      ); // Handle empty input
+                                                            onExerciseUpdate(
+                                                                phaseId,
+                                                                sessionId,
+                                                                {
+                                                                    ...exercise,
+                                                                    setsMin:
+                                                                        newValue,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                    <span className="text-xs">
+                                                        {" "}
+                                                        -{" "}
+                                                    </span>
+                                                    <input
+                                                        className="w-12 px-0 py-1 text-center border rounded"
+                                                        type="number"
+                                                        value={
+                                                            exercise.setsMax ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                e.target.value;
+                                                            const newValue =
+                                                                value === ""
+                                                                    ? 0
+                                                                    : parseInt(
+                                                                          value
+                                                                      ); // Handle empty input
+                                                            onExerciseUpdate(
+                                                                phaseId,
+                                                                sessionId,
+                                                                {
+                                                                    ...exercise,
+                                                                    setsMax:
+                                                                        newValue,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
                                             </td>
                                             <td className="px-1 py-2">
-                                                <input
-                                                    className="w-full px-0 py-1 text-center border rounded"
-                                                    value={`${exercise.repsMin}-${exercise.repsMax}`}
-                                                    onChange={(e) => {
-                                                        const [min, max] =
-                                                            e.target.value
-                                                                .split("-")
-                                                                .map(Number);
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                repsMin: min,
-                                                                repsMax: max,
-                                                            }
-                                                        );
-                                                    }}
-                                                />
+                                                <div className="flex items-center text-center justify-center gap-1">
+                                                    <input
+                                                        className="w-12 px-0 py-1 text-center border rounded"
+                                                        type="number"
+                                                        value={
+                                                            exercise.repsMin ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                e.target.value;
+                                                            const newValue =
+                                                                value === ""
+                                                                    ? 0
+                                                                    : parseInt(
+                                                                          value
+                                                                      ); // Handle empty input
+                                                            onExerciseUpdate(
+                                                                phaseId,
+                                                                sessionId,
+                                                                {
+                                                                    ...exercise,
+                                                                    repsMin:
+                                                                        newValue,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                    <span className="text-xs">
+                                                        {" "}
+                                                        -{" "}
+                                                    </span>
+                                                    <input
+                                                        className="w-12 px-0 py-1 text-center border rounded"
+                                                        type="number"
+                                                        value={
+                                                            exercise.repsMax ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                e.target.value;
+                                                            const newValue =
+                                                                value === ""
+                                                                    ? 0
+                                                                    : parseInt(
+                                                                          value
+                                                                      ); // Handle empty input
+                                                            onExerciseUpdate(
+                                                                phaseId,
+                                                                sessionId,
+                                                                {
+                                                                    ...exercise,
+                                                                    repsMax:
+                                                                        newValue,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
                                             </td>
+
                                             <td className="px-1 py-2">
                                                 <input
                                                     className="w-full px-0 text-center py-1 border rounded"
@@ -376,7 +449,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                 />
                                             </td>
                                             <td className="px-1 py-2">
-                                                <input
+                                                {/* <input
                                                     className="w-full px-0 text-center py-1 border rounded"
                                                     value={`${exercise.restMin}-${exercise.restMax}`}
                                                     onChange={(e) => {
@@ -394,30 +467,72 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                             }
                                                         );
                                                     }}
-                                                />
-                                            </td>
-                                            <td className="px-0 py-2 items-center justify-between">
-                                                <button
-                                                    onClick={() =>
-                                                        onCancelEdit()
-                                                    }
-                                                    className="text-red-500 hover:text-red-700 mr-2"
-                                                >
-                                                    <TiCancel className="text-xl" />
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        onEditExercise(null)
-                                                    }
-                                                    className="text-green-500 hover:text-green-700"
-                                                >
-                                                    <FaSave className="text-lg" />
-                                                </button>
+                                                /> */}
+                                                <div className="flex items-center text-center justify-center gap-1">
+                                                    <input
+                                                        className="w-12 px-0 py-1 text-center border rounded"
+                                                        type="number"
+                                                        value={
+                                                            exercise.restMin ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                e.target.value;
+                                                            const newValue =
+                                                                value === ""
+                                                                    ? 0
+                                                                    : parseInt(
+                                                                          value
+                                                                      ); // Handle empty input
+                                                            onExerciseUpdate(
+                                                                phaseId,
+                                                                sessionId,
+                                                                {
+                                                                    ...exercise,
+                                                                    restMin:
+                                                                        newValue,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                    <span className="text-xs">
+                                                        {" "}
+                                                        -{" "}
+                                                    </span>
+                                                    <input
+                                                        className="w-12 px-0 py-1 text-center border rounded"
+                                                        type="number"
+                                                        value={
+                                                            exercise.restMax ||
+                                                            ""
+                                                        }
+                                                        onChange={(e) => {
+                                                            const value =
+                                                                e.target.value;
+                                                            const newValue =
+                                                                value === ""
+                                                                    ? 0
+                                                                    : parseInt(
+                                                                          value
+                                                                      ); // Handle empty input
+                                                            onExerciseUpdate(
+                                                                phaseId,
+                                                                sessionId,
+                                                                {
+                                                                    ...exercise,
+                                                                    restMax:
+                                                                        newValue,
+                                                                }
+                                                            );
+                                                        }}
+                                                    />
+                                                </div>
                                             </td>
                                         </>
                                     ) : (
                                         <>
-                                            <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap">
+                                            <td className="sticky left-0 bg-white z-10 px-2 py-2">
                                                 <button
                                                     onClick={() =>
                                                         onEditExercise(
@@ -429,12 +544,18 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     <FaEdit />
                                                 </button>
                                                 <button
-                                                    onClick={() =>
-                                                        onExerciseDelete(
-                                                            phaseId,
-                                                            sessionId,
-                                                            exercise.id
-                                                        )
+                                                    // onClick={() =>
+                                                    //     onExerciseDelete(
+                                                    //         phaseId,
+                                                    //         sessionId,
+                                                    //         exercise.id
+                                                    //     )
+                                                    // }
+                                                    onClick={
+                                                        () =>
+                                                            handleDeleteExercise(
+                                                                exercise.id
+                                                            ) // Pass the exercise ID here
                                                     }
                                                     className="text-red-500 hover:text-red-700"
                                                 >
@@ -464,30 +585,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                 {exercise.tempo}
                                             </td>
                                             <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap">{`${exercise.restMin}-${exercise.restMax}`}</td>
-                                            <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap">
-                                                <button
-                                                    onClick={() =>
-                                                        onEditExercise(
-                                                            exercise.id
-                                                        )
-                                                    }
-                                                    className="text-blue-500 hover:text-blue-700 mr-2"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    onClick={() =>
-                                                        onExerciseDelete(
-                                                            phaseId,
-                                                            sessionId,
-                                                            exercise.id
-                                                        )
-                                                    }
-                                                    className="text-red-500 hover:text-red-700"
-                                                >
-                                                    <FaTrash />
-                                                </button>
-                                            </td>
                                         </>
                                     )}
                                 </tr>

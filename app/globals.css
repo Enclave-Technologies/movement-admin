@@ -118,6 +118,20 @@ body {
     @apply rounded-lg;
 }
 
+/* styles.css */
+
+.touchscreen-button {
+    opacity: 1; /* Default opacity */
+}
+
+@media (pointer: coarse) {
+    /* This targets touchscreen devices */
+    .touchscreen-button {
+        opacity: 0.75; /* Change to 75% opacity */
+        transition: opacity 0.3s ease; /* Optional: Add transition */
+    }
+}
+
 @keyframes outline-animation {
     0% {
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);

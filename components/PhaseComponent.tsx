@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { ID } from "appwrite";
 import { on } from "events";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 
 const PhaseComponent: FC<PhaseProps> = ({
     phase,
@@ -33,6 +34,8 @@ const PhaseComponent: FC<PhaseProps> = ({
     const [isEditing, setIsEditing] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [phaseName, setPhaseName] = useState(phase.phaseName);
+    const [showPhaseDeleteConfirm, setShowPhaseDeleteConfirm] = useState(false);
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -65,6 +68,19 @@ const PhaseComponent: FC<PhaseProps> = ({
         onAddSession(phase.phaseId, newSession);
     };
 
+    const handleDeletePhase = () => {
+        setShowPhaseDeleteConfirm(true); // Show confirmation dialog
+    };
+
+    const confirmDeletePhase = () => {
+        onPhaseDelete(phase.phaseId); // Perform delete
+        setShowPhaseDeleteConfirm(false); // Close dialog
+    };
+
+    const cancelDeletePhase = () => {
+        setShowPhaseDeleteConfirm(false); // Just close the dialog
+    };
+
     return (
         <div className="bg-white rounded-lg shadow-md border w-full border-gray-200 ">
             <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
@@ -91,9 +107,15 @@ const PhaseComponent: FC<PhaseProps> = ({
                             </button>
                             <button
                                 className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
-                                onClick={() => {
-                                    onPhaseDelete(phase.phaseId);
-                                }}
+                                // onClick={() => {
+                                //     const isConfirmed = window.confirm(
+                                //         "Are you sure you want to delete this phase?"
+                                //     );
+                                //     if (isConfirmed) {
+                                //         onPhaseDelete(phase.phaseId);
+                                //     }
+                                // }}
+                                onClick={handleDeletePhase}
                             >
                                 <FaTrash />
                             </button>
@@ -105,6 +127,14 @@ const PhaseComponent: FC<PhaseProps> = ({
                                 {/* <span className="hidden lg:flex">Copy</span> */}
                             </button>
                         </>
+                    )}
+
+                    {showPhaseDeleteConfirm && (
+                        <DeleteConfirmationDialog
+                            title={`Phase: ${phase.phaseName}`}
+                            confirmDelete={confirmDeletePhase}
+                            cancelDelete={cancelDeletePhase}
+                        />
                     )}
                 </div>
                 <div className="flex items-center gap-2">

@@ -66,18 +66,20 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-green-500 text-white">
-                                <th className="font-normal pl-5 pr-4 h-12"></th>
-                                <th className="font-normal pl-5 pr-4 h-12">
+                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"></th>
+                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap">
                                     Client Name
                                 </th>
-                                <th className="font-normal pl-5 pr-4">Email</th>
-                                <th className="font-normal pl-5 pr-4">
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                                    Email
+                                </th>
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
                                     Phone Number
                                 </th>
-                                <th className="font-normal pl-5 pr-4">
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
                                     Trainer Name
                                 </th>
-                                <th className="font-normal pl-5 pr-4">
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
                                     Action
                                 </th>
                             </tr>
@@ -89,32 +91,36 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                     key={index}
                                     className={`${
                                         index % 2 ? "bg-gray-50" : "bg-gray-200"
-                                    } h-12 touch-action-none`}
+                                    } h-12 touch-action-none cursor-pointer`}
                                     onClick={() => handleRowClick(client)}
                                 >
                                     <td className="pl-5">
-                                        <Image
-                                            src={
-                                                client.imageUrl ||
-                                                defaultProfileURL
-                                            } // Provide a default placeholder
-                                            width={30}
-                                            height={30}
-                                            alt={`Image of ${client.name}`}
-                                            className="w-10 h-10 rounded-full"
-                                        />
+                                        <div className="w-10 h-10">
+                                            <Image
+                                                src={
+                                                    client.imageUrl ||
+                                                    defaultProfileURL
+                                                } // Provide a default placeholder
+                                                width={30}
+                                                height={30}
+                                                alt={`Image of ${client.name}`}
+                                                className="rounded-full"
+                                            />
+                                        </div>
                                     </td>
-                                    <td className="pl-5">{client.name}</td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
+                                        {client.name}
+                                    </td>
+                                    <td className="pl-5 whitespace-nowrap">
                                         {client.email || "-"}
                                     </td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
                                         {client.phone || "-"}
                                     </td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
                                         {client.trainer_name || "Not Assigned"}
                                     </td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
                                         <Link href={`client/${client.uid}`}>
                                             <p
                                                 className="text-sm underline

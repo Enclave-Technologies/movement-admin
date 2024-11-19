@@ -380,7 +380,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             {/* <pre>{JSON.stringify(clientPhases, null, 2)}</pre> */}
             <div className="fixed bottom-4 right-4 z-50">
                 <button
-                    className="bg-green-500/25 hover:bg-green-500/100 text-white p-4 rounded-full shadow-md transition-colors duration-300"
+                    className="bg-green-500/75 hover:bg-green-500/100 text-white p-4 rounded-full shadow-md transition-colors duration-300 touchscreen-button"
                     onClick={handleDataSubmit}
                 >
                     <FaSave className="text-5xl" />
