@@ -55,7 +55,7 @@ export async function middleware(request) {
                 sameSite: "None",
                 secure: true,
                 path: "/",
-                // domain: "enclave.live",
+                domain: "enclave.live",
             });
             return NextResponse.redirect(new URL("/login", request.url));
         } else {
