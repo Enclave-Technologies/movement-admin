@@ -27,8 +27,8 @@ const WorkoutRecordBody = ({
                         <span
                             className={`ml-2 transition-transform text-white ${
                                 openExercises.includes(exercise.id)
-                                    ? "rotate-180"
-                                    : ""
+                                    ? ""
+                                    : "rotate-180"
                             }`}
                         >
                             <BsTriangleFill />
