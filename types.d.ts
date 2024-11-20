@@ -15,45 +15,6 @@ interface Client {
     imageUrl?: string;
 }
 
-interface PhaseRow {
-    order: number;
-    motion: string;
-    specificDescription: string;
-    repsMin: number;
-    repsMax: number;
-    setsMin: number;
-    setsMax: number;
-}
-// Define the interface for a session exercise
-interface SessionExercise {
-    // Unique session exercise ID
-    id: string;
-    // Exercises associated with the session
-    exercises: string;
-    // Sessions associated with the exercise
-    sessions: string;
-    // Minimum reps for the exercise
-    repsMin: number;
-    // Maximum reps for the exercise
-    repsMax: number;
-    // Minimum sets for the exercise
-    setsMin: number;
-    // Maximum sets for the exercise
-    setsMax: number;
-    // Tempo of the exercise
-    tempo?: string;
-    // Time Under Tension (TUT) for the exercise
-    TUT?: number;
-    // Minimum rest time between sets
-    restMin?: number;
-    // Maximum rest time between sets
-    restMax?: number;
-    // Order of the exercise in the session
-    exerciseOrder: number;
-    motion: string;
-    specificDescription: string;
-}
-
 interface WorkoutData {
     id: string;
     Motion: string;
@@ -77,32 +38,6 @@ interface EditableRowProps {
     isEditing: boolean;
     setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
     allWorkouts: WorkoutData[];
-}
-
-// Define the interface for a movement session
-interface MovSession {
-    // Unique session ID
-    id: string;
-    // Name of the session
-    sessionName: string;
-    // Order of the session in the sequence
-    sessionOrder: number;
-    // Phases associated with the session
-    phases: string;
-    // List of session exercises associated with the session, default is an empty list
-    exercises: SessionExercise[];
-}
-
-// Define the interface for a phase
-interface Phase {
-    // Unique phase ID
-    id: string;
-    // Name of the phase
-    phaseName: string;
-    // Boolean indicating if the phase is active
-    isActive: boolean;
-    // List of movement sessions associated with the phase, default is an empty list
-    sessions: MovSession[];
 }
 
 // Define the interface for a phase dropdown option
@@ -192,4 +127,124 @@ interface GoalTileProps {
     isEditMode: boolean;
     onEdit: () => void;
     onDelete: () => void;
+}
+
+interface Exercise {
+    id: string; // $id
+    exerciseId: string;
+    exerciseDescription?: string | null;
+    exerciseMotion: string;
+    exerciseShortDescription?: string | null;
+    exerciseVideo?: string | null;
+    repsMin: number;
+    repsMax: number;
+    setsMin: number;
+    setsMax: number;
+    tempo?: string | null;
+    TUT?: number | null;
+    restMin: number;
+    restMax: number;
+    exerciseOrder: number;
+    setOrderMarker?: string | null;
+}
+
+interface MovementSession {
+    sessionId: string; // $id
+    sessionName: string;
+    sessionOrder: number;
+    sessionTime?: string | null;
+    exercises: Exercise[];
+}
+
+interface Phase {
+    phaseId: string; // $id
+    phaseName: string;
+    isActive: boolean;
+    sessions: MovementSession[];
+}
+
+interface PhaseProps {
+    phase: Phase;
+    workouts: WorkoutData[];
+    onPhaseNameChange: (phaseId: string, newPhaseName: string) => void;
+    handleCopyPhase: (phaseId: string) => void;
+    onPhaseDelete: (phaseId: string) => void;
+    onActivatePhase: (phaseId: string, phaseState: boolean) => void;
+    onAddSession: (phaseId: string, newSession: MovementSession) => void;
+    activePhaseId: string | null;
+    onSessionDelete;
+    onSessionNameChange;
+    editingExerciseId;
+    onExerciseAdd;
+    onExerciseUpdate;
+    onExerciseDelete;
+    onExerciseOrderChange;
+    onEditExercise;
+    onCancelEdit;
+}
+
+interface SessionProps {
+    phaseId: string;
+    session: MovementSession;
+    workouts: WorkoutData[];
+    onSessionNameChange: (sessionId: string, sessionName: str) => void;
+    onSessionDelete: (sessionId: string) => void;
+
+    editingExerciseId;
+    onExerciseAdd;
+    onExerciseUpdate;
+    onExerciseDelete;
+    onExerciseOrderChange;
+    onEditExercise;
+    onCancelEdit;
+}
+
+interface SessionExerciseProps {
+    phaseId: string;
+    sessionId: string;
+    exercises: Exercise[];
+    workouts: WorkoutData[];
+    onExerciseAdd: (phaseId: string, sessionId: string) => void;
+    onExerciseUpdate: (
+        phaseId: string,
+        sessionId: string,
+        updatedExercise: Exercise
+    ) => void;
+    editingExerciseId: string | null;
+    onExerciseDelete: (
+        phaseId: string,
+        sessionId: string,
+        exerciseId: string
+    ) => void;
+    onExerciseOrderChange: (
+        phaseId: string,
+        sessionId: string,
+        updatedExercises: Exercise[]
+    ) => void;
+    onEditExercise: (exerciseId: string) => void;
+    onCancelEdit: () => void;
+}
+
+interface DataResponse {
+    phases: Phase[];
+}
+
+interface EditableTableProps {
+    phaseId: string;
+    sessionId: string;
+    workoutOptions: { value: string; label: string; workout: WorkoutData }[];
+    exercises: Exercise[];
+    editingExerciseId: string | null;
+    onCancelEdit: () => void;
+    onEditExercise: (exerciseId: string) => void;
+    onExerciseUpdate: (
+        phaseId: string,
+        sessionId: string,
+        updatedExercise: any
+    ) => void;
+    onExerciseDelete: (
+        phaseId: string,
+        sessionId: string,
+        exerciseId: string
+    ) => void;
 }

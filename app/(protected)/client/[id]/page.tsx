@@ -21,7 +21,7 @@ const LinkTileData = [
     },
     {
         href: (params: { id: string }) => `${params.id}/recommended-workouts`,
-        label: "Recommended Workouts",
+        label: "Workout Planning",
         statKey: "recommendedWorkouts",
     },
     {

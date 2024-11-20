@@ -2,9 +2,13 @@
 import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
 import React, { useState, useMemo } from "react";
+import Image from "next/image";
+import { defaultProfileURL } from "@/configs/constants";
+import { useRouter } from "next/navigation";
 
 const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
     const [search, setSearch] = useState("");
+    const router = useRouter();
 
     const filteredClients = useMemo(() => {
         return clients.filter((client) => {
@@ -15,6 +19,15 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
             );
         });
     }, [clients, search]);
+
+    const handleRowClick = (client) => {
+        // Implement the action you want to execute on double-click
+        console.log("Client clicked:", client);
+        // For example, you can redirect to the client details page
+        // window.location.href = `client/${client.uid}`;
+        router.push(`client/${client.uid}`);
+    };
+
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full">
@@ -53,17 +66,22 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                     <table className="w-full text-left">
                         <thead>
                             <tr className="bg-green-500 text-white">
-                                <th className="font-normal pl-5 pr-4 h-12">
+                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"></th>
+                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap">
                                     Client Name
                                 </th>
-                                <th className="font-normal pl-5 pr-4">Email</th>
-                                <th className="font-normal pl-5 pr-4">
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                                    Email
+                                </th>
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
                                     Phone Number
                                 </th>
-                                <th className="font-normal pl-5 pr-4">
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
                                     Trainer Name
                                 </th>
-                                <th className="font-normal pl-5 pr-4">More</th>
+                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                                    Action
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="border-t-2 border-white">
@@ -73,23 +91,40 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                     key={index}
                                     className={`${
                                         index % 2 ? "bg-gray-50" : "bg-gray-200"
-                                    } h-12`}
+                                    } h-12 touch-action-none cursor-pointer`}
+                                    onClick={() => handleRowClick(client)}
                                 >
-                                    <td className="pl-5">{client.name}</td>
                                     <td className="pl-5">
+                                        <div className="w-10 h-10">
+                                            <Image
+                                                src={
+                                                    client.imageUrl ||
+                                                    defaultProfileURL
+                                                } // Provide a default placeholder
+                                                width={30}
+                                                height={30}
+                                                alt={`Image of ${client.name}`}
+                                                className="rounded-full"
+                                            />
+                                        </div>
+                                    </td>
+                                    <td className="pl-5 whitespace-nowrap">
+                                        {client.name}
+                                    </td>
+                                    <td className="pl-5 whitespace-nowrap">
                                         {client.email || "-"}
                                     </td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
                                         {client.phone || "-"}
                                     </td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
                                         {client.trainer_name || "Not Assigned"}
                                     </td>
-                                    <td className="pl-5">
+                                    <td className="pl-5 whitespace-nowrap">
                                         <Link href={`client/${client.uid}`}>
                                             <p
                                                 className="text-sm underline
-                                             text-gold-500 hover:text-green-500"
+                                             text-green-500 hover:text-gold-500"
                                             >
                                                 View Details
                                             </p>

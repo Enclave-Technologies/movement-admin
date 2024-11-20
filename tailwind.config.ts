@@ -35,7 +35,9 @@ const config: Config = {
                 },
 
                 green: {
+                    300: "#E1FF74",
                     500: "#006747",
+                    800: "#03140F",
                     900: "#005536",
                 },
                 gold: {
@@ -44,6 +46,14 @@ const config: Config = {
             },
         },
     },
-    plugins: [],
+    plugins: [
+        function ({ addUtilities }) {
+            addUtilities({
+                ".touch-action-none": {
+                    "touch-action": "none",
+                },
+            });
+        },
+    ],
 };
 export default config;

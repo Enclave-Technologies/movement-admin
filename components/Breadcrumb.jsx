@@ -26,7 +26,7 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
                             alt="Home"
                             width={20}
                             height={20}
-                            className="mr-2 rounded-full w-10" // Add margin and round the image
+                            className="mr-2 rounded-full w-10"
                         />
                         <span className="font-medium">{homeTitle}</span>
                     </Link>
@@ -40,7 +40,11 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
                             <IoIosArrowForward className="text-gray-400" />
                             <Link
                                 href={href}
-                                className="ml-2 text-gray-700 hover:text-blue-600 font-medium"
+                                className={`ml-2 font-extrabold underline ${
+                                    index === segments.slice(2).length - 1
+                                        ? "gradient-animation bg-clip-text"
+                                        : "text-gray-700 hover:text-blue-600"
+                                }`}
                             >
                                 {customTexts[index] || segment}
                             </Link>
