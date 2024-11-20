@@ -15,6 +15,7 @@ const RecordWorkout = () => {
     const [clientId, setClientId] = useState("");
     const [phaseId, setPhaseId] = useState("");
     const [sessionId, setSessionId] = useState("");
+
     const [pageLoading, setPageLoading] = useState(true);
     const [openExercises, setOpenExercises] = useState([]);
     const [sessionInformation, setSessionInformation] = useState(null);
