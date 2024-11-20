@@ -11,11 +11,9 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 const RecordWorkout = () => {
     const searchParams = useSearchParams();
 
-    // Extract the query parameters
-    const clientId = searchParams.get("clientId");
-    const phaseId = searchParams.get("phaseId");
-    const sessionId = searchParams.get("sessionId");
-
+    const [clientId, setClientId] = useState("");
+    const [phaseId, setPhaseId] = useState("");
+    const [sessionId, setSessionId] = useState("");
     const [pageLoading, setPageLoading] = useState(true);
     const [openExercises, setOpenExercises] = useState([]);
     const [sessionInformation, setSessionInformation] = useState(null);
@@ -34,6 +32,15 @@ const RecordWorkout = () => {
     useEffect(() => {
         async function loadData() {
             setPageLoading(true);
+            // Extract the query parameters
+            const clientId = searchParams.get("clientId");
+            const phaseId = searchParams.get("phaseId");
+            const sessionId = searchParams.get("sessionId");
+
+            setClientId(clientId);
+            setPhaseId(phaseId);
+            setSessionId(sessionId);
+
             const response = await axios.get(
                 `${API_BASE_URL}/mvmt/v1/client/workout-tracker?client_id=${clientId}&phase_id=${phaseId}&session_id=${sessionId}`,
                 { withCredentials: true }
