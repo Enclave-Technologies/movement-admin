@@ -53,6 +53,7 @@ const sessions = [
 const Page = ({ params }: { params: { id: string } }) => {
     const [pageLoading, setPageLoading] = useState(true);
     const [nextSession, setNextSession] = useState(null);
+    const [progressId, setProgressId] = useState("");
     const [sessionLog, setSessionLog] = useState([]);
     const [workoutPressed, setWorkoutPressed] = useState(false);
     const page_title = ["Tracked Workouts"];
@@ -68,9 +69,11 @@ const Page = ({ params }: { params: { id: string } }) => {
                     { withCredentials: true }
                 );
 
-                const { nextSession, sessionLogs } = clientPhases.data;
+                const { nextSession, sessionLogs, progressId } =
+                    clientPhases.data;
                 setNextSession(nextSession[0]);
                 setSessionLog(sessionLogs);
+                setProgressId(progressId);
             } catch (e) {
                 console.log(e);
             } finally {
@@ -95,20 +98,19 @@ const Page = ({ params }: { params: { id: string } }) => {
             const response = await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
                 {
-                    client_id: params.id,
-                    nextSession,
+                    progress_id: progressId,
                 },
                 {
                     withCredentials: true,
                 }
             );
-            // console.log(response.status);
+            console.log(response);
             // console.log("Client ID:", params.id);
             // console.log("Phase ID:", nextSession?.phases.$id);
             // console.log("Session ID:", nextSession?.$id);
-            // router.push(
-            //     `/record-workout?clientId=${params.id}&phaseId=${nextSession?.phases.$id}&sessionId=${nextSession?.$id}`
-            // );
+            router.push(
+                `/record-workout?clientId=${params.id}&phaseId=${nextSession?.phases.$id}&sessionId=${nextSession?.$id}`
+            );
         } catch (e) {
             console.error("Failed to start workout:", e);
         } finally {
@@ -134,9 +136,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                     customTexts={page_title}
                 />
             </div>
-            <div>
-                <br />
-                {JSON.stringify(nextSession, null, 2)}
+            <div className="mt-4">
+                {/* <br /> */}
+                {/* {JSON.stringify(nextSession, null, 2)} */}
                 <h5 className="font-bold">Next Workout</h5>
             </div>
             <br />
