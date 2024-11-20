@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import WorkoutRecordHeader from "@/components/WorkoutRecordHeader";
@@ -91,23 +91,31 @@ const RecordWorkout = () => {
     }
 
     return (
-        <div className="min-h-screen bg-green-800 flex flex-col items-center">
-            <div className="flex flex-col w-full max-w-full mx-auto">
-                <WorkoutRecordHeader
-                    phaseName={sessionInformation["phases.phaseName"]}
-                    sessionName={sessionInformation["sessionName"]}
-                    startTime={""}
-                />
+        <Suspense
+            fallback={
+                <div className="bg-green-800">
+                    <Spinner />
+                </div>
+            }
+        >
+            <div className="min-h-screen bg-green-800 flex flex-col items-center">
+                <div className="flex flex-col w-full max-w-full mx-auto">
+                    <WorkoutRecordHeader
+                        phaseName={sessionInformation["phases.phaseName"]}
+                        sessionName={sessionInformation["sessionName"]}
+                        startTime={""}
+                    />
 
-                <WorkoutRecordBody
-                    workoutRecords={exerciseData}
-                    toggleAccordion={toggleAccordion}
-                    openExercises={openExercises}
-                    handleSetChange={handleSetChange}
-                    handleExerciseNotesChange={handleExerciseNotesChange}
-                />
+                    <WorkoutRecordBody
+                        workoutRecords={exerciseData}
+                        toggleAccordion={toggleAccordion}
+                        openExercises={openExercises}
+                        handleSetChange={handleSetChange}
+                        handleExerciseNotesChange={handleExerciseNotesChange}
+                    />
+                </div>
             </div>
-        </div>
+        </Suspense>
     );
 };
 
