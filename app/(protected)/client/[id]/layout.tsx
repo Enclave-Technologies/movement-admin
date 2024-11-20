@@ -38,9 +38,16 @@
 import { UserProvider } from "@/context/ClientContext";
 import { useParams } from "next/navigation";
 import ClientLayoutContent from "@/components/ClientLayoutContent";
+import { useEffect } from "react";
 
 const ClientLayout = ({ children }: { children: React.ReactNode }) => {
     const params = useParams();
+
+    useEffect(() => {
+        if (!params.id) {
+            window.location.href = "/"; // Redirect to home if the param is missing
+        }
+    }, [params.id]);
 
     if (!params.id) {
         return <div>Error: {JSON.stringify(params)}</div>;

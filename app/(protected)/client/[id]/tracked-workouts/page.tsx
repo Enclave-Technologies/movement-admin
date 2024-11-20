@@ -1,8 +1,16 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Breadcrumb from "@/components/Breadcrumb";
 import { useUser } from "@/context/ClientContext";
+import BreadcrumbLoading from "@/components/BreadcrumbLoading";
+import Spinner from "@/components/Spinner";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+import NextSessionInfo from "@/components/NextSessionInfo";
+import SessionLogTable from "@/components/SessionLogTable";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const sessions = [
     {
@@ -42,15 +50,81 @@ const sessions = [
     },
 ];
 
-const Page = () => {
+const Page = ({ params }: { params: { id: string } }) => {
+    const [pageLoading, setPageLoading] = useState(true);
+    const [nextSession, setNextSession] = useState(null);
+    const [sessionLog, setSessionLog] = useState([]);
+    const [workoutPressed, setWorkoutPressed] = useState(false);
     const page_title = ["Tracked Workouts"];
-    const { userData, setUserData } = useUser();
+    const { userData } = useUser();
+    const router = useRouter();
+
+    useEffect(() => {
+        async function loadData() {
+            try {
+                setPageLoading(true);
+                const clientPhases = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/client/tracked-workouts?client_id=${params.id}`,
+                    { withCredentials: true }
+                );
+
+                const { nextSession, sessionLogs } = clientPhases.data;
+                setNextSession(nextSession[0]);
+                setSessionLog(sessionLogs);
+            } catch (e) {
+                console.log(e);
+            } finally {
+                setPageLoading(false);
+            }
+        }
+        loadData();
+    }, []);
+
     const handleViewSession = (session: any) => {
         console.log(
             `Viewing session on ${session.date}:\n\nTut:\n${session.tut}\n\nExercises:\n${session.exercises}`
         );
     };
 
+    const handleStartWorkout = async () => {
+        // e.preventDefault();
+        try {
+            // setPageLoading(true);
+            setWorkoutPressed(true);
+            console.log("Preparing to start workout...");
+            const response = await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
+                {
+                    client_id: params.id,
+                    nextSession,
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+            // console.log(response.status);
+            // console.log("Client ID:", params.id);
+            // console.log("Phase ID:", nextSession?.phases.$id);
+            // console.log("Session ID:", nextSession?.$id);
+            // router.push(
+            //     `/record-workout?clientId=${params.id}&phaseId=${nextSession?.phases.$id}&sessionId=${nextSession?.$id}`
+            // );
+        } catch (e) {
+            console.error("Failed to start workout:", e);
+        } finally {
+            setWorkoutPressed(false);
+            // setPageLoading(false);
+        }
+    };
+
+    if (pageLoading) {
+        return (
+            <div className="ml-12">
+                <BreadcrumbLoading />
+                <Spinner />
+            </div>
+        );
+    }
     return (
         <div>
             <div className="ml-12">
@@ -61,72 +135,23 @@ const Page = () => {
                 />
             </div>
             <div>
+                <br />
+                {JSON.stringify(nextSession, null, 2)}
                 <h5 className="font-bold">Next Workout</h5>
             </div>
             <br />
 
-            <div className="border rounded-lg p-2 mb-5 border-green-500">
-                <div className="flex justify-between items-center bg-gray-50 p-2">
-                    <ul className="text-left">
-                        <li>PHASE 3</li>
-                        <li>SESSION : UPPER BODY</li>
-                    </ul>
-                    <Link href="tracked-workouts/create-workout">
-                        <button className="px-4 py-2 text-white rounded-2xl bg-green-500">
-                            START WORKOUT
-                        </button>
-                    </Link>
-                </div>
-            </div>
+            <NextSessionInfo
+                sessionInfo={nextSession}
+                workoutPressed={workoutPressed}
+                handleStartWorkout={handleStartWorkout}
+            />
             <section>
-                <h3 className="font-bold mb-2">Workout History</h3>
-                <table className="w-full border-collapse">
-                    <thead>
-                        <tr className="bg-green-500">
-                            <th className="border p-2 text-white text-center">
-                                Date
-                            </th>
-                            <th className="border p-2 text-white text-center">
-                                Phase
-                            </th>
-                            <th className="border p-2 text-white text-center">
-                                Tut
-                            </th>
-                            <th className="border p-2 text-white text-center">
-                                #Exercises
-                            </th>
-                            <th className="border p-2 text-white text-center"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {sessions.map((session) => (
-                            <tr key={session.id}>
-                                <td className="border p-2 text-center">
-                                    {session.date}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    {session.session}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    {session.tut}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    {session.exercises}
-                                </td>
-                                <td className="border p-2 text-center">
-                                    <button
-                                        onClick={() =>
-                                            handleViewSession(session)
-                                        }
-                                        className="text-blue-500 underline"
-                                    >
-                                        View
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+                <h3 className="font-bold mb-2 uppercase">Workout History</h3>
+                <SessionLogTable
+                    handleViewSession={handleViewSession}
+                    sessions={sessionLog}
+                />
             </section>
         </div>
     );
