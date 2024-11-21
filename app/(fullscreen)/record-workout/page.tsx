@@ -1,7 +1,6 @@
 "use client";
 import axios from "axios";
 import React, { Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
 import Spinner from "@/components/Spinner";
 import SearchParamsLoader from "@/components/WorkoutRecordDataLoader";
 import WorkoutRecordHeader from "@/components/WorkoutRecordHeader";
@@ -10,8 +9,6 @@ import WorkoutRecordBody from "@/components/WorkoutRecordBody";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const RecordWorkout = () => {
-    const searchParams = useSearchParams();
-
     const [clientId, setClientId] = useState("");
     const [phaseId, setPhaseId] = useState("");
     const [sessionId, setSessionId] = useState("");
