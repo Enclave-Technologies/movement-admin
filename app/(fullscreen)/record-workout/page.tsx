@@ -55,13 +55,6 @@ const RecordWorkout = () => {
         );
     };
 
-    // if (pageLoading) {
-    //     return (
-    //         <div className="bg-green-800">
-    //             <Spinner />
-    //         </div>
-    //     );
-    // }
 
     return (
         <Suspense
