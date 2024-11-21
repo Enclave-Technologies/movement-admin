@@ -1,6 +1,5 @@
 "use client";
-import axios from "axios";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useState } from "react";
 import Spinner from "@/components/Spinner";
 import SearchParamsLoader from "@/components/WorkoutRecordDataLoader";
 import WorkoutRecordHeader from "@/components/WorkoutRecordHeader";
@@ -54,7 +53,6 @@ const RecordWorkout = () => {
             )
         );
     };
-
 
     return (
         <Suspense
