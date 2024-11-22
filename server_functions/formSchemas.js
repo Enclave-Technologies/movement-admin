@@ -1,21 +1,16 @@
 import { z } from "zod";
 
 // Define a schema for the register form data
-export const RegisterFormSchema = z
-  .object({
-    username: z.string().min(2, "Username must be at least 2 letters"),
-    email: z.string().email("Invalid email address"), // Add email validation
-    password: z.string().min(6, "Password must be at least 6 characters"),
-    confirmPassword: z
-      .string()
-      .min(6, "Confirm Password must be at least 6 characters"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
+export const RegisterFormSchema = z.object({
+    firstName: z.string().min(2, "First Name must be at least 2 letters"),
+    lastName: z.string().min(2, "Last Name must be at least 2 letters"),
+    phone: z.string().max(20, "Phone should be less than 20 letters"),
+    email: z.string().email("Invalid email address"),
+    jobTitle: z.string().min(2, "Job Title must be at least 2 letters"),
+    role: z.enum(["admin", "trainer"]),
+});
 
 export const LoginFormSchema = z.object({
-  email: z.string().email("Invalid email address"), // Add email validation
-  password: z.string().min(6, "Password must be at least 6 characters"),
+    email: z.string().email("Invalid email address"), // Add email validation
+    password: z.string().min(6, "Password must be at least 6 characters"),
 });
