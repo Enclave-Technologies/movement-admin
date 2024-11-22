@@ -35,6 +35,9 @@ const createAdminClient = async () => {
         get users() {
             return new Users(adminClient);
         },
+        get teams() {
+            return new Teams(adminClient);
+        },
     };
 };
 

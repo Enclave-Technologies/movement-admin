@@ -15,61 +15,109 @@ import {
     LoginFormSchema,
 } from "@/server_functions/formSchemas";
 
-// export async function register(state, formData) {
-//     // 1. Validate fields
-//     const validatedResult = RegisterFormSchema.safeParse({
-//         username: formData.get("username"),
-//         email: formData.get("email"),
-//         password: formData.get("password"),
-//         confirmPassword: formData.get("confirm-password"),
-//     });
-//     if (!validatedResult.success) {
-//         // Handle validation errors
-//         const errors = validatedResult.error.formErrors.fieldErrors;
-//         return { success: false, errors };
-//     }
-//     const { username, email, password } = validatedResult.data;
+export async function register(state, formData) {
+    // 1. Validate fields
+    const validatedResult = RegisterFormSchema.safeParse({
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        phone: formData.get("phone"),
+        email: formData.get("email"),
+        jobTitle: formData.get("jobTitle"),
+        role: formData.get("role"),
+    });
+    if (!validatedResult.success) {
+        // Handle validation errors
+        const errors = validatedResult.error.formErrors.fieldErrors;
+        return { success: false, errors };
+    }
 
-//     // 2. Try creating with details
-//     const { account } = await createAdminClient();
-//     try {
-//         await account.create(ID.unique(), email, password, username);
-//     } catch (error) {
-//         if (
-//             error instanceof AppwriteException &&
-//             error.code === 409 &&
-//             error.type === "user_already_exists"
-//         ) {
-//             return {
-//                 success: false,
-//                 errors: { email: ["Email already exists, please login"] },
-//             };
-//         }
-//     }
+    console.log(validatedResult.data);
+    const { firstName, lastName, phone, email, jobTitle, role } =
+        validatedResult.data;
 
-//     // 3. If successful in creating account, then login
-//     try {
-//         const session = await account.createEmailPasswordSession(
-//             email,
-//             password
-//         );
-//         cookies().set(SESSION_COOKIE_NAME, session.secret, {
-//             httpOnly: true,
-//             sameSite: "None",
-//             secure: true,
-//             expires: new Date(session.expire),
-//             path: "/",
-//             domain: "enclave.live",
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         return {
-//             success: false,
-//             errors: { email: ["An error occurred. Please try again."] },
-//         };
-//     }
-//     redirect("/");
-// }
+    // 2. Try creating with details
+    const { account, database, users, teams } = await createAdminClient();
+    const uid = ID.unique();
+    try {
+        await account.create(
+            uid,
+            email,
+            "password",
+            `${firstName} ${lastName}`
+        );
+        // console.log("Create acc");
+    } catch (error) {
+        if (
+            error instanceof AppwriteException &&
+            error.code === 409 &&
+            error.type === "user_already_exists"
+        ) {
+            return {
+                success: false,
+                errors: { email: ["Email already exists, please login"] },
+            };
+        }
+    }
+
+    // // 3. If successful in creating team association
+    try {
+        const teamList = await teams.list();
+        for (const team of teamList.teams) {
+            if (team.name.toLowerCase().includes(role)) {
+                await teams.createMembership(team.$id, [], email, uid);
+                // console.log("Team match");
+            }
+        }
+        // console.log(teamList);
+    } catch (error) {
+        console.error(error);
+        users.delete(uid);
+
+        return {
+            success: false,
+            errors: { email: ["An error occurred. Please try again."] },
+        };
+    }
+
+    // 4. If that is successful, create the trainer object
+    try {
+        await database.createDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
+            uid,
+            {
+                auth_id: uid,
+                firstName: firstName,
+                lastName: lastName,
+                jobTitle: jobTitle,
+                phone: phone,
+            }
+        );
+    } catch (error) {
+        console.log(error);
+        users.delete(uid);
+        return {
+            success: false,
+            errors: {
+                email: [error.message],
+            },
+        };
+    }
+
+    // reset the form
+    // Reset the form fields
+    formData.set("firstName", "");
+    formData.set("lastName", "");
+    formData.set("phone", "");
+    formData.set("email", "");
+    formData.set("jobTitle", "");
+    formData.set("role", "trainer");
+    return {
+        success: true,
+        errors: {},
+        message: `User ${firstName} added successfully!`,
+    };
+}
 
 export async function login(state, formData) {
     console.log("1. LOGIN", formData);
@@ -245,18 +293,29 @@ export async function fetchUserDetails() {
         const sessionCookie = JSON.parse(
             cookies().get(SESSION_COOKIE_NAME).value
         );
-        const { account, database } = await createSessionClient(
-            sessionCookie.session
-        );
+        const {
+            account,
+            database,
+            teams: sessTeam,
+        } = await createSessionClient(sessionCookie.session);
         const accDetails = await account.get();
+        const { teams } = await sessTeam.list();
 
         const fullDetails = await database.getDocument(
             process.env.NEXT_PUBLIC_DATABASE_ID,
             process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
             accDetails.$id
         );
+        console.log(accDetails);
+        console.log(teams[0]);
         console.log(fullDetails);
-        return fullDetails;
+
+        const mergedObject = {
+            ...accDetails,
+            team: teams[0],
+            ...fullDetails,
+        };
+        return mergedObject;
     } catch (error) {
         console.log(error);
         return null;
