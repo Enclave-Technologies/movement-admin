@@ -1,7 +1,5 @@
 import React, { FC, useState } from "react";
-import {
-    FaPlus,
-} from "react-icons/fa";
+import { FaPlus } from "react-icons/fa";
 import EditModeTable from "./EditModeTable";
 import DragModeTable from "./DragModeTable";
 

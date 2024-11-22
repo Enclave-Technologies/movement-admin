@@ -6,6 +6,7 @@ import { PiUsersFour } from "react-icons/pi";
 import { FiSettings } from "react-icons/fi";
 import { IoLogOutOutline } from "react-icons/io5";
 import { AiOutlineMenu } from "react-icons/ai";
+import { RiAdminFill } from "react-icons/ri";
 import { usePathname } from "next/navigation";
 import LoadingSpinner from "./LoadingSpinner";
 import { logout } from "@/server_functions/auth";
@@ -14,10 +15,16 @@ import { useTrainer } from "@/context/TrainerContext";
 
 const sidebarItems = [
     {
+        label: "Admin Panel",
+        icon: RiAdminFill,
+        href: "/admin-panel",
+    },
+    {
         label: "My Clients",
         icon: LuUsers2,
         href: "/my-clients",
     },
+
     {
         label: "All Clients",
         icon: PiUsersFour,
@@ -38,6 +45,8 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
         trainerError: error,
     } = useTrainer();
     const [loadingLogout, setLoadingLogout] = useState(false);
+
+    // console.log(trainerData);
 
     const handleLogout = async () => {
         setLoadingLogout(true);
@@ -84,6 +93,38 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                             ? "bg-white text-primary"
                             : "text-white hover:bg-gold-500 transition-colors";
 
+                        // Check if the user is an admin and the item is for the admin panel
+                        // if (
+                        //     trainerData?.team.name === "Admins" &&
+                        //     item.href.includes("admin")
+                        // ) {
+                        //     return (
+                        //         <Link href={item.href} key={item.label}>
+                        //             <div
+                        //                 className={`flex items-center ${
+                        //                     isCollapsed
+                        //                         ? "justify-center h-12 w-12"
+                        //                         : "justify-start p-3"
+                        //                 } rounded-md cursor-pointer ${className}`}
+                        //             >
+                        //                 {loading ? (
+                        //                     <div className="animate-pulse">
+                        //                         <div className="bg-gray-300 rounded-full w-6 h-6"></div>
+                        //                     </div>
+                        //                 ) : (
+                        //                     <item.icon className="w-6 h-6" />
+                        //                 )}
+                        //                 {!isCollapsed && (
+                        //                     <span className="ml-2">
+                        //                         {loading ? "" : item.label}
+                        //                     </span>
+                        //                 )}
+                        //             </div>
+                        //         </Link>
+                        //     );
+                        // }
+
+                        // Render other sidebar items regardless of the team
                         return (
                             <Link href={item.href} key={item.label}>
                                 <div
@@ -93,10 +134,16 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                                             : "justify-start p-3"
                                     } rounded-md cursor-pointer ${className}`}
                                 >
-                                    <item.icon className="w-6 h-6" />
+                                    {loading ? (
+                                        <div className="animate-pulse">
+                                            <div className="bg-gray-300 rounded-full w-6 h-6"></div>
+                                        </div>
+                                    ) : (
+                                        <item.icon className="w-6 h-6" />
+                                    )}
                                     {!isCollapsed && (
                                         <span className="ml-2">
-                                            {item.label}
+                                            {loading ? "" : item.label}
                                         </span>
                                     )}
                                 </div>
