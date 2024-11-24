@@ -1,21 +1,38 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import SignupButton from "@/components/ResponsiveButton";
-import { fetchUserDetails, register } from "@/server_functions/auth";
+import {
+    fetchUserDetails,
+    register,
+    registerClient,
+} from "@/server_functions/auth";
+import {
+    Accordion,
+    AccordionItem,
+    AccordionItemHeading,
+    AccordionItemButton,
+    AccordionItemPanel,
+} from "react-accessible-accordion";
 import { useFormState } from "react-dom";
-import Image from "next/image";
-import Link from "next/link";
 import Toast from "@/components/Toast";
 import Spinner from "@/components/Spinner";
+import RegisterForm from "@/components/RegisterForm";
+import AddClientForm from "@/components/AddClientForm";
+import axios from "axios";
+
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
 const AdminPanel = () => {
     const [state, action] = useFormState(register, undefined);
+    const [clientState, clientAction] = useFormState(registerClient, undefined);
     const [pageLoading, setPageLoading] = useState(true);
     const [trainerDetails, setTrainerDetails] = useState(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+    const [allTrainers, setAllTrainers] = useState([]);
     const ref = useRef<HTMLFormElement>(null);
+    const refClientForm = useRef<HTMLFormElement>(null);
     console.log(state);
 
     useEffect(() => {
@@ -24,6 +41,15 @@ const AdminPanel = () => {
                 setPageLoading(true);
                 const details = await fetchUserDetails();
                 setTrainerDetails(details);
+
+                const allTrainers = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/admin/trainerIds`,
+                    {
+                        withCredentials: true, // Include cookies in the request
+                    }
+                );
+
+                setAllTrainers(allTrainers.data);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -46,6 +72,22 @@ const AdminPanel = () => {
             setShowToast(true);
         }
     }, [state]);
+    useEffect(() => {
+        if (clientState?.success) {
+            refClientForm.current?.reset();
+            setToastMessage(
+                clientState.message || "User registered successfully!"
+            );
+            setToastType("success");
+            setShowToast(true);
+        } else if (clientState?.errors) {
+            setToastMessage(
+                Object.values(clientState.errors).flat().join(", ")
+            );
+            setToastType("error");
+            setShowToast(true);
+        }
+    }, [clientState]);
 
     const handleToastClose = () => {
         setShowToast(false);
@@ -56,140 +98,59 @@ const AdminPanel = () => {
     }
 
     return (
-        <div className="flex justify-center items-center min-h-screen">
-            {trainerDetails?.team.name === "Admins" && (
-                <div className="w-full max-w-md p-6 bg-gray-50 shadow-lg rounded-lg">
-                    <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                        Register a Trainer / Admin
-                    </h2>
-                    <form className="space-y-4" action={action} ref={ref}>
-                        <div>
-                            <label
-                                htmlFor="firstName"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                First Name
-                            </label>
-                            <input
-                                type="text"
-                                id="firstName"
-                                name="firstName"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+        <div className="flex justify-center items-center w-full">
+            <Accordion
+                className="w-full"
+                allowZeroExpanded
+                preExpanded={["client"]}
+            >
+                {trainerDetails?.team.name === "Admins" && (
+                    <AccordionItem uuid="admin" className="mt-1">
+                        <AccordionItemHeading>
+                            <AccordionItemButton className="bg-green-500 flex py-4 px-2 text-white hover:bg-green-900 transition-colors duration-300">
+                                Register a Trainer / Admin
+                            </AccordionItemButton>
+                        </AccordionItemHeading>
+                        <AccordionItemPanel>
+                            <div className="p-6 bg-gray-50 shadow-lg rounded-lg">
+                                <RegisterForm
+                                    action={action}
+                                    ref={ref}
+                                    state={state}
+                                />
+                                {showToast && (
+                                    <Toast
+                                        message={toastMessage}
+                                        onClose={handleToastClose}
+                                        type={toastType}
+                                    />
+                                )}
+                            </div>
+                        </AccordionItemPanel>
+                    </AccordionItem>
+                )}
+                <AccordionItem uuid="client" className="mt-1">
+                    <AccordionItemHeading>
+                        <AccordionItemButton
+                            className="bg-green-500 flex py-4 px-2
+                         text-white hover:bg-green-900 transition-colors rounded
+                         duration-300"
+                        >
+                            Add Client
+                        </AccordionItemButton>
+                    </AccordionItemHeading>
+                    <AccordionItemPanel>
+                        <div className="p-6 bg-gray-50 shadow-lg rounded-lg">
+                            <AddClientForm
+                                action={clientAction}
+                                state={clientState}
+                                allTrainers={allTrainers}
+                                ref={refClientForm}
                             />
-                            {state?.errors?.firstName && (
-                                <p className="text-red-500 text-xs italic">
-                                    {state.errors.firstName}
-                                </p>
-                            )}
                         </div>
-                        <div>
-                            <label
-                                htmlFor="lastName"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Last Name
-                            </label>
-                            <input
-                                type="text"
-                                id="lastName"
-                                name="lastName"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                            {state?.errors?.lastName && (
-                                <p className="text-red-500 text-xs italic">
-                                    {state.errors.lastName}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="phone"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Phone
-                            </label>
-                            <input
-                                type="text"
-                                id="phone"
-                                name="phone"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                            {state?.errors?.phone && (
-                                <p className="text-red-500 text-xs italic">
-                                    {state.errors.phone}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="email"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                            {state?.errors?.email && (
-                                <p className="text-red-500 text-xs italic">
-                                    {state.errors.email}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="jobTitle"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Job Title
-                            </label>
-                            <input
-                                type="text"
-                                id="jobTitle"
-                                name="jobTitle"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            />
-                            {state?.errors?.jobTitle && (
-                                <p className="text-red-500 text-xs italic">
-                                    {state.errors.jobTitle}
-                                </p>
-                            )}
-                        </div>
-                        <div>
-                            <label
-                                htmlFor="role"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Role
-                            </label>
-                            <select
-                                id="role"
-                                name="role"
-                                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                            >
-                                <option value="admin">Admin</option>
-                                <option value="trainer">Trainer</option>
-                            </select>
-                            {state?.errors?.role && (
-                                <p className="text-red-500 text-xs italic">
-                                    {state.errors.role}
-                                </p>
-                            )}
-                        </div>
-                        <SignupButton label="Submit" />
-                    </form>
-                    {showToast && (
-                        <Toast
-                            message={toastMessage}
-                            onClose={handleToastClose}
-                            type={toastType}
-                        />
-                    )}
-                </div>
-            )}
+                    </AccordionItemPanel>
+                </AccordionItem>
+            </Accordion>
         </div>
     );
 };
