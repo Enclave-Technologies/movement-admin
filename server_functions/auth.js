@@ -14,6 +14,7 @@ import {
     RegisterFormSchema,
     LoginFormSchema,
     ClientFormSchema,
+    exerciseSchema,
 } from "@/server_functions/formSchemas";
 
 export async function register(state, formData) {
@@ -211,12 +212,7 @@ export async function registerClient(state, formData) {
 
     // reset the form
     // Reset the form fields
-    formData.set("firstName", "");
-    formData.set("lastName", "");
-    formData.set("phone", "");
-    formData.set("email", "");
-    formData.set("jobTitle", "");
-    formData.set("role", "trainer");
+
     return {
         success: true,
         errors: {},
@@ -238,7 +234,7 @@ export async function login(state, formData) {
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("3. LOGIN", email, password);
+    console.log("3. LOGIN");
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {
@@ -349,7 +345,11 @@ export async function logout() {
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
 
-        (await cookies()).getAll().map((cookie) => console.log(cookie));
+        const cookie_recheck = JSON.parse(
+            cookies().get(SESSION_COOKIE_NAME)?.value
+        );
+
+        console.log("Rechecking if cookie still exists! ->", cookie_recheck);
 
         // Redirect to the login page
         redirect("/login");
@@ -464,4 +464,120 @@ export async function updatePassword(state, formData) {
         console.log(error);
         return null;
     }
+}
+
+export async function addWorkout(state, formData) {
+    // 1. Validate fields
+    const validatedResult = exerciseSchema.safeParse({
+        motion: formData.get("motion"),
+        specificDescription: formData.get("specificDescription"),
+        recommendedRepsMin: parseInt(formData.get("recommendedRepsMin")),
+        recommendedRepsMax: parseInt(formData.get("recommendedRepsMax")),
+        recommendedSetsMin: parseInt(formData.get("recommendedSetsMin")),
+        recommendedSetsMax: parseInt(formData.get("recommendedSetsMax")),
+        tempo: formData.get("tempo"),
+        tut: parseInt(formData.get("tut")),
+        recommendedRestMin: parseInt(formData.get("recommendedRestMin")),
+        recommendedRestMax: parseInt(formData.get("recommendedRestMax")),
+        shortDescription: formData.get("shortDescription"),
+    });
+
+    if (!validatedResult.success) {
+        // Handle validation errors
+        const errors = validatedResult.error.formErrors.fieldErrors;
+        return { success: false, errors };
+    }
+
+    console.log(validatedResult.data);
+    const {
+        motion,
+        specificDescription,
+        recommendedRepsMin,
+        recommendedRepsMax,
+        recommendedSetsMin,
+        recommendedSetsMax,
+        tempo,
+        tut,
+        recommendedRestMin,
+        recommendedRestMax,
+        shortDescription,
+    } = validatedResult.data;
+
+    // 2. Try creating with details
+    try {
+        const cookie = JSON.parse(cookies().get(SESSION_COOKIE_NAME)?.value);
+
+        const { database } = await createSessionClient(cookie?.session);
+
+        const uid = ID.unique();
+        console.log(uid);
+        const createdDoc = await database.createDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_EXERCISES,
+            uid,
+            {
+                Motion: motion.toUpperCase(),
+                SpecificDescription: specificDescription.toUpperCase(),
+                RecommendedRepsMin: recommendedRepsMin,
+                RecommendedRepsMax: recommendedRepsMax,
+                RecommendedSetsMin: recommendedSetsMin,
+                RecommendedSetsMax: recommendedSetsMax,
+                Tempo: tempo,
+                TUT: tut,
+                RecommendedRestMin: recommendedRestMin,
+                RecommendedRestMax: recommendedRestMax,
+                ShortDescription: shortDescription.toUpperCase(),
+                videoURL: "",
+                approved: false,
+            }
+        );
+        console.log(createdDoc);
+        console.log("Create acc");
+    } catch (error) {
+        // Log the error
+        console.error("Error in addWorkout function:", error);
+
+        // Handle different types of errors
+        if (error instanceof AppwriteException) {
+            return {
+                success: false,
+                errors: {
+                    motion: [
+                        `An error occurred while creating the exercise: ${error.response.message}`,
+                    ],
+                },
+            };
+        } else if (error instanceof TypeError) {
+            return {
+                success: false,
+                errors: {
+                    motion: ["Invalid data format. Please check your input."],
+                },
+            };
+        } else if (error instanceof RangeError) {
+            return {
+                success: false,
+                errors: {
+                    motion: [
+                        "One or more values are out of the acceptable range.",
+                    ],
+                },
+            };
+        } else {
+            return {
+                success: false,
+                errors: {
+                    motion: [
+                        "An unexpected error occurred. Please try again later.",
+                    ],
+                },
+            };
+        }
+    }
+
+    return {
+        success: true,
+        errors: {},
+        message: `Exercise ${shortDescription} added successfully!`,
+    };
 }
