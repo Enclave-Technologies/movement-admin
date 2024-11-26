@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
     addWorkout,
     fetchUserDetails,
@@ -46,38 +46,64 @@ const AdminPanel = () => {
     const refClientForm = useRef<HTMLFormElement>(null);
     const refWorkoutForm = useRef<HTMLFormElement>(null);
 
-    useEffect(() => {
-        async function loadData() {
-            try {
-                setPageLoading(true);
-                const details = await fetchUserDetails();
-                setTrainerDetails(details);
-                const allTrainers = await axios.get(
-                    `${API_BASE_URL}/mvmt/v1/admin/trainerIds`,
-                    {
-                        withCredentials: true, // Include cookies in the request
-                    }
-                );
+    const loadData = useCallback(async () => {
+        try {
+            const details = await fetchUserDetails();
+            setTrainerDetails(details);
+            const allTrainers = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/trainerIds`,
+                {
+                    withCredentials: true, // Include cookies in the request
+                }
+            );
+            setAllTrainers(allTrainers.data);
 
-                setAllTrainers(allTrainers.data);
-
-                const allExercises = await axios.get(
-                    `${API_BASE_URL}/mvmt/v1/admin/exercises`,
-                    {
-                        withCredentials: true,
-                    }
-                );
-
-                setAllExercises(allExercises.data);
-            } catch (error) {
-                console.log(error);
-            } finally {
-                setPageLoading(false);
-            }
+            const allExercises = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises`,
+                {
+                    withCredentials: true,
+                }
+            );
+            setAllExercises(allExercises.data);
+        } catch (error) {
+            console.log(error);
+        } finally {
         }
-
-        loadData();
     }, []);
+
+    useEffect(() => {
+        // async function loadData() {
+        //     try {
+        //         setPageLoading(true);
+        //         const details = await fetchUserDetails();
+        //         setTrainerDetails(details);
+        //         const allTrainers = await axios.get(
+        //             `${API_BASE_URL}/mvmt/v1/admin/trainerIds`,
+        //             {
+        //                 withCredentials: true, // Include cookies in the request
+        //             }
+        //         );
+
+        //         setAllTrainers(allTrainers.data);
+
+        //         const allExercises = await axios.get(
+        //             `${API_BASE_URL}/mvmt/v1/admin/exercises`,
+        //             {
+        //                 withCredentials: true,
+        //             }
+        //         );
+
+        //         setAllExercises(allExercises.data);
+        //     } catch (error) {
+        //         console.log(error);
+        //     } finally {
+        //         setPageLoading(false);
+        //     }
+        // }
+        setPageLoading(true);
+        loadData();
+        setPageLoading(false);
+    }, [loadData]);
 
     const handleApprovalChange = async (
         exerciseId: string,
@@ -126,6 +152,7 @@ const AdminPanel = () => {
 
     useEffect(() => {
         if (state?.success) {
+            loadData();
             ref.current?.reset();
             setToastMessage(
                 state.message || "Trainer registered successfully!"
@@ -157,8 +184,8 @@ const AdminPanel = () => {
     }, [clientState]);
 
     useEffect(() => {
-        console.log(exerciseState);
         if (exerciseState?.success) {
+            loadData();
             refWorkoutForm.current?.reset();
             setToastMessage(
                 exerciseState.message || "Exercise registered successfully!"

@@ -96,6 +96,21 @@ export async function register(state, formData) {
                 phone: phone,
             }
         );
+
+        await database.createDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_USERS,
+            uid,
+            {
+                auth_id: uid,
+                firstName,
+                lastName,
+                email,
+                phone,
+                trainer_id: uid,
+                imageUrl: null,
+            }
+        );
     } catch (error) {
         console.log(error);
         users.delete(uid);
@@ -109,16 +124,11 @@ export async function register(state, formData) {
 
     // reset the form
     // Reset the form fields
-    formData.set("firstName", "");
-    formData.set("lastName", "");
-    formData.set("phone", "");
-    formData.set("email", "");
-    formData.set("jobTitle", "");
-    formData.set("role", "trainer");
+
     return {
         success: true,
         errors: {},
-        message: `User ${firstName} added successfully!`,
+        message: `Trainer ${firstName} added successfully to both trainer list and client list!`,
     };
 }
 
@@ -198,6 +208,7 @@ export async function registerClient(state, formData) {
                         email,
                         phone,
                         trainer_id: trainerId,
+                        imageUrl: null,
                     }
                 );
                 return {
