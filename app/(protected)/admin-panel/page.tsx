@@ -45,7 +45,6 @@ const AdminPanel = () => {
     const ref = useRef<HTMLFormElement>(null);
     const refClientForm = useRef<HTMLFormElement>(null);
     const refWorkoutForm = useRef<HTMLFormElement>(null);
-    console.log(state);
 
     useEffect(() => {
         async function loadData() {
@@ -53,7 +52,6 @@ const AdminPanel = () => {
                 setPageLoading(true);
                 const details = await fetchUserDetails();
                 setTrainerDetails(details);
-
                 const allTrainers = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/admin/trainerIds`,
                     {
