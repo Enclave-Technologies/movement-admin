@@ -13,6 +13,8 @@ import { SESSION_COOKIE_NAME } from "@/configs/constants";
 import {
     RegisterFormSchema,
     LoginFormSchema,
+    ClientFormSchema,
+    exerciseSchema,
 } from "@/server_functions/formSchemas";
 
 export async function register(state, formData) {
@@ -119,6 +121,105 @@ export async function register(state, formData) {
     };
 }
 
+export async function registerClient(state, formData) {
+    // 1. Validate fields
+    const validatedResult = ClientFormSchema.safeParse({
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        phone: formData.get("phone"),
+        email: formData.get("email"),
+        trainerId: formData.get("trainerId"),
+    });
+    if (!validatedResult.success) {
+        // Handle validation errors
+        const errors = validatedResult.error.formErrors.fieldErrors;
+        return { success: false, errors };
+    }
+
+    console.log(validatedResult.data);
+    const { firstName, lastName, phone, email, trainerId } =
+        validatedResult.data;
+
+    // 2. Try creating with details
+    const { account, database, users, teams } = await createAdminClient();
+    const uid = ID.unique();
+    try {
+        await account.create(
+            uid,
+            email,
+            "password",
+            `${firstName} ${lastName}`
+        );
+        // console.log("Create acc");
+    } catch (error) {
+        if (
+            error instanceof AppwriteException &&
+            error.code === 409 &&
+            error.type === "user_already_exists"
+        ) {
+            return {
+                success: false,
+                errors: { email: ["Email already exists, please login"] },
+            };
+        }
+    }
+
+    // // 3. If successful in creating team association
+    try {
+        const teamList = await teams.list();
+        for (const team of teamList.teams) {
+            if (team.name.toLowerCase().includes("client")) {
+                await teams.createMembership(team.$id, [], email, uid);
+                // console.log("Team match");
+            }
+        }
+        // console.log(teamList);
+    } catch (error) {
+        console.error(error);
+        users.delete(uid);
+
+        return {
+            success: false,
+            errors: { email: ["An error occurred. Please try again."] },
+        };
+    }
+
+    // 4. If that is successful, create the trainer object
+    try {
+        await database.createDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_USERS,
+            uid,
+            {
+                auth_id: uid,
+                firstName,
+                lastName,
+                email,
+                phone,
+                trainer_id: trainerId,
+            }
+        );
+    } catch (error) {
+        console.log(error);
+        users.delete(uid);
+        return {
+            success: false,
+            errors: {
+                email: [error.message],
+            },
+        };
+    }
+
+    // reset the form
+    // Reset the form fields
+
+    return {
+        success: true,
+        errors: {},
+        message: `User ${firstName} added successfully!`,
+    };
+}
+
 export async function login(state, formData) {
     console.log("1. LOGIN", formData);
     // 1. Validate fields
@@ -133,7 +234,7 @@ export async function login(state, formData) {
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("3. LOGIN", email, password);
+    console.log("3. LOGIN");
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {
@@ -244,7 +345,11 @@ export async function logout() {
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
 
-        (await cookies()).getAll().map((cookie) => console.log(cookie));
+        const cookie_recheck = JSON.parse(
+            cookies().get(SESSION_COOKIE_NAME)?.value
+        );
+
+        console.log("Rechecking if cookie still exists! ->", cookie_recheck);
 
         // Redirect to the login page
         redirect("/login");
@@ -359,4 +464,120 @@ export async function updatePassword(state, formData) {
         console.log(error);
         return null;
     }
+}
+
+export async function addWorkout(state, formData) {
+    // 1. Validate fields
+    const validatedResult = exerciseSchema.safeParse({
+        motion: formData.get("motion"),
+        specificDescription: formData.get("specificDescription"),
+        recommendedRepsMin: parseInt(formData.get("recommendedRepsMin")),
+        recommendedRepsMax: parseInt(formData.get("recommendedRepsMax")),
+        recommendedSetsMin: parseInt(formData.get("recommendedSetsMin")),
+        recommendedSetsMax: parseInt(formData.get("recommendedSetsMax")),
+        tempo: formData.get("tempo"),
+        tut: parseInt(formData.get("tut")),
+        recommendedRestMin: parseInt(formData.get("recommendedRestMin")),
+        recommendedRestMax: parseInt(formData.get("recommendedRestMax")),
+        shortDescription: formData.get("shortDescription"),
+    });
+
+    if (!validatedResult.success) {
+        // Handle validation errors
+        const errors = validatedResult.error.formErrors.fieldErrors;
+        return { success: false, errors };
+    }
+
+    console.log(validatedResult.data);
+    const {
+        motion,
+        specificDescription,
+        recommendedRepsMin,
+        recommendedRepsMax,
+        recommendedSetsMin,
+        recommendedSetsMax,
+        tempo,
+        tut,
+        recommendedRestMin,
+        recommendedRestMax,
+        shortDescription,
+    } = validatedResult.data;
+
+    // 2. Try creating with details
+    try {
+        const cookie = JSON.parse(cookies().get(SESSION_COOKIE_NAME)?.value);
+
+        const { database } = await createSessionClient(cookie?.session);
+
+        const uid = ID.unique();
+        console.log(uid);
+        const createdDoc = await database.createDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_EXERCISES,
+            uid,
+            {
+                Motion: motion.toUpperCase(),
+                SpecificDescription: specificDescription.toUpperCase(),
+                RecommendedRepsMin: recommendedRepsMin,
+                RecommendedRepsMax: recommendedRepsMax,
+                RecommendedSetsMin: recommendedSetsMin,
+                RecommendedSetsMax: recommendedSetsMax,
+                Tempo: tempo,
+                TUT: tut,
+                RecommendedRestMin: recommendedRestMin,
+                RecommendedRestMax: recommendedRestMax,
+                ShortDescription: shortDescription.toUpperCase(),
+                videoURL: "",
+                approved: false,
+            }
+        );
+        console.log(createdDoc);
+        console.log("Create acc");
+    } catch (error) {
+        // Log the error
+        console.error("Error in addWorkout function:", error);
+
+        // Handle different types of errors
+        if (error instanceof AppwriteException) {
+            return {
+                success: false,
+                errors: {
+                    motion: [
+                        `An error occurred while creating the exercise: ${error.response.message}`,
+                    ],
+                },
+            };
+        } else if (error instanceof TypeError) {
+            return {
+                success: false,
+                errors: {
+                    motion: ["Invalid data format. Please check your input."],
+                },
+            };
+        } else if (error instanceof RangeError) {
+            return {
+                success: false,
+                errors: {
+                    motion: [
+                        "One or more values are out of the acceptable range.",
+                    ],
+                },
+            };
+        } else {
+            return {
+                success: false,
+                errors: {
+                    motion: [
+                        "An unexpected error occurred. Please try again later.",
+                    ],
+                },
+            };
+        }
+    }
+
+    return {
+        success: true,
+        errors: {},
+        message: `Exercise ${shortDescription} added successfully!`,
+    };
 }

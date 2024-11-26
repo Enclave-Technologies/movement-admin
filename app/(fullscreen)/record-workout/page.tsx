@@ -4,6 +4,8 @@ import Spinner from "@/components/Spinner";
 import SearchParamsLoader from "@/components/WorkoutRecordDataLoader";
 import WorkoutRecordHeader from "@/components/WorkoutRecordHeader";
 import WorkoutRecordBody from "@/components/WorkoutRecordBody";
+import { ID } from "appwrite";
+import axios from "axios";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -11,11 +13,13 @@ const RecordWorkout = () => {
     const [clientId, setClientId] = useState("");
     const [phaseId, setPhaseId] = useState("");
     const [sessionId, setSessionId] = useState("");
+    const [workoutTrackId, setWorkoutTrackId] = useState("");
 
     const [pageLoading, setPageLoading] = useState(true);
     const [openExercises, setOpenExercises] = useState([]);
     const [sessionInformation, setSessionInformation] = useState(null);
     const [exerciseData, setExerciseData] = useState([]);
+    const [savingState, setSavingState] = useState(false);
 
     const toggleAccordion = (exId: string) => {
         setOpenExercises((prevOpenExercises) => {
@@ -28,11 +32,13 @@ const RecordWorkout = () => {
     };
 
     const handleSetChange = (exerciseId, setId, field, value) => {
+        const currentTime = new Date().toISOString();
         setExerciseData((prevRecords) =>
             prevRecords.map((exercise) =>
                 exercise.id === exerciseId
                     ? {
                           ...exercise,
+                          endTime: currentTime,
                           sets: exercise.sets.map((set) =>
                               set.id === setId
                                   ? { ...set, [field]: value }
@@ -45,12 +51,50 @@ const RecordWorkout = () => {
     };
 
     const handleExerciseNotesChange = (exerciseId, value) => {
+        const currentTime = new Date().toISOString();
         setExerciseData((prevRecords) =>
             prevRecords.map((exercise) =>
                 exercise.id === exerciseId
-                    ? { ...exercise, notes: value }
+                    ? { ...exercise, endTime: currentTime, notes: value }
                     : exercise
             )
+        );
+    };
+
+    const saveToDatabase = async () => {
+        try {
+            setSavingState(true);
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/workout-tracker`,
+                { clientId, phaseId, sessionId, exerciseData, workoutTrackId },
+                { withCredentials: true }
+            );
+        } catch (error) {
+            console.error("Error saving workout data:", error);
+        } finally {
+            setSavingState(false);
+        }
+    };
+
+    const handleAddSet = (exerciseId) => {
+        const currentTime = new Date().toISOString();
+        setExerciseData((prevExerciseData) =>
+            prevExerciseData.map((exercise) => {
+                if (exercise.id === exerciseId) {
+                    const newSet = {
+                        id: ID.unique(),
+                        reps: 0,
+                        weight: "",
+                    };
+
+                    return {
+                        ...exercise,
+                        endTime: currentTime,
+                        sets: [...exercise.sets, newSet],
+                    };
+                }
+                return exercise;
+            })
         );
     };
 
@@ -66,6 +110,7 @@ const RecordWorkout = () => {
                 setClientId={setClientId}
                 setPhaseId={setPhaseId}
                 setSessionId={setSessionId}
+                setWorkoutTrackId={setWorkoutTrackId}
                 setSessionInformation={setSessionInformation}
                 setExerciseData={setExerciseData}
                 setPageLoading={setPageLoading}
@@ -81,6 +126,8 @@ const RecordWorkout = () => {
                             phaseName={sessionInformation["phases.phaseName"]}
                             sessionName={sessionInformation["sessionName"]}
                             startTime={""}
+                            savingState={savingState}
+                            handleSave={saveToDatabase}
                         />
 
                         <WorkoutRecordBody
@@ -91,6 +138,7 @@ const RecordWorkout = () => {
                             handleExerciseNotesChange={
                                 handleExerciseNotesChange
                             }
+                            handleAddSet={handleAddSet}
                         />
                     </div>
                 </div>
