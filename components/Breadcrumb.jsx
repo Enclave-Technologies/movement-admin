@@ -22,7 +22,11 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
                         className="flex items-center text-gray-700 hover:text-blue-600"
                     >
                         <Image
-                            src={homeImage || defaultProfileURL}
+                            src={
+                                homeImage && homeImage.trim() !== ""
+                                    ? homeImage
+                                    : defaultProfileURL
+                            }
                             alt="Home"
                             width={20}
                             height={20}

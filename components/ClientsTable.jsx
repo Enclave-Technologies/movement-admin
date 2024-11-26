@@ -98,8 +98,11 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                         <div className="w-10 h-10">
                                             <Image
                                                 src={
-                                                    client.imageUrl ||
-                                                    defaultProfileURL
+                                                    client.imageUrl &&
+                                                    client.imageUrl.trim() !==
+                                                        ""
+                                                        ? client.imageUrl
+                                                        : defaultProfileURL
                                                 } // Provide a default placeholder
                                                 width={30}
                                                 height={30}

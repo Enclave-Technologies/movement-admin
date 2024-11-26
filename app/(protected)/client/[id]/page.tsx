@@ -84,8 +84,14 @@ const Page = ({ params }: { params: { id: string } }) => {
                             <div className="relative">
                                 <Image
                                     src={
-                                        userData?.imageUrl || defaultProfileURL
+                                        userData.imageUrl &&
+                                        userData.imageUrl.trim() !== ""
+                                            ? userData.imageUrl
+                                            : defaultProfileURL
                                     }
+                                    // src={
+                                    //     userData?.imageUrl || defaultProfileURL
+                                    // }
                                     height={80}
                                     width={80}
                                     alt={`${userData?.name} image`}
