@@ -37,9 +37,9 @@ const SearchParamsLoader = ({
             // console.log(JSON.stringify(response.data, null, 2));
 
             const {
-                recommendedWorkouts,
+                // recommendedWorkouts,
                 sessionInfo,
-                workoutId,
+                // workoutId,
                 trackWorkout,
             } = response.data;
 
