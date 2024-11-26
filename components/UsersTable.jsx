@@ -44,8 +44,8 @@ const UsersTable = ({ search, setSearch, clients, fetchMoreData, hasMore }) => {
           </p>
         }
       >
-        <table className="w-full text-left">
-          <thead className="border-t-2 border-white">
+        <table className="w-full text-left rounded-md overflow-hidden">
+          <thead className="">
             <tr className="bg-green-500 text-white">
               <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"></th>
               <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap">
@@ -63,7 +63,7 @@ const UsersTable = ({ search, setSearch, clients, fetchMoreData, hasMore }) => {
               <th className="font-normal pl-5 pr-4  whitespace-nowrap"></th>
             </tr>
           </thead>
-          <tbody className="border-t-2 border-white">
+          <tbody className="border-t-0 border-white">
             {filteredClients.map((client, index) => (
               <tr
                 // key={client.$id}

@@ -16,14 +16,19 @@ import Image from "next/image";
 
 const sidebarItems = [
   {
+    label: "My Clients",
+    icon: RiAdminFill,
+    href: "/my-clients",
+  },
+  {
     label: "Users",
     icon: RiAdminFill,
-    href: "/all-clients",
+    href: "/users",
   },
   {
     label: "Coaching Team",
     icon: LuUsers2,
-    href: "/coaching-teams",
+    href: "/coaching-team",
   },
 
   {
