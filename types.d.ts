@@ -248,3 +248,14 @@ interface EditableTableProps {
         exerciseId: string
     ) => void;
 }
+
+interface AddClientFormProps {
+    action: (event: FormData) => void;
+    state: any;
+    allTrainers: any;
+}
+
+interface AddFormProps {
+    action: (event: FormData) => void;
+    state: any;
+}

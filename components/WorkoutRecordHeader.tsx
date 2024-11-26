@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { ImCross } from "react-icons/im";
 import { useRouter } from "next/navigation";
+import LoadingSpinner from "./LoadingSpinner";
 
-const WorkoutRecordHeader = ({ phaseName, sessionName, startTime }) => {
+const WorkoutRecordHeader = ({
+    phaseName,
+    sessionName,
+    startTime,
+    handleSave,
+    savingState,
+}) => {
     const router = useRouter();
-
-    const handleSave = () => {
-        // SAVE THE DATA
-        router.push("/");
-    };
 
     const [time, setTime] = useState(0);
 
@@ -19,6 +21,13 @@ const WorkoutRecordHeader = ({ phaseName, sessionName, startTime }) => {
 
         return () => clearInterval(timer);
     }, []);
+
+    const handleClose = async () => {
+        // SAVE THE DATA
+        const saved = await handleSave();
+        console.log(saved);
+        router.push("/");
+    };
 
     const formatTime = (time) => {
         const minutes = Math.floor(time / 60);
@@ -33,7 +42,7 @@ const WorkoutRecordHeader = ({ phaseName, sessionName, startTime }) => {
         <div className="workout-record-header w-full flex items-center justify-between bg-green-500 px-8 py-4 rounded-lg mb-4">
             <button
                 className="close-button text-white py-4 px-4 border rounded-xl bg-red-500/60"
-                onClick={handleSave}
+                onClick={handleClose}
                 aria-label="Close"
             >
                 <ImCross className="text-2xl" />
@@ -45,11 +54,22 @@ const WorkoutRecordHeader = ({ phaseName, sessionName, startTime }) => {
             </ul>
             <div>
                 <button
-                    className="save-button border border-solid rounded-xl px-6 py-2 text-white bg-green-500 hover:bg-green-500"
+                    className={`save-button w-32 border items-center justify-center border-solid rounded-xl px-4 py-4 text-white ${
+                        savingState
+                            ? "bg-gray-500 cursor-wait"
+                            : "bg-green-500 hover:bg-green-500"
+                    }`}
                     onClick={handleSave}
+                    disabled={savingState}
                     aria-label="Save"
                 >
-                    SAVE
+                    {savingState ? (
+                        <span className="flex">
+                            <LoadingSpinner /> Saving...{" "}
+                        </span>
+                    ) : (
+                        "SAVE"
+                    )}
                 </button>
             </div>
         </div>

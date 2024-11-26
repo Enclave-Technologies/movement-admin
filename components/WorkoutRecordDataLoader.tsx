@@ -1,12 +1,21 @@
-'use client'; // Ensure this is a client-side component
+"use client"; // Ensure this is a client-side component
 
-import React, { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import axios from "axios";
+import { ID } from "appwrite";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const SearchParamsLoader = ({ setClientId, setPhaseId, setSessionId, setSessionInformation, setExerciseData, setPageLoading }) => {
+const SearchParamsLoader = ({
+    setClientId,
+    setPhaseId,
+    setSessionId,
+    setWorkoutTrackId,
+    setSessionInformation,
+    setExerciseData,
+    setPageLoading,
+}) => {
     const searchParams = useSearchParams();
 
     useEffect(() => {
@@ -25,7 +34,7 @@ const SearchParamsLoader = ({ setClientId, setPhaseId, setSessionId, setSessionI
                 `${API_BASE_URL}/mvmt/v1/client/workout-tracker?client_id=${clientId}&phase_id=${phaseId}&session_id=${sessionId}`,
                 { withCredentials: true }
             );
-            console.log(JSON.stringify(response.data, null, 2));
+            // console.log(JSON.stringify(response.data, null, 2));
 
             const {
                 recommendedWorkouts,
@@ -36,11 +45,21 @@ const SearchParamsLoader = ({ setClientId, setPhaseId, setSessionId, setSessionI
 
             setExerciseData(trackWorkout);
             setSessionInformation(sessionInfo[0]);
+            setWorkoutTrackId(ID.unique());
             setPageLoading(false);
         }
 
         loadData();
-    }, [searchParams, setClientId, setPhaseId, setSessionId, setSessionInformation, setExerciseData, setPageLoading]);
+    }, [
+        searchParams,
+        setClientId,
+        setPhaseId,
+        setSessionId,
+        setWorkoutTrackId,
+        setSessionInformation,
+        setExerciseData,
+        setPageLoading,
+    ]);
 
     return null;
 };
