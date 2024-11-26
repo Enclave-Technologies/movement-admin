@@ -139,4 +139,5 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
         </main>
     );
 };
+
 export default ClientsTable;
