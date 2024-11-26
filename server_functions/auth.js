@@ -327,7 +327,7 @@ export async function login(state, formData) {
             secure: true,
             expires: new Date(session.expire),
             path: "/",
-            // domain: "enclave.live",
+            domain: "enclave.live",
         });
 
         // Retrieve and log the cookie
@@ -390,7 +390,7 @@ export async function logout() {
             sameSite: "None",
             secure: true,
             path: "/",
-            // domain: "enclave.live",
+            domain: "enclave.live",
         });
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
@@ -413,7 +413,7 @@ export async function logout() {
             sameSite: "None",
             secure: true,
             path: "/",
-            // domain: "enclave.live",
+            domain: "enclave.live",
         });
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted after error`);
