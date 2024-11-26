@@ -7,6 +7,7 @@ const WorkoutRecordBody = ({
     openExercises,
     handleSetChange,
     handleExerciseNotesChange,
+    handleAddSet,
 }) => {
     return (
         <div>
@@ -60,7 +61,7 @@ const WorkoutRecordBody = ({
                                                         REPS
                                                     </th>
                                                     <th className="p-2">
-                                                        WEIGHT
+                                                        WEIGHT (KG)
                                                     </th>
                                                 </tr>
                                             </thead>
@@ -76,7 +77,8 @@ const WorkoutRecordBody = ({
                                                             </td>
                                                             <td className="p-2 text-center">
                                                                 <input
-                                                                    type="text"
+                                                                    type="number"
+                                                                    step="1"
                                                                     value={
                                                                         set.reps
                                                                     }
@@ -97,7 +99,8 @@ const WorkoutRecordBody = ({
                                                             </td>
                                                             <td className="p-2 text-center">
                                                                 <input
-                                                                    type="text"
+                                                                    type="number"
+                                                                    step="0.01"
                                                                     value={
                                                                         set.weight
                                                                     }
@@ -147,6 +150,9 @@ const WorkoutRecordBody = ({
                                         <button
                                             className="rounded-xl px-16 py-2 bg-green-300 text-green-800 border hover:border-solid hover:border-green-300 
                             hover:bg-green-800 hover:text-green-300 font-semibold"
+                                            onClick={() =>
+                                                handleAddSet(exercise.id)
+                                            }
                                         >
                                             Add Set
                                         </button>
@@ -158,15 +164,19 @@ const WorkoutRecordBody = ({
                                     </button> */}
                                     </div>
 
-                                    <button className="border border-solid rounded-xl font-semibold px-16 py-2 border-white text-white hover:bg-white hover:text-gray-900">
+                                    {/* <button className="border border-solid rounded-xl font-semibold px-16 py-2 border-white text-white hover:bg-white hover:text-gray-900">
                                         Confirm
-                                    </button>
+                                    </button> */}
                                 </div>
                             </div>
                         </div>
                     )}
                 </div>
             ))}
+
+            {/* <pre className="text-white">
+                {JSON.stringify(workoutRecords, null, 2)}
+            </pre> */}
         </div>
     );
 };
