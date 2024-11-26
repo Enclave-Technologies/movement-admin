@@ -12,6 +12,7 @@ import LoadingSpinner from "./LoadingSpinner";
 import { logout } from "@/server_functions/auth";
 import TrainerInfo from "./TrainerInfo";
 import { useTrainer } from "@/context/TrainerContext";
+import Image from "next/image";
 
 const sidebarItems = [
   {
@@ -61,7 +62,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
 
   return (
     <div
-      className={`sticky top-0 left-0 h-screen bg-white text-primary shadow-lg z-40 pt-16 ${
+      className={`sticky top-0 left-0 h-screen bg-white text-primary shadow-lg z-40 pt-4 ${
         isCollapsed ? "w-16" : "w-64"
       } transition-all duration-300`}
     >
@@ -71,9 +72,26 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
         } flex flex-col justify-between gap-4 h-full`}
       >
         <div className="flex flex-col gap-4 h-full">
-          <button onClick={toggleSidebar} className="absolute top-4 right-6">
-            <AiOutlineMenu />
-          </button>
+          <div
+            className={`flex flex-row ${
+              isCollapsed ? "justify-center" : "justify-between"
+            } w-full top-0 left-0 px-2 min-h-8`}
+          >
+            <Image
+              src={require("@/public/images/Symbol-movement.svg")}
+              className={`aspect-square object-cover rounded-full ${
+                isCollapsed ? "hidden" : "block"
+              }`}
+              alt={"Movement Logo"}
+              // unoptimized
+              width={32}
+              height={32}
+            />
+
+            <button onClick={toggleSidebar}>
+              <AiOutlineMenu />
+            </button>
+          </div>
 
           <nav className="flex flex-col space-y-2 p-2 gap-[2px]">
             {sidebarItems.map((item) => {
