@@ -16,6 +16,7 @@ import {
     ClientFormSchema,
     exerciseSchema,
 } from "@/server_functions/formSchemas";
+import { Query } from "appwrite";
 
 export async function register(state, formData) {
     // 1. Validate fields
@@ -157,6 +158,55 @@ export async function registerClient(state, formData) {
             error.code === 409 &&
             error.type === "user_already_exists"
         ) {
+            // Check if user is already a trainer, then just add them to the user list.
+            // get user_doc from users table
+            const user_doc = await database.listDocuments(
+                process.env.NEXT_PUBLIC_DATABASE_ID,
+                process.env.NEXT_PUBLIC_COLLECTION_USERS,
+                [Query.equal("email", [email])]
+            );
+
+            // Get auth doc from auth table
+            const auth_doc = await users.list([Query.equal("email", [email])]);
+
+            // Get trainer doc from trainers table
+            let trainer_doc = null;
+            if (auth_doc.total === 1) {
+                try {
+                    trainer_doc = await database.getDocument(
+                        process.env.NEXT_PUBLIC_DATABASE_ID,
+                        process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
+                        auth_doc.users[0].$id
+                    );
+                } catch (error) {
+                    trainer_doc = null;
+                }
+            }
+
+            // Now check, if trainer_doc and user_doc.total === 0
+            // If yes, create user doc, send sucess
+            // else raise email is registered error
+            if (trainer_doc && user_doc.total === 0) {
+                await database.createDocument(
+                    process.env.NEXT_PUBLIC_DATABASE_ID,
+                    process.env.NEXT_PUBLIC_COLLECTION_USERS,
+                    trainer_doc.$id,
+                    {
+                        auth_id: trainer_doc.$id,
+                        firstName,
+                        lastName,
+                        email,
+                        phone,
+                        trainer_id: trainerId,
+                    }
+                );
+                return {
+                    success: true,
+                    errors: {},
+                    message: `User ${firstName} added successfully!`,
+                };
+            }
+
             return {
                 success: false,
                 errors: { email: ["Email already exists, please login"] },
