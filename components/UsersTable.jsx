@@ -1,10 +1,11 @@
 "use client";
 import Link from "next/link";
 import InfiniteScroll from "react-infinite-scroll-component";
-import React, { useState, useMemo } from "react";
+import React, { useMemo } from "react";
 import Image from "next/image";
 import { defaultProfileURL } from "@/configs/constants";
 import { useRouter } from "next/navigation";
+import Table from "./Table";
 
 const UsersTable = ({ search, setSearch, clients, fetchMoreData, hasMore }) => {
   const router = useRouter();
@@ -26,6 +27,64 @@ const UsersTable = ({ search, setSearch, clients, fetchMoreData, hasMore }) => {
     // window.location.href = `client/${client.uid}`;
     router.push(`client/${client.uid}`);
   };
+
+  const head = useMemo(() => {
+    return ["", "Full Name", "Email", "Phone Number", "Trainer", ""].map(
+      (header, index) => {
+        return (
+          <th
+            key={index}
+            className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"
+          >
+            {header}
+          </th>
+        );
+      }
+    );
+  }, []);
+
+  const rows = useMemo(() => {
+    return filteredClients.map((client, index) => (
+      <tr
+        key={index}
+        className={`${
+          index % 2 ? "bg-white" : "bg-gray-100"
+        } h-12 touch-action-none cursor-pointer hover:bg-gray-200`}
+        onClick={() => handleRowClick(client)}
+      >
+        <td className="pl-5">
+          <div className="w-10 h-10 flex items-center justify-center">
+            <Image
+              src={
+                client.imageUrl && client.imageUrl.trim() !== ""
+                  ? client.imageUrl
+                  : defaultProfileURL
+              } // Provide a default placeholder
+              width={32}
+              height={32}
+              alt={`Image of ${client.name}`}
+              className="rounded-full"
+            />
+          </div>
+        </td>
+        <td className="pl-5 whitespace-nowrap">{client.name}</td>
+        <td className="pl-5 whitespace-nowrap">{client.email || "-"}</td>
+        <td className="pl-5 whitespace-nowrap">{client.phone || "-"}</td>
+        <td className="pl-5 whitespace-nowrap">
+          {client.trainer_name || "Not Assigned"}
+        </td>
+        <td className="pl-5 whitespace-nowrap">
+          <Link href={`client/${client.uid}`}>
+            <p className="text-sm underline text-green-500 hover:text-gold-500">
+              View Details
+            </p>
+          </Link>
+        </td>
+      </tr>
+    ));
+  }, [filteredClients]);
+
+  return <Table rows={rows} head={head} />;
 
   return (
     <div className="w-full">
@@ -103,10 +162,7 @@ const UsersTable = ({ search, setSearch, clients, fetchMoreData, hasMore }) => {
                 </td>
                 <td className="pl-5 whitespace-nowrap">
                   <Link href={`client/${client.uid}`}>
-                    <p
-                      className="text-sm underline
-                                             text-green-500 hover:text-gold-500"
-                    >
+                    <p className="text-sm underline text-green-500 hover:text-gold-500">
                       View Details
                     </p>
                   </Link>
