@@ -498,7 +498,7 @@ const AdminPanel = () => {
               </AccordionItemButton>
             </AccordionItemHeading>
             <AccordionItemPanel>
-              <TrainerTable pageTitle={""} trainers={allTrainers} />
+              {/* <TrainerTable pageTitle={""} trainers={allTrainers} /> */}
             </AccordionItemPanel>
           </AccordionItem>
         )}
