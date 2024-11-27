@@ -5,142 +5,127 @@ import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import { defaultProfileURL } from "@/configs/constants";
 import { useRouter } from "next/navigation";
+import Searchbar from "./pure-components/Searchbar";
 
-const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
-    const [search, setSearch] = useState("");
-    const router = useRouter();
+const ClientsTable = ({
+  search,
+  setSearch,
+  clients,
+  fetchMoreData,
+  hasMore,
+}) => {
+  const router = useRouter();
 
-    const filteredClients = useMemo(() => {
-        return clients.filter((client) => {
-            return (
-                client.name.toLowerCase().includes(search.toLowerCase()) ||
-                client.email?.toLowerCase().includes(search.toLowerCase()) ||
-                client.phone?.toLowerCase().includes(search.toLowerCase())
-            );
-        });
-    }, [clients, search]);
+  const filteredClients = useMemo(() => {
+    return clients.filter((client) => {
+      return (
+        client.name.toLowerCase().includes(search.toLowerCase()) ||
+        client.email?.toLowerCase().includes(search.toLowerCase()) ||
+        client.phone?.toLowerCase().includes(search.toLowerCase())
+      );
+    });
+  }, [clients, search]);
 
-    const handleRowClick = (client) => {
-        // Implement the action you want to execute on double-click
-        console.log("Client clicked:", client);
-        // For example, you can redirect to the client details page
-        // window.location.href = `client/${client.uid}`;
-        router.push(`client/${client.uid}`);
-    };
+  const handleRowClick = (client) => {
+    // Implement the action you want to execute on double-click
+    console.log("Client clicked:", client);
+    // For example, you can redirect to the client details page
+    // window.location.href = `client/${client.uid}`;
+    router.push(`client/${client.uid}`);
+  };
 
-    return (
-        <main className="flex flex-col bg-gray-100 text-black">
-            <div className="w-full">
-                <div
-                    className="border border-gray-400 rounded-2xl overflow-hidden 
-                h-12 w-full p-2 m-2 mt-6"
+  return (
+    <main className="flex flex-col bg-gray-100 text-black">
+      <div className="w-full">
+        <InfiniteScroll
+          dataLength={clients.length}
+          next={fetchMoreData}
+          hasMore={hasMore}
+          loader={
+            <h4 className="text-center text-sm text-gray-700 w-full animate-pulse">
+              Loading...
+            </h4>
+          }
+          endMessage={
+            <p className="text-center text-sm text-gray-700 w-full">
+              No more data to load.
+            </p>
+          }
+        >
+          <table className="w-full text-left">
+            <thead>
+              <tr className="bg-green-500 text-white">
+                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"></th>
+                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap">
+                  Client Name
+                </th>
+                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                  Email
+                </th>
+                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                  Phone Number
+                </th>
+                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                  Trainer Name
+                </th>
+                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                  Action
+                </th>
+              </tr>
+            </thead>
+            <tbody className="border-t-2 border-white">
+              {filteredClients.map((client, index) => (
+                <tr
+                  // key={client.$id}
+                  key={index}
+                  className={`${
+                    index % 2 ? "bg-gray-50" : "bg-gray-200"
+                  } h-12 touch-action-none cursor-pointer`}
+                  onClick={() => handleRowClick(client)}
                 >
-                    <input
-                        className="w-full h-full focus:outline-none bg-gray-100"
-                        value={search}
-                        placeholder="Search clients by name, email, or phone"
-                        onChange={(e) => {
-                            console.log(e.target.value);
-                            setSearch(e.target.value);
-                        }}
-                    />
-                </div>
-                <h1 className="text-3xl font-bold text-black mt-5 mb-5 ml-2 leading-tight">
-                    {pageTitle}
-                </h1>
-                <InfiniteScroll
-                    dataLength={clients.length}
-                    next={fetchMoreData}
-                    hasMore={hasMore}
-                    loader={
-                        <h4 className="text-center text-sm text-gray-700 w-full animate-pulse">
-                            Loading...
-                        </h4>
-                    }
-                    endMessage={
-                        <p className="text-center text-sm text-gray-700 w-full">
-                            No more data to load.
-                        </p>
-                    }
-                >
-                    <table className="w-full text-left">
-                        <thead>
-                            <tr className="bg-green-500 text-white">
-                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"></th>
-                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap">
-                                    Client Name
-                                </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
-                                    Email
-                                </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
-                                    Phone Number
-                                </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
-                                    Trainer Name
-                                </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="border-t-2 border-white">
-                            {filteredClients.map((client, index) => (
-                                <tr
-                                    // key={client.$id}
-                                    key={index}
-                                    className={`${
-                                        index % 2 ? "bg-gray-50" : "bg-gray-200"
-                                    } h-12 touch-action-none cursor-pointer`}
-                                    onClick={() => handleRowClick(client)}
-                                >
-                                    <td className="pl-5">
-                                        <div className="w-10 h-10">
-                                            <Image
-                                                src={
-                                                    client.imageUrl &&
-                                                    client.imageUrl.trim() !==
-                                                        ""
-                                                        ? client.imageUrl
-                                                        : defaultProfileURL
-                                                } // Provide a default placeholder
-                                                width={30}
-                                                height={30}
-                                                alt={`Image of ${client.name}`}
-                                                className="rounded-full"
-                                            />
-                                        </div>
-                                    </td>
-                                    <td className="pl-5 whitespace-nowrap">
-                                        {client.name}
-                                    </td>
-                                    <td className="pl-5 whitespace-nowrap">
-                                        {client.email || "-"}
-                                    </td>
-                                    <td className="pl-5 whitespace-nowrap">
-                                        {client.phone || "-"}
-                                    </td>
-                                    <td className="pl-5 whitespace-nowrap">
-                                        {client.trainer_name || "Not Assigned"}
-                                    </td>
-                                    <td className="pl-5 whitespace-nowrap">
-                                        <Link href={`client/${client.uid}`}>
-                                            <p
-                                                className="text-sm underline
+                  <td className="pl-5">
+                    <div className="w-10 h-10">
+                      <Image
+                        src={
+                          client.imageUrl && client.imageUrl.trim() !== ""
+                            ? client.imageUrl
+                            : defaultProfileURL
+                        } // Provide a default placeholder
+                        width={30}
+                        height={30}
+                        alt={`Image of ${client.name}`}
+                        className="rounded-full"
+                      />
+                    </div>
+                  </td>
+                  <td className="pl-5 whitespace-nowrap">{client.name}</td>
+                  <td className="pl-5 whitespace-nowrap">
+                    {client.email || "-"}
+                  </td>
+                  <td className="pl-5 whitespace-nowrap">
+                    {client.phone || "-"}
+                  </td>
+                  <td className="pl-5 whitespace-nowrap">
+                    {client.trainer_name || "Not Assigned"}
+                  </td>
+                  <td className="pl-5 whitespace-nowrap">
+                    <Link href={`client/${client.uid}`}>
+                      <p
+                        className="text-sm underline
                                              text-green-500 hover:text-gold-500"
-                                            >
-                                                View Details
-                                            </p>
-                                        </Link>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </InfiniteScroll>
-            </div>
-        </main>
-    );
+                      >
+                        View Details
+                      </p>
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </InfiniteScroll>
+      </div>
+    </main>
+  );
 };
 
 export default ClientsTable;

@@ -6,6 +6,7 @@ import { getCurrentUser } from "@/server_functions/auth";
 import UsersTable from "@/components/UsersTable";
 import { FaSearch } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
+import Searchbar from "@/components/pure-components/Searchbar";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -70,21 +71,7 @@ export default function AllClients() {
   return (
     <main className="flex flex-col bg-gray-100 text-black">
       <div className="w-full flex flex-col gap-4">
-        <div
-          className="border bg-white border-gray-300 rounded-full overflow-hidden 
-                h-12 w-full px-4 p-2 flex flex-row justify-start items-center gap-2"
-        >
-          <IoSearch className="text-gray-400" size={20} />
-          <input
-            className="w-full h-full focus:outline-none placeholder:text-gray-500"
-            value={search}
-            placeholder="Search clients by name, email, or phone"
-            onChange={(e) => {
-              console.log(e.target.value);
-              setSearch(e.target.value);
-            }}
-          />
-        </div>
+        <Searchbar search={search} setSearch={setSearch} />
         <h1 className="text-xl font-bold text-black ml-2 leading-tight">
           All Users
         </h1>
