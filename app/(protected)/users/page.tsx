@@ -7,6 +7,8 @@ import UsersTable from "@/components/UsersTable";
 import { FaSearch } from "react-icons/fa";
 import { IoSearch } from "react-icons/io5";
 import Searchbar from "@/components/pure-components/Searchbar";
+import AddUserForm from "@/components/forms/add-user-form";
+import RightModal from "@/components/pure-components/RightModal";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -16,6 +18,7 @@ export default function AllClients() {
   const [isFetching, setIsFetching] = useState(false); // State to track if a fetch is in progress
   const [hasMore, setHasMore] = useState(true);
   const [search, setSearch] = useState("");
+  const [showRightModal, setShowRightModal] = useState(false);
 
   useEffect(() => {
     debouncedFetchData(lastId);
@@ -45,7 +48,6 @@ export default function AllClients() {
     );
     // const newItems = await response.json();
     const newItems = response.data;
-    console.log(newItems);
     // Filter out newItems that already exist in clients
     const uniqueNewItems = newItems.filter(
       (newItem: Client) => !clients.some((client) => client.uid === newItem.uid)
@@ -68,13 +70,36 @@ export default function AllClients() {
     fetchData(newLastId);
   };
 
+  const rightModal = () => {
+    return (
+      <RightModal
+        formTitle="Add User"
+        hideModal={() => {
+          setShowRightModal(false);
+        }}
+      >
+        <AddUserForm />
+      </RightModal>
+    );
+  };
+
   return (
     <main className="flex flex-col bg-gray-100 text-black">
       <div className="w-full flex flex-col gap-4">
         <Searchbar search={search} setSearch={setSearch} />
-        <h1 className="text-xl font-bold text-black ml-2 leading-tight">
-          All Users
-        </h1>
+        <div className="w-full flex flex-row items-center justify-between">
+          <h1 className="text-xl font-bold text-black ml-2 leading-tight">
+            All Users
+          </h1>
+          <button
+            onClick={() => {
+              setShowRightModal(true);
+            }}
+            className="bg-primary text-white py-2 px-4 rounded-md"
+          >
+            + Add User
+          </button>
+        </div>
         <UsersTable
           clients={clients}
           hasMore={hasMore}
@@ -82,6 +107,7 @@ export default function AllClients() {
           setSearch={setSearch}
           fetchMoreData={fetchMoreData}
         />
+        {showRightModal ? rightModal() : null}
       </div>
     </main>
   );
