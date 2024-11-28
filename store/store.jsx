@@ -9,33 +9,45 @@ const StoreContext = createContext();
 
 // Create a provider component
 export const StoreProvider = ({ children }) => {
-  const [users, setUsers] = useState(null); // State to hold user data
-  const [exercises, setExercises] = useState(true);
-  const [trainers, setTrainers] = useState(null);
+  const [users, setUsers] = useState([]); // State to hold user data
+  const [exercises, setExercises] = useState([]);
+  const [trainers, setTrainers] = useState([]);
 
   const fetchUsers = async () => {
-    try {
-      const response = await axios.get(
-        `${API_BASE_URL}/mvmt/v1/trainer/clients/${params.id}`,
-
-        {
-          withCredentials: true, // Include cookies in the request
-        }
-      );
-      setUserData(response.data); // Assuming setUserData updates the user data
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      setUserError(error);
-    } finally {
-      setUserLoading(false);
-    }
+    const response = await axios.get(
+      `${API_BASE_URL}/mvmt/v1/trainer/clients?lastId=&limit=50`,
+      {
+        withCredentials: true, // Include cookies in the request
+      }
+    );
+    setUsers(response.data);
   };
-  const fetchExercises = async () => {};
-  const fetchTrainers = async () => {};
+
+  const fetchExercises = async () => {
+    const response = await axios.get(
+      `${API_BASE_URL}/mvmt/v1/admin/exercises`,
+      {
+        withCredentials: true,
+      }
+    );
+    setExercises(response.data);
+  };
+
+  const fetchTrainers = async () => {
+    const response = await axios.get(
+      `${API_BASE_URL}/mvmt/v1/admin/trainerIds`,
+      {
+        withCredentials: true, // Include cookies in the request
+      }
+    );
+    setTrainers(response.data);
+  };
 
   useEffect(() => {
-    fetchData();
-  }, [params.id]);
+    fetchUsers();
+    fetchExercises();
+    fetchTrainers();
+  }, []);
 
   return (
     <StoreContext.Provider value={{ users, exercises, trainers }}>

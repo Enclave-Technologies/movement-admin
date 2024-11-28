@@ -5,6 +5,7 @@ import Select, { components, OptionProps } from "react-select";
 import SignupButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
 import { registerClient } from "@/server_functions/auth";
+import { useStore } from "@/store/store";
 
 const Option = (props: OptionProps<any, false>) => {
   const { data } = props;
@@ -31,8 +32,8 @@ const Option = (props: OptionProps<any, false>) => {
 };
 
 const AddUserForm = () => {
+  const { trainers } = useStore();
   const [clientState, clientAction] = useFormState(registerClient, undefined);
-  const [allTrainers, setAllTrainers] = useState([]);
   const refWorkoutForm = useRef<HTMLFormElement>(null);
 
   return (
@@ -124,7 +125,7 @@ const AddUserForm = () => {
         <Select
           id="trainerId"
           name="trainerId"
-          options={allTrainers}
+          options={trainers}
           getOptionLabel={(option) => option.name}
           getOptionValue={(option) => option.id}
           components={{ Option }}
@@ -132,8 +133,6 @@ const AddUserForm = () => {
           classNamePrefix="react-select"
         />
       </div>
-      {/* <pre>{JSON.stringify(allTrainers, null, 2)}</pre> */}
-
       <SignupButton label="Submit" />
     </form>
   );
