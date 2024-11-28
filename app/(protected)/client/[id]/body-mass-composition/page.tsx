@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useUser } from "@/context/ClientContext"; // Import the custom hook
 import Breadcrumb from "@/components/Breadcrumb";
+import axios from "axios";
 
 const dummyData = [
     {
@@ -34,10 +35,29 @@ const dummyData = [
     },
 ];
 
-const Page = () => {
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser(); // Access the user data from Context
     const page_title = ["BMI Records"];
-    console.log(userData);
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const response = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/client/bmc?client_id=${params.id}`,
+                    { withCredentials: true }
+                );
+                const data = response.data;
+                console.log(data);
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        fetchData();
+    });
+
     return (
         <div>
             <div className="ml-12">
