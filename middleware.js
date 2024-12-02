@@ -24,7 +24,9 @@ export async function middleware(request) {
         if (publicPaths.some((path) => pathname.startsWith(path))) {
             // If user is logged in and trying to access a public path, redirect to home
             if (user) {
-                return NextResponse.redirect(new URL("/", request.url));
+                return NextResponse.redirect(
+                    new URL("/my-clients", request.url)
+                );
             }
             // If not logged in, allow access to public paths
             return NextResponse.next();
