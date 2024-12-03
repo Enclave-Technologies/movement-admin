@@ -6,8 +6,8 @@ import Select, { components, OptionProps } from "react-select";
 import SignupButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
 import { registerClient } from "@/server_functions/auth";
-import { useStore } from "@/store/store";
 import Toast from "../Toast";
+import { useGlobalContext } from "@/context/GlobalContextProvider";
 
 const Option = (props: OptionProps<any, false>) => {
     const { data } = props;
@@ -36,7 +36,7 @@ const Option = (props: OptionProps<any, false>) => {
 };
 
 const AddUserForm = ({ fetchData }) => {
-    const { trainers } = useStore();
+    const { trainers } = useGlobalContext();
     const [clientState, clientAction] = useFormState(registerClient, undefined);
     const ref = useRef<HTMLFormElement>(null);
     const [showToast, setShowToast] = useState(false);
@@ -45,7 +45,7 @@ const AddUserForm = ({ fetchData }) => {
 
     useEffect(() => {
         if (clientState?.success) {
-            fetchData("");
+            fetchData();
             ref.current?.reset();
             setToastMessage(
                 clientState.message || "Trainer registered successfully!"
@@ -152,16 +152,18 @@ const AddUserForm = ({ fetchData }) => {
                     >
                         Select Trainer
                     </label>
-                    <Select
-                        id="trainerId"
-                        name="trainerId"
-                        options={trainers}
-                        getOptionLabel={(option) => option.name}
-                        getOptionValue={(option) => option.id}
-                        components={{ Option }}
-                        className="mt-1 block w-full"
-                        classNamePrefix="react-select"
-                    />
+                    <div suppressHydrationWarning>
+                        <Select
+                            id="trainerId"
+                            name="trainerId"
+                            options={trainers}
+                            getOptionLabel={(option) => option.name}
+                            getOptionValue={(option) => option.id}
+                            components={{ Option }}
+                            className="mt-1 block w-full"
+                            classNamePrefix="react-select"
+                        />
+                    </div>
                 </div>
                 <SignupButton label="Submit" />
             </form>

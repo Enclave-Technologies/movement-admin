@@ -1,7 +1,7 @@
 "use client";
 import Sidebar from "@/components/Sidebar";
 import { TrainerProvider } from "@/context/TrainerContext";
-import { StoreProvider } from "@/store/store";
+import { StoreProvider } from "@/context/GlobalContextProvider";
 import { useState } from "react";
 
 export default function RootLayout({

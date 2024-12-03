@@ -13,8 +13,7 @@ export const StoreProvider = ({ children }) => {
     const [users, setUsers] = useState([]); // State to hold user data
     const [exercises, setExercises] = useState([]);
     const [trainers, setTrainers] = useState([]);
-    const [counters, setCounters] = useState([]);
-
+    const [countDoc, setCountDoc] = useState(null);
     const fetchUsers = async () => {
         const response = await axios.get(
             `${API_BASE_URL}/mvmt/v1/trainer/clients?pageNo=1&limit=${LIMIT}`,
@@ -51,22 +50,29 @@ export const StoreProvider = ({ children }) => {
                 withCredentials: true, // Include cookies in the request
             }
         );
-        console.log(response.data);
+        setCountDoc(response.data);
     };
 
-    useEffect(() => {
-        fetchCounts();
+    // Add a function to update the state
+    const reloadData = () => {
         fetchUsers();
         fetchExercises();
         fetchTrainers();
+        fetchCounts();
+    };
+
+    useEffect(() => {
+        reloadData();
     }, []);
 
     return (
-        <StoreContext.Provider value={{ users, exercises, trainers }}>
+        <StoreContext.Provider
+            value={{ countDoc, users, exercises, trainers, reloadData }}
+        >
             {children}
         </StoreContext.Provider>
     );
 };
 
 // Custom hook to use the User Context
-export const useStore = () => useContext(StoreContext);
+export const useGlobalContext = () => useContext(StoreContext);
