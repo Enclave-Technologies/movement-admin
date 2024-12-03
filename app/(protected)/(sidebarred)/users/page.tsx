@@ -5,21 +5,53 @@ import UsersTable from "@/components/UsersTable";
 import Searchbar from "@/components/pure-components/Searchbar";
 import AddUserForm from "@/components/forms/add-user-form";
 import RightModal from "@/components/pure-components/RightModal";
+import { getCurrentUser } from "@/server_functions/auth";
+import { LIMIT } from "@/configs/constants";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+const fetchData = async (
+    lastId: number,
+    isFetching: boolean,
+    setIsFetching: React.Dispatch<React.SetStateAction<boolean>>
+) => {
+    console.log("CALLING FETCH DATA FUNCTION");
+    if (isFetching) return; // Prevent multiple simultaneous fetches
+    setIsFetching(true);
+
+    const response = await axios.get(
+        `${API_BASE_URL}/mvmt/v1/trainer/clients?pageNo=${lastId}&limit=${LIMIT}`,
+        {
+            withCredentials: true, // Include cookies in the request
+        }
+    );
+    // // const newItems = await response.json();
+    const newItems = response.data;
+
+    console.log(newItems);
+
+    // setClients((prevItems) => [...prevItems, ...uniqueNewItems]);
+    // if (newItems.length === 0 || newItems.length < 50) {
+    //     setHasMore(false);
+    // }
+    // } else {
+    //     setClients((prevItems) => [...prevItems, ...newItems]);
+    // }
+    setIsFetching(false);
+};
+
 export default function AllClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
-    const [lastId, setLastId] = useState(""); // State to hold the last ID of the fetched clients
+    const [lastId, setLastId] = useState<number>(1); // State to hold the last ID of the fetched clients
     const [isFetching, setIsFetching] = useState(false); // State to track if a fetch is in progress
     const [hasMore, setHasMore] = useState(true);
     const [search, setSearch] = useState("");
-    const [tableLoading, setTableLoading] = useState(true);
+    // const [tableLoading, setTableLoading] = useState(true);
     const [showRightModal, setShowRightModal] = useState(false);
 
-    // useEffect(() => {
-    //     debouncedFetchData(lastId);
-    // }, [lastId]);
+    useEffect(() => {
+        fetchData(lastId, isFetching, setIsFetching);
+    }, [lastId]);
 
     // const debounce = (func: Function, wait: number) => {
     //     let timeout: NodeJS.Timeout;
@@ -29,37 +61,6 @@ export default function AllClients() {
     //         timeout = setTimeout(() => func.apply(context, args), wait);
     //     };
     // };
-
-    const fetchData = async (lastId: string) => {
-        if (isFetching) return; // Prevent multiple simultaneous fetches
-        setIsFetching(true);
-
-        // const current_user = await getCurrentUser();
-        // const userId = current_user?.$id; // Extract the $id property
-
-        // const response = await axios.get(
-        //     `${API_BASE_URL}/mvmt/v1/trainer/clients?lastId=${lastId}&limit=50`,
-        //     {
-        //         withCredentials: true, // Include cookies in the request
-        //     }
-        // );
-        // // const newItems = await response.json();
-        // const newItems = response.data;
-        // // Filter out newItems that already exist in clients
-        // const uniqueNewItems = newItems.filter(
-        //     (newItem: Client) =>
-        //         !clients.some((client) => client.uid === newItem.uid)
-        // );
-
-        // setClients((prevItems) => [...prevItems, ...uniqueNewItems]);
-        // if (newItems.length === 0 || newItems.length < 50) {
-        //     setHasMore(false);
-        // }
-        // } else {
-        //     setClients((prevItems) => [...prevItems, ...newItems]);
-        // }
-        setIsFetching(false);
-    };
 
     // const debouncedFetchData = useCallback(debounce(fetchData, 300), [
     //     fetchData,
