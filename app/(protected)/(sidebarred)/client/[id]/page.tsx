@@ -5,6 +5,7 @@ import { useUser } from "@/context/ClientContext";
 import LinkTile from "@/components/LinkTile";
 import { defaultProfileURL } from "@/configs/constants";
 import axios from "axios";
+import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -113,6 +114,36 @@ const Page = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         )}
+        <div className="bg-white shadow-md flex flex-col items-start gap-2 rounded-lg p-4">
+          <Link href="/workout-history">Workout History</Link>
+          <div className="flex flex-row justify-between w-full">
+            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
+              <p>28/11/2024</p>
+              <p>Phase 1, Cutting</p>
+            </div>
+            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
+              <p>28/11/2024</p>
+              <p>Phase 1, Cutting</p>
+            </div>
+            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
+              <p>28/11/2024</p>
+              <p>Phase 1, Cutting</p>
+            </div>
+            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
+              <p>28/11/2024</p>
+              <p>Phase 1, Cutting</p>
+            </div>
+            <div className="flex flex-col justify-between border-2 border-gray-400 flex-1">
+              <div>
+                <p>Upcoming Session</p>
+                <p>Phase 1, Bulking</p>
+              </div>
+              <button className="bg-green-500 text-white px-4 py-2 rounded-md">
+                Start Workout
+              </button>
+            </div>
+          </div>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {LinkTileData.map((tile, index) => (
             <LinkTile
