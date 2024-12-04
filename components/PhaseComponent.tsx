@@ -203,8 +203,9 @@ const PhaseComponent: FC<PhaseProps> = ({
         ) : (
           phase.sessions
             .sort((a, b) => a.sessionOrder - b.sessionOrder)
-            .map((session) => (
+            .map((session, index) => (
               <SessionComponent
+                index={index}
                 phaseId={phase.phaseId}
                 key={session.sessionId}
                 session={session}

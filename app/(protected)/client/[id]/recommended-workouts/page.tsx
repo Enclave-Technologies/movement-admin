@@ -9,6 +9,7 @@ import Spinner from "@/components/Spinner";
 import PhaseComponent from "@/components/PhaseComponent";
 import { FaPlus, FaSave } from "react-icons/fa";
 import DemoTable from "@/components/DemoTable";
+import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -306,7 +307,7 @@ const Page = ({ params }: { params: { id: string } }) => {
     );
   }
   return (
-    <div className="uppercase ">
+    <div className="uppercase">
       <div className="ml-12 flex justify-between">
         <Breadcrumb
           homeImage={userData?.imageUrl}
@@ -319,7 +320,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                 </button> */}
       </div>
       {/* <DemoTable exercises={workouts} /> */}
-      <div className="mt-12">
+      <div className="mt-4">
         <div className="w-full space-y-4">
           {clientPhases.length === 0 ? (
             <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
@@ -359,7 +360,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         </div>
       </div>
       <button
-        className="flex items-center justify-center w-full mt-4 px-4 py-2 secondary-btn uppercase gap-5"
+        className="flex items-center justify-center w-full mt-4 px-4 py-2 secondary-btn uppercase gap-5 bg-green-500 text-white"
         onClick={handleAddPhase}
       >
         <FaPlus className="text-lg" />

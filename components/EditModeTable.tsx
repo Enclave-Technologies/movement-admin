@@ -59,7 +59,7 @@ const EditModeTable: FC<EditableTableProps> = ({
             <col className="w-[150px]" />
             <col className="w-[150px]" />
           </colgroup>
-          <thead className="bg-green-500 text-white">
+          <thead className="bg-gray-100 text-black">
             <tr>
               <th className="px-2 py-2 text-xs text-left min-w-32">Order</th>
               <th className="px-2 py-2 text-xs text-left min-w-64">Motion</th>
@@ -74,7 +74,7 @@ const EditModeTable: FC<EditableTableProps> = ({
               <th className="px-2 py-2 text-xs text-left min-w-32">TUT</th>
               <th className="px-2 py-2 text-xs text-left min-w-32">Tempo</th>
               <th className="px-2 py-2 text-xs text-left min-w-32">Rest</th>
-              <th className="sticky right-0 bg-green-500 z-20 px-2 py-2 text-xs text-left min-w-32">
+              <th className="sticky right-0 bg-gray-100 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500">
                 Actions
               </th>
             </tr>
@@ -351,7 +351,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                           />
                         </div>
                       </td>
-                      <td className="sticky right-0 bg-green-500 z-10 px-2 py-2 items-center justify-center">
+                      <td className="sticky right-0 bg-white z-10 px-2 py-2 h-14 flex items-center justify-center border-l-[1px] border-gray-500">
                         {/* <button
                                                     onClick={() =>
                                                         onCancelEdit()
@@ -365,7 +365,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                             // TODO: To save the exercise in DB
                             onEditExercise(null);
                           }}
-                          className="text-white hover:text-white w-full"
+                          className="text-black hover:text-black"
                         >
                           <FaSave className="text-lg" />
                         </button>
@@ -394,10 +394,10 @@ const EditModeTable: FC<EditableTableProps> = ({
                         {exercise.tempo}
                       </td>
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10">{`${exercise.restMin}-${exercise.restMax}`}</td>
-                      <td className="sticky right-0 bg-green-500 z-10 px-2 py-2 h-10">
+                      <td className="sticky right-0 bg-white z-10 px-2 py-2 h-10 flex items-center justify-center border-l-[1px] border-gray-500">
                         <button
                           onClick={() => onEditExercise(exercise.id)}
-                          className="text-white hover:text-white mr-2"
+                          className="text-black hover:text-black mr-2"
                         >
                           <FaEdit />
                         </button>
