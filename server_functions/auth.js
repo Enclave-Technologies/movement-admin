@@ -62,7 +62,7 @@ export async function register(state, formData) {
         }
     }
 
-    // // 3. If successful in creating team association
+    // 3. If successful in creating team association
     try {
         const teamList = await teams.list();
         for (const team of teamList.teams) {
@@ -111,6 +111,27 @@ export async function register(state, formData) {
                 imageUrl: null,
             }
         );
+
+        // const countDoc = await database.getDocument(
+        //     process.env.NEXT_PUBLIC_DATABASE_ID,
+        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
+        //     process.env.COUNT_DOCUMENT_ID
+        // );
+
+        // const currentTrainerCount = countDoc.trainers_count || 0;
+        // const updatedTrainerCount = currentTrainerCount + 1;
+        // const currentUserCount = countDoc.users_count || 0;
+        // const updatedUserCount = currentUserCount + 1;
+
+        // await database.updateDocument(
+        //     process.env.NEXT_PUBLIC_DATABASE_ID,
+        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
+        //     process.env.COUNT_DOCUMENT_ID,
+        //     {
+        //         trainers_count: updatedTrainerCount,
+        //         users_count: updatedUserCount,
+        //     }
+        // );
     } catch (error) {
         console.log(error);
         users.delete(uid);
@@ -225,7 +246,7 @@ export async function registerClient(state, formData) {
         }
     }
 
-    // // 3. If successful in creating team association
+    // 3. If successful in creating team association
     try {
         const teamList = await teams.list();
         for (const team of teamList.teams) {
@@ -260,6 +281,24 @@ export async function registerClient(state, formData) {
                 trainer_id: trainerId,
             }
         );
+
+        // const countDoc = await database.getDocument(
+        //     process.env.NEXT_PUBLIC_DATABASE_ID,
+        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
+        //     process.env.COUNT_DOCUMENT_ID
+        // );
+
+        // const currentUserCount = countDoc.users_count || 0;
+        // const updatedUserCount = currentUserCount + 1;
+
+        // await database.updateDocument(
+        //     process.env.NEXT_PUBLIC_DATABASE_ID,
+        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
+        //     process.env.COUNT_DOCUMENT_ID,
+        //     {
+        //         users_count: updatedUserCount,
+        //     }
+        // );
     } catch (error) {
         console.log(error);
         users.delete(uid);
@@ -270,9 +309,6 @@ export async function registerClient(state, formData) {
             },
         };
     }
-
-    // reset the form
-    // Reset the form fields
 
     return {
         success: true,

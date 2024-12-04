@@ -7,7 +7,7 @@ import { defaultProfileURL } from "@/configs/constants";
 import { useRouter } from "next/navigation";
 import Table from "./Table";
 
-const UsersTable = ({ search, setSearch, clients, fetchMoreData, hasMore }) => {
+const UsersTable = ({ search, clients }) => {
     const router = useRouter();
 
     const filteredClients = useMemo(() => {
