@@ -286,7 +286,7 @@ const WorkoutPlan = ({
   }
 
   return (
-    <div className="">
+    <div className="uppercase">
       <div className="flex justify-between">
         <button
           className="text-sm flex items-center justify-center mt-4 px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"

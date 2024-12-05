@@ -6,6 +6,11 @@ import { useUser } from "@/context/ClientContext";
 import { TrainerProvider } from "@/context/TrainerContext";
 import SessionLogTable from "../SessionLogTable";
 import WorkoutPlan from "./WorkoutPlan";
+import { FaHistory } from "react-icons/fa";
+import { MdChangeHistory } from "react-icons/md";
+import { IoDocumentText, IoDocumentTextOutline } from "react-icons/io5";
+import { TbTargetArrow } from "react-icons/tb";
+import { IoIosBody } from "react-icons/io";
 
 const ClientDetails = ({ client_id }) => {
   const { userData } = useUser();
@@ -19,11 +24,10 @@ const ClientDetails = ({ client_id }) => {
   const [fetchingGoals, setFetchingGoals] = useState(true);
 
   useEffect(() => {
-    setDataLoading(true);
     fetchTrackedWorkouts();
     fetchWorkoutPlan();
     fetchGoals();
-  }, [client_id]);
+  }, []);
 
   async function fetchWorkoutPlan() {
     try {
@@ -40,7 +44,7 @@ const ClientDetails = ({ client_id }) => {
     } catch (error) {
       console.error(error);
     } finally {
-      setFetchingWorkouts(false);
+      setDataLoading(false);
     }
   }
 
@@ -64,7 +68,7 @@ const ClientDetails = ({ client_id }) => {
     // setNextSession(nextSession[0]);
     setSessionLog(sessionLogs);
     // setProgressId(progressId);
-    setDataLoading(false);
+    setFetchingWorkouts(false);
   }
 
   return (
@@ -73,7 +77,11 @@ const ClientDetails = ({ client_id }) => {
         <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
         <div className="p-4 bg-white w-full shadow-md rounded-lg overflow-hidden">
           {selectedTab == "workout-history" && (
-            <SessionLogTable handleViewSession={null} sessions={sessionLog} />
+            <SessionLogTable
+              dataLoading={fetchingWorkouts}
+              handleViewSession={null}
+              sessions={sessionLog}
+            />
           )}
           {selectedTab == "goals" && (
             <GoalList
@@ -85,7 +93,7 @@ const ClientDetails = ({ client_id }) => {
           )}
           {selectedTab == "workout-plan" && (
             <WorkoutPlan
-              pageLoading={fetchingWorkouts}
+              pageLoading={dataLoading}
               setPageLoading={setFetchingWorkouts}
               client_id={client_id}
               workouts={workouts}
@@ -108,6 +116,7 @@ const Tabs = ({ selectedTab, setSelectedTab }) => {
         onClick={() => {
           setSelectedTab("workout-history");
         }}
+        icon={<MdChangeHistory size={20} />}
       />
       <Tab
         isSelected={selectedTab === "workout-plan"}
@@ -115,6 +124,7 @@ const Tabs = ({ selectedTab, setSelectedTab }) => {
         onClick={() => {
           setSelectedTab("workout-plan");
         }}
+        icon={<IoDocumentTextOutline size={20} />}
       />
       <Tab
         isSelected={selectedTab === "goals"}
@@ -122,6 +132,7 @@ const Tabs = ({ selectedTab, setSelectedTab }) => {
         onClick={() => {
           setSelectedTab("goals");
         }}
+        icon={<TbTargetArrow size={20} />}
       />
       <Tab
         isSelected={selectedTab === "body-mass-composition"}
@@ -129,19 +140,21 @@ const Tabs = ({ selectedTab, setSelectedTab }) => {
         onClick={() => {
           setSelectedTab("body-mass-composition");
         }}
+        icon={<IoIosBody size={20} />}
       />
     </div>
   );
 };
 
-const Tab = ({ label, onClick, isSelected }) => {
+const Tab = ({ label, onClick, isSelected, icon }) => {
   return (
     <div
-      className={`hover:cursor-pointer flex-1 flex flex-row items-center justify-center py-4 ${
+      className={`hover:cursor-pointer flex-1 flex flex-row items-center justify-center py-4 gap-2 ${
         isSelected ? "bg-green-500 text-white" : "bg-white"
       }`}
       onClick={onClick}
     >
+      {icon}
       <p>{label}</p>
     </div>
   );

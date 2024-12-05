@@ -2,7 +2,7 @@ import React from "react";
 
 const BreadcrumbLoading = () => {
   return (
-    <nav className="mt-6 flex p-2" aria-label="Breadcrumb">
+    <nav className="flex p-2" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         <li>
           <div className="flex items-center text-gray-700">

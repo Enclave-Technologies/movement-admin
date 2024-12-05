@@ -116,20 +116,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             </div>
           </div>
         )}
-        {/* <RecentWorkoutHistory client_id={params.id} /> */}
         <ClientDetails client_id={params.id} />
-        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {LinkTileData.map((tile, index) => (
-            <LinkTile
-              key={index}
-              href={tile.href(params)}
-              label={tile.label}
-              stat={statsLoading ? "Loading..." : stats[tile.statKey] || "N/A"}
-              isLoading={statsLoading}
-              className="flex flex-col items-center justify-between gap-0 p-4 bg-gray-200 border-2 rounded-xl border-primary w-full h-32"
-            />
-          ))}
-        </div> */}
       </div>
     </div>
   );
