@@ -27,7 +27,9 @@ export async function register(state, formData) {
         email: formData.get("email"),
         jobTitle: formData.get("jobTitle"),
         role: formData.get("role"),
+        gender: formData.get("gender"),
     });
+
     if (!validatedResult.success) {
         // Handle validation errors
         const errors = validatedResult.error.formErrors.fieldErrors;
@@ -35,7 +37,7 @@ export async function register(state, formData) {
     }
 
     console.log(validatedResult.data);
-    const { firstName, lastName, phone, email, jobTitle, role } =
+    const { firstName, lastName, phone, email, jobTitle, role, gender } =
         validatedResult.data;
 
     // 2. Try creating with details
@@ -94,6 +96,8 @@ export async function register(state, formData) {
                 lastName: lastName,
                 jobTitle: jobTitle,
                 phone: phone,
+                email: email,
+                gender: gender,
             }
         );
 
@@ -109,29 +113,9 @@ export async function register(state, formData) {
                 phone,
                 trainer_id: uid,
                 imageUrl: null,
+                gender: gender,
             }
         );
-
-        // const countDoc = await database.getDocument(
-        //     process.env.NEXT_PUBLIC_DATABASE_ID,
-        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
-        //     process.env.COUNT_DOCUMENT_ID
-        // );
-
-        // const currentTrainerCount = countDoc.trainers_count || 0;
-        // const updatedTrainerCount = currentTrainerCount + 1;
-        // const currentUserCount = countDoc.users_count || 0;
-        // const updatedUserCount = currentUserCount + 1;
-
-        // await database.updateDocument(
-        //     process.env.NEXT_PUBLIC_DATABASE_ID,
-        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
-        //     process.env.COUNT_DOCUMENT_ID,
-        //     {
-        //         trainers_count: updatedTrainerCount,
-        //         users_count: updatedUserCount,
-        //     }
-        // );
     } catch (error) {
         console.log(error);
         users.delete(uid);
@@ -161,6 +145,7 @@ export async function registerClient(state, formData) {
         phone: formData.get("phone"),
         email: formData.get("email"),
         trainerId: formData.get("trainerId"),
+        gender: formData.get("gender"),
     });
     if (!validatedResult.success) {
         // Handle validation errors
@@ -169,7 +154,7 @@ export async function registerClient(state, formData) {
     }
 
     console.log(validatedResult.data);
-    const { firstName, lastName, phone, email, trainerId } =
+    const { firstName, lastName, phone, email, trainerId, gender } =
         validatedResult.data;
 
     // 2. Try creating with details
@@ -230,6 +215,7 @@ export async function registerClient(state, formData) {
                         phone,
                         trainer_id: trainerId,
                         imageUrl: null,
+                        gender: gender,
                     }
                 );
                 return {
@@ -279,26 +265,9 @@ export async function registerClient(state, formData) {
                 email,
                 phone,
                 trainer_id: trainerId,
+                gender: gender,
             }
         );
-
-        // const countDoc = await database.getDocument(
-        //     process.env.NEXT_PUBLIC_DATABASE_ID,
-        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
-        //     process.env.COUNT_DOCUMENT_ID
-        // );
-
-        // const currentUserCount = countDoc.users_count || 0;
-        // const updatedUserCount = currentUserCount + 1;
-
-        // await database.updateDocument(
-        //     process.env.NEXT_PUBLIC_DATABASE_ID,
-        //     process.env.NEXT_PUBLIC_COLLECTION_COUNTS,
-        //     process.env.COUNT_DOCUMENT_ID,
-        //     {
-        //         users_count: updatedUserCount,
-        //     }
-        // );
     } catch (error) {
         console.log(error);
         users.delete(uid);
@@ -564,19 +533,18 @@ export async function updatePassword(state, formData) {
 }
 
 export async function addWorkout(state, formData) {
+    console.log("Form data:");
+    for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
     // 1. Validate fields
     const validatedResult = exerciseSchema.safeParse({
-        motion: formData.get("motion"),
-        specificDescription: formData.get("specificDescription"),
-        recommendedRepsMin: parseInt(formData.get("recommendedRepsMin")),
-        recommendedRepsMax: parseInt(formData.get("recommendedRepsMax")),
-        recommendedSetsMin: parseInt(formData.get("recommendedSetsMin")),
-        recommendedSetsMax: parseInt(formData.get("recommendedSetsMax")),
-        tempo: formData.get("tempo"),
-        tut: parseInt(formData.get("tut")),
-        recommendedRestMin: parseInt(formData.get("recommendedRestMin")),
-        recommendedRestMax: parseInt(formData.get("recommendedRestMax")),
-        shortDescription: formData.get("shortDescription"),
+        Motion: formData.get("Motion"),
+        targetArea: formData.get("targetArea"),
+        fullName: formData.get("fullName"),
+        shortName: formData.get("shortName"),
+        authorization: formData.get("authorization"),
     });
 
     if (!validatedResult.success) {
@@ -585,22 +553,10 @@ export async function addWorkout(state, formData) {
         return { success: false, errors };
     }
 
-    console.log(validatedResult.data);
-    const {
-        motion,
-        specificDescription,
-        recommendedRepsMin,
-        recommendedRepsMax,
-        recommendedSetsMin,
-        recommendedSetsMax,
-        tempo,
-        tut,
-        recommendedRestMin,
-        recommendedRestMax,
-        shortDescription,
-    } = validatedResult.data;
+    const { Motion, targetArea, fullName, shortName, authorization } =
+        validatedResult.data;
 
-    // 2. Try creating with details
+    // // 2. Try creating with details
     try {
         const cookie = JSON.parse(cookies().get(SESSION_COOKIE_NAME)?.value);
 
@@ -613,19 +569,11 @@ export async function addWorkout(state, formData) {
             process.env.NEXT_PUBLIC_COLLECTION_EXERCISES,
             uid,
             {
-                Motion: motion.toUpperCase(),
-                SpecificDescription: specificDescription.toUpperCase(),
-                RecommendedRepsMin: recommendedRepsMin,
-                RecommendedRepsMax: recommendedRepsMax,
-                RecommendedSetsMin: recommendedSetsMin,
-                RecommendedSetsMax: recommendedSetsMax,
-                Tempo: tempo,
-                TUT: tut,
-                RecommendedRestMin: recommendedRestMin,
-                RecommendedRestMax: recommendedRestMax,
-                ShortDescription: shortDescription.toUpperCase(),
-                videoURL: "",
-                approved: false,
+                motion: Motion,
+                targetArea,
+                fullName,
+                shortName,
+                approved: authorization === "Admins",
             }
         );
         console.log(createdDoc);
@@ -675,6 +623,6 @@ export async function addWorkout(state, formData) {
     return {
         success: true,
         errors: {},
-        message: `Exercise ${shortDescription} added successfully!`,
+        message: `Exercise ${formData.get("fullName")} added successfully!`,
     };
 }

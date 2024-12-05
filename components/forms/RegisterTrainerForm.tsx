@@ -1,89 +1,40 @@
 "use client";
-import { API_BASE_URL } from "@/configs/constants";
-import { defaultProfileURL } from "@/configs/constants";
-import Image from "next/image";
-import React, { useEffect, useRef, useState } from "react";
-import Select, { components, OptionProps } from "react-select";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import SignupButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
-import { registerClient } from "@/server_functions/auth";
+import { register } from "@/server_functions/auth";
 import Toast from "../Toast";
-import axios from "axios";
 
-const Option = (props: OptionProps<any, false>) => {
-    const { data } = props;
-    return (
-        <components.Option {...props}>
-            <div className="flex items-center">
-                <Image
-                    src={data.imageUrl || defaultProfileURL}
-                    alt={data.name}
-                    width={30}
-                    height={30}
-                    className="w-8 h-8 rounded-full mr-2"
-                />
-
-                <div className="flex flex-col">
-                    <span className="font-semibold">{data.name}</span>
-                    {data.jobTitle && (
-                        <span className="text-gray-500 text-sm">
-                            {data.jobTitle}
-                        </span>
-                    )}
-                </div>
-            </div>
-        </components.Option>
-    );
-};
-
-const AddUserForm = ({ fetchData }) => {
-    // const { trainers } = useGlobalContext();
-    const [trainers, setTrainers] = useState([]);
-    const [clientState, clientAction] = useFormState(registerClient, undefined);
+const RegisterTrainerForm = ({ fetchData }) => {
+    const [state, action] = useFormState(register, undefined);
     const ref = useRef<HTMLFormElement>(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
     useEffect(() => {
-        const loadTrainers = async () => {
-            const response = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/admin/trainerIds?limit=-1`,
-                {
-                    withCredentials: true, // Include cookies in the request
-                }
-            );
-            setTrainers(response.data);
-        };
-
-        loadTrainers();
-    }, []);
-
-    useEffect(() => {
-        if (clientState?.success) {
+        if (state?.success) {
             fetchData();
             ref.current?.reset();
             setToastMessage(
-                clientState.message || "Trainer registered successfully!"
+                state.message || "Trainer registered successfully!"
             );
             setToastType("success");
             setShowToast(true);
-        } else if (clientState?.errors) {
-            setToastMessage(
-                Object.values(clientState.errors).flat().join(", ")
-            );
+        } else if (state?.errors) {
+            setToastMessage(Object.values(state.errors).flat().join(", "));
             setToastType("error");
             setShowToast(true);
         }
-    }, [clientState]);
+    }, [state]);
 
     const handleToastClose = () => {
         setShowToast(false);
     };
 
     return (
-        <div>
-            <form className="space-y-4" action={clientAction} ref={ref}>
+        <div className="w-full">
+            <form className="space-y-4" action={action} ref={ref}>
                 <div>
                     <label
                         htmlFor="firstName"
@@ -97,9 +48,9 @@ const AddUserForm = ({ fetchData }) => {
                         name="firstName"
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {clientState?.errors?.firstName && (
+                    {state?.errors?.firstName && (
                         <p className="text-red-500 text-xs italic">
-                            {clientState.errors.firstName}
+                            {state.errors.firstName}
                         </p>
                     )}
                 </div>
@@ -116,9 +67,9 @@ const AddUserForm = ({ fetchData }) => {
                         name="lastName"
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {clientState?.errors?.lastName && (
+                    {state?.errors?.lastName && (
                         <p className="text-red-500 text-xs italic">
-                            {clientState.errors.lastName}
+                            {state.errors.lastName}
                         </p>
                     )}
                 </div>
@@ -135,9 +86,9 @@ const AddUserForm = ({ fetchData }) => {
                         name="phone"
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {clientState?.errors?.phone && (
+                    {state?.errors?.phone && (
                         <p className="text-red-500 text-xs italic">
-                            {clientState.errors.phone}
+                            {state.errors.phone}
                         </p>
                     )}
                 </div>
@@ -154,9 +105,9 @@ const AddUserForm = ({ fetchData }) => {
                         name="email"
                         className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
-                    {clientState?.errors?.email && (
+                    {state?.errors?.email && (
                         <p className="text-red-500 text-xs italic">
-                            {clientState.errors.email}
+                            {state.errors.email}
                         </p>
                     )}
                 </div>
@@ -175,31 +126,51 @@ const AddUserForm = ({ fetchData }) => {
                         <option value="m">Man</option>
                         <option value="f">Woman</option>
                     </select>
-                    {clientState?.errors?.gender && (
+                    {state?.errors?.gender && (
                         <p className="text-red-500 text-xs italic">
-                            {clientState.errors.gender}
+                            {state.errors.gender}
                         </p>
                     )}
                 </div>
                 <div>
                     <label
-                        htmlFor="trainerId"
+                        htmlFor="jobTitle"
                         className="block text-sm font-medium text-gray-700"
                     >
-                        Select Trainer
+                        Job Title
                     </label>
-                    <div suppressHydrationWarning>
-                        <Select
-                            id="trainerId"
-                            name="trainerId"
-                            options={trainers}
-                            getOptionLabel={(option) => option.name}
-                            getOptionValue={(option) => option.id}
-                            components={{ Option }}
-                            className="mt-1 block w-full"
-                            classNamePrefix="react-select"
-                        />
-                    </div>
+                    <input
+                        type="text"
+                        id="jobTitle"
+                        name="jobTitle"
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {state?.errors?.jobTitle && (
+                        <p className="text-red-500 text-xs italic">
+                            {state.errors.jobTitle}
+                        </p>
+                    )}
+                </div>
+                <div>
+                    <label
+                        htmlFor="role"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Role
+                    </label>
+                    <select
+                        id="role"
+                        name="role"
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    >
+                        <option value="trainer">Trainer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                    {state?.errors?.role && (
+                        <p className="text-red-500 text-xs italic">
+                            {state.errors.role}
+                        </p>
+                    )}
                 </div>
                 <SignupButton label="Submit" />
             </form>
@@ -214,4 +185,4 @@ const AddUserForm = ({ fetchData }) => {
     );
 };
 
-export default AddUserForm;
+export default RegisterTrainerForm;

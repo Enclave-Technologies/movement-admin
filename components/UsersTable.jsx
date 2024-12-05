@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import InfiniteScroll from "react-infinite-scroll-component";
 import React, { useMemo } from "react";
 import Image from "next/image";
 import { defaultProfileURL } from "@/configs/constants";
@@ -91,6 +90,15 @@ const UsersTable = ({ search, clients }) => {
             </tr>
         ));
     }, [filteredClients]);
+
+    if (clients.length === 0) {
+        return (
+            <div className="flex flex-col justify-center items-center h-[100vh] text-gray-600">
+                <p className="font-bold text-lg mb-2">No clients added</p>
+                <p className="font-medium">Press add user to get started</p>
+            </div>
+        );
+    }
 
     return <Table rows={rows} head={head} />;
 };

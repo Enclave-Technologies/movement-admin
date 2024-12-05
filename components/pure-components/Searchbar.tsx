@@ -1,7 +1,11 @@
 import React from "react";
 import { IoSearch } from "react-icons/io5";
 
-const Searchbar = ({ search, setSearch }) => {
+const Searchbar = ({
+    search,
+    setSearch,
+    placeholder = "Search clients by name, email, or phone",
+}) => {
     return (
         <div
             className="border bg-white border-gray-300 rounded-full overflow-hidden 
@@ -11,7 +15,7 @@ const Searchbar = ({ search, setSearch }) => {
             <input
                 className="w-full h-full focus:outline-none placeholder:text-gray-500"
                 value={search}
-                placeholder="Search by name, email, or phone"
+                placeholder={placeholder}
                 onChange={(e) => {
                     setSearch(e.target.value);
                 }}

@@ -6,6 +6,9 @@ const UserSkeleton = ({
     button_text,
     rowCount = 10,
     buttons = 5,
+    active_page = 1,
+    searchLoadingText = "Search clients by name, email, or phone",
+    tableHeaders = ["", "Full Name", "Email", "Phone Number", "Trainer", ""],
 }) => {
     return (
         <main className="flex flex-col bg-gray-100 text-black">
@@ -14,8 +17,8 @@ const UserSkeleton = ({
                     className="border bg-white border-gray-300 rounded-full overflow-hidden 
                 h-12 w-full px-4 p-2 flex flex-row justify-start items-center gap-2 text-gray-500 animate-pulse"
                 >
-                    <IoSearch className="text-gray-400" size={20} /> Search
-                    clients by name, email, or phone
+                    <IoSearch className="text-gray-400" size={20} />{" "}
+                    {searchLoadingText}
                 </div>
                 <div className="w-full flex flex-row items-center justify-between">
                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">
@@ -30,14 +33,7 @@ const UserSkeleton = ({
                         <table className="w-full text-left rounded-md overflow-hidden">
                             <thead className="">
                                 <tr className="bg-green-500 text-white">
-                                    {[
-                                        "",
-                                        "Full Name",
-                                        "Email",
-                                        "Phone Number",
-                                        "Trainer",
-                                        "",
-                                    ].map((header, index) => {
+                                    {tableHeaders.map((header, index) => {
                                         return (
                                             <th
                                                 key={index}
@@ -57,24 +53,22 @@ const UserSkeleton = ({
                                             key={index}
                                             className="animate-pulse"
                                         >
-                                            <td className="pl-5 py-1 flex items-center gap-4">
-                                                <div className="w-10 h-10 rounded-full bg-gray-200"></div>
-                                            </td>
-                                            <td className="pl-5 py-1">
-                                                <div className="w-32 h-8 bg-gray-200"></div>
-                                            </td>
-                                            <td className="pl-5 py-1">
-                                                <div className="w-64 h-8 bg-gray-200"></div>
-                                            </td>
-                                            <td className="pl-5 py-1">
-                                                <div className="w-32 h-8 bg-gray-200"></div>
-                                            </td>
-                                            <td className="pl-5 py-1">
-                                                <div className="w-32 h-8 bg-gray-200"></div>
-                                            </td>
-                                            <td className="pl-5 py-1">
-                                                <div className="w-32 h-8 bg-gray-200"></div>
-                                            </td>
+                                            {tableHeaders.map(
+                                                (_, cellIndex) => (
+                                                    <td
+                                                        key={cellIndex}
+                                                        className="pl-5 py-1"
+                                                    >
+                                                        <div
+                                                            className={`${
+                                                                cellIndex === 0
+                                                                    ? "w-10 h-10 rounded-full bg-gray-200"
+                                                                    : "w-32 h-8 bg-gray-200"
+                                                            }`}
+                                                        ></div>
+                                                    </td>
+                                                )
+                                            )}
                                         </tr>
                                     )
                                 )}
@@ -87,7 +81,7 @@ const UserSkeleton = ({
                         <button
                             key={index}
                             className={`px-4 py-2 rounded-md ${
-                                index === 0
+                                index === active_page - 1
                                     ? "bg-primary text-white"
                                     : "bg-gray-200 text-black"
                             }`}

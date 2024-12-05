@@ -18,10 +18,14 @@ const Pagination = ({
         }
 
         if (maxRight > totalPages) {
-            return Array.from(
-                { length: maxVisiblePages },
-                (_, i) => totalPages - maxVisiblePages + i + 1
-            );
+            if (maxVisiblePages >= totalPages) {
+                return Array.from({ length: totalPages }, (_, i) => i + 1);
+            } else {
+                return Array.from(
+                    { length: maxVisiblePages },
+                    (_, i) => totalPages - maxVisiblePages + i + 1
+                );
+            }
         }
 
         return Array.from({ length: maxVisiblePages }, (_, i) => maxLeft + i);

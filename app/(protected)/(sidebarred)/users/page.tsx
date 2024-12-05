@@ -9,9 +9,7 @@ import { useGlobalContext } from "@/context/GlobalContextProvider";
 import { LIMIT } from "@/configs/constants";
 import Pagination from "@/components/pure-components/Pagination";
 import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
 const fetchData = async (
     lastId: number,
     setClients: React.Dispatch<React.SetStateAction<Client[]>>,
@@ -84,6 +82,7 @@ export default function AllClients() {
                 button_text="Add User"
                 pageTitle="All Users"
                 buttons={totalPages}
+                active_page={lastId}
             />
         );
 

@@ -16,7 +16,7 @@ const TrainerTable = ({ trainers, search }) => {
     }, [trainers, search]);
 
     const head = useMemo(() => {
-        const headers = ["", "Name", "Description", "Email", "Phone"];
+        const headers = ["", "Name", "Title", "Email", "Phone"];
         return headers.map((header, index) => {
             return (
                 <th

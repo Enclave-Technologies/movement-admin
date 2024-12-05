@@ -11,6 +11,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { fetchUserDetails } from "@/server_functions/auth";
+import RegisterTrainerForm from "@/components/forms/RegisterTrainerForm";
 
 const CoachingTeam = () => {
     const [allTrainers, setAllTrainers] = useState([]);
@@ -45,7 +46,7 @@ const CoachingTeam = () => {
         if (countDoc && trainers) {
             loadData(pageNo);
         }
-    }, [pageNo, countDoc, trainers]);
+    }, [pageNo, countDoc]);
 
     const rightModal = () => {
         return (
@@ -56,7 +57,9 @@ const CoachingTeam = () => {
                     setShowRightModal(false);
                 }}
             >
-                <div className="h-4 w-4 bg-black"></div>
+                <div className="w-full">
+                    <RegisterTrainerForm fetchData={reloadData} />
+                </div>
             </RightModal>
         );
     };
@@ -67,6 +70,9 @@ const CoachingTeam = () => {
                 button_text="Add Trainer"
                 pageTitle="Coaching Team"
                 buttons={totalPages}
+                active_page={pageNo}
+                searchLoadingText="Search trainer by name, email, phone or title"
+                tableHeaders={["", "Name", "Title", "Email", "Phone"]}
             />
         );
     }
@@ -74,7 +80,11 @@ const CoachingTeam = () => {
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                <Searchbar search={search} setSearch={setSearch} />
+                <Searchbar
+                    search={search}
+                    setSearch={setSearch}
+                    placeholder="Search trainer by name, email, phone or title"
+                />
 
                 <div className="w-full flex flex-row items-center justify-between">
                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">
