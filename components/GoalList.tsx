@@ -6,9 +6,7 @@ import { goalTypes } from "@/configs/constants";
 import axios from "axios";
 import { GoalListSkeleton } from "./GoalListSkeleton";
 import EditGoalModal from "./EditGoalModal";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
 const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);

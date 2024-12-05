@@ -5,9 +5,7 @@ import { useUser } from "@/context/ClientContext";
 import LinkTile from "@/components/LinkTile";
 import { defaultProfileURL } from "@/configs/constants";
 import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
 const LinkTileData = [
     {
         href: (params: { id: string }) => `${params.id}/goals`,

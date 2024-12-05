@@ -6,8 +6,7 @@ import WorkoutRecordHeader from "@/components/WorkoutRecordHeader";
 import WorkoutRecordBody from "@/components/WorkoutRecordBody";
 import { ID } from "appwrite";
 import axios from "axios";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { API_BASE_URL } from "@/configs/constants";
 
 const RecordWorkout = () => {
     const [clientId, setClientId] = useState("");

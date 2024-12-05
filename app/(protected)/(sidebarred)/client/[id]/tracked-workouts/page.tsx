@@ -9,9 +9,7 @@ import { useRouter } from "next/navigation";
 import axios from "axios";
 import NextSessionInfo from "@/components/NextSessionInfo";
 import SessionLogTable from "@/components/SessionLogTable";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
 const sessions = [
     {
         id: 1,
