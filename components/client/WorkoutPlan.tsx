@@ -12,36 +12,16 @@ import DemoTable from "@/components/DemoTable";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const Page = ({ params }: { params: { id: string } }) => {
+const WorkoutPlan = ({
+  pageLoading,
+  setPageLoading,
+  client_id,
+  workouts,
+  clientPhases,
+  setClientPhases,
+}) => {
   const { userData } = useUser();
-  const page_title = ["Workout Plan"];
-  const [clientPhases, setClientPhases] = useState<Phase[]>();
-  const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
-  const [pageLoading, setPageLoading] = useState(true);
   const [editingExerciseId, setEditingExerciseId] = useState(null);
-
-  useEffect(() => {
-    async function loadData() {
-      setPageLoading(true);
-      try {
-        const clientPhases = await axios.get(
-          `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${params.id}`,
-          { withCredentials: true }
-        );
-        const workouts = await axios.get(
-          `${API_BASE_URL}/mvmt/v1/trainer/workouts`,
-          { withCredentials: true }
-        );
-        setClientPhases(clientPhases.data.phases);
-        setWorkouts(workouts.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setPageLoading(false);
-      }
-    }
-    loadData();
-  }, []);
 
   const handleAddPhase = () => {
     // Logic to add a new phase
@@ -103,7 +83,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       const response = await axios.post(
         `${API_BASE_URL}/mvmt/v1/client/phases`,
         {
-          client_id: params.id,
+          client_id: client_id,
           data,
         },
         { withCredentials: true }
@@ -301,19 +281,13 @@ const Page = ({ params }: { params: { id: string } }) => {
     return (
       <div className="">
         <BreadcrumbLoading />
-        <Spinner />
       </div>
     );
   }
 
   return (
-    <div className="uppercase ">
+    <div className="uppercase">
       <div className="flex justify-between">
-        <Breadcrumb
-          homeImage={userData?.imageUrl}
-          homeTitle={userData?.name}
-          customTexts={page_title}
-        />
         <button
           className="text-sm flex items-center justify-center mt-4 px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
           onClick={handleAddPhase}
@@ -375,4 +349,4 @@ const Page = ({ params }: { params: { id: string } }) => {
   );
 };
 
-export default Page;
+export default WorkoutPlan;
