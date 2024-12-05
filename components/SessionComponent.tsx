@@ -1,7 +1,16 @@
 import React, { FC, useEffect, useRef, useState } from "react";
-import { FaChevronDown, FaChevronUp, FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronRight,
+  FaChevronUp,
+  FaEdit,
+  FaTrash,
+} from "react-icons/fa";
 import SessionExerciseComponent from "./SessionExerciseComponent";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/configs/constants";
+import axios from "axios";
 
 const SessionComponent: FC<SessionProps> = ({
   index,
@@ -17,7 +26,11 @@ const SessionComponent: FC<SessionProps> = ({
   onExerciseOrderChange,
   onEditExercise,
   onCancelEdit,
+  client_id,
+  nextSession,
+  progressId,
 }) => {
+  const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [sessionName, setSessionName] = useState(session.sessionName);
   const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
@@ -53,8 +66,34 @@ const SessionComponent: FC<SessionProps> = ({
     setShowSessionDeleteConfirm(false); // Just close the dialog
   };
 
+  const handleStartSession = async () => {
+    // e.preventDefault();
+    try {
+      // setPageLoading(true);
+      // setWorkoutPressed(true);
+      console.log("Preparing to start workout...");
+      const response = await axios.post(
+        `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
+        {
+          progress_id: progressId,
+        },
+        {
+          withCredentials: true,
+        }
+      );
+      router.push(
+        `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
+      );
+    } catch (e) {
+      console.error("Failed to start workout:", e);
+    } finally {
+      // setWorkoutPressed(false);
+      // setPageLoading(false);
+    }
+  };
+
   return (
-    <div className="bg-white rounded-md shadow-sm border border-gray-200 p-4 mb-4 ">
+    <div className="bg-white rounded-md p-4 pr-0 border-b-[1px] border-gray-300 flex flex-col gap-4">
       <div className="flex items-center justify-between container-class relative">
         <div className="">
           {isEditing ? (
@@ -67,24 +106,40 @@ const SessionComponent: FC<SessionProps> = ({
               ref={inputRef}
             />
           ) : (
-            <div className="flex items-center">
-              <span className="font-medium">
-                {index + 1}. {sessionName}
-              </span>
-              <button
-                className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
-                onClick={() => {
-                  setIsEditing(true);
-                }}
-              >
-                <FaEdit />
-              </button>
-              <button
-                className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
-                onClick={handleSessionDelete}
-              >
-                <FaTrash />
-              </button>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                >
+                  {isCollapsed ? (
+                    <>
+                      <FaChevronRight className="text-lg" />
+                    </>
+                  ) : (
+                    <>
+                      <FaChevronUp className="text-lg" />
+                    </>
+                  )}
+                </button>
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">{sessionName}</span>
+                  <button
+                    className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
+                    onClick={() => {
+                      setIsEditing(true);
+                    }}
+                  >
+                    <FaEdit />
+                  </button>
+                  <button
+                    className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
+                    onClick={handleSessionDelete}
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
+              </div>
               {showSessionDeleteConfirm && (
                 <DeleteConfirmationDialog
                   title={`Session: ${session.sessionName}`}
@@ -95,24 +150,13 @@ const SessionComponent: FC<SessionProps> = ({
             </div>
           )}
         </div>
-
         <div className="flex flex-row items-center gap-4">
-          <button className="bg-green-500 text-white px-4 py-2 rounded-md">
-            Start Session ( {session.sessionTime || "0"} mins)
-          </button>
           <button
-            className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="bg-green-500 text-white px-4 py-2 rounded-md"
+            onClick={handleStartSession}
           >
-            {isCollapsed ? (
-              <>
-                <FaChevronDown className="text-lg" />
-              </>
-            ) : (
-              <>
-                <FaChevronUp className="text-lg" />
-              </>
-            )}
+            Start Session
+            {/* ( {session.sessionTime || "0"} mins) */}
           </button>
         </div>
       </div>

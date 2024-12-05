@@ -22,6 +22,8 @@ const ClientDetails = ({ client_id }) => {
   const [dataLoading, setDataLoading] = useState(true);
   const [fetchingWorkouts, setFetchingWorkouts] = useState(true);
   const [fetchingGoals, setFetchingGoals] = useState(true);
+  const [nextSession, setNextSession] = useState(null);
+  const [progressId, setProgressId] = useState("");
 
   useEffect(() => {
     fetchTrackedWorkouts();
@@ -65,9 +67,9 @@ const ClientDetails = ({ client_id }) => {
     );
 
     const { nextSession, sessionLogs, progressId } = clientPhases.data;
-    // setNextSession(nextSession[0]);
+    setNextSession(nextSession[0]);
     setSessionLog(sessionLogs);
-    // setProgressId(progressId);
+    setProgressId(progressId);
     setFetchingWorkouts(false);
   }
 
@@ -75,7 +77,7 @@ const ClientDetails = ({ client_id }) => {
     <TrainerProvider>
       <div className="flex flex-col items-start w-full gap-2">
         <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-        <div className="p-4 bg-white w-full shadow-md rounded-lg overflow-hidden">
+        <div className="p-4 bg-white w-full shadow-md rounded-lg overflow-hidden pt-6">
           {selectedTab == "workout-history" && (
             <SessionLogTable
               dataLoading={fetchingWorkouts}
@@ -99,6 +101,8 @@ const ClientDetails = ({ client_id }) => {
               workouts={workouts}
               clientPhases={clientPhases}
               setClientPhases={setClientPhases}
+              nextSession={nextSession}
+              progressId={progressId}
             />
           )}
         </div>

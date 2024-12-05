@@ -8,6 +8,7 @@ import axios from "axios";
 import Link from "next/link";
 import RecentWorkoutHistory from "@/components/client/RecentWorkoutHistory";
 import ClientDetails from "@/components/client/ClientDetails";
+import { useRouter } from "next/router";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 

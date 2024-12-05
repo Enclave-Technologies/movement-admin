@@ -61,19 +61,19 @@ const EditModeTable: FC<EditableTableProps> = ({
           </colgroup>
           <thead className="bg-gray-200 text-black">
             <tr>
-              <th className="px-2 py-2 text-xs text-left min-w-32">Order</th>
-              <th className="px-2 py-2 text-xs text-left min-w-64">Motion</th>
-              <th className="px-2 py-2 text-xs text-left min-w-64">
+              <th className="px-2 py-2 text-xs text-center min-w-32">Order</th>
+              <th className="px-2 py-2 text-xs text-center min-w-64">Motion</th>
+              <th className="px-2 py-2 text-xs text-center min-w-64">
                 Description
               </th>
-              <th className="px-2 py-2 text-xs text-left min-w-64">
+              <th className="px-2 py-2 text-xs text-center min-w-64">
                 Short Description
               </th>
-              <th className="px-2 py-2 text-xs text-left min-w-32">Sets</th>
-              <th className="px-2 py-2 text-xs text-left min-w-32">Reps</th>
-              <th className="px-2 py-2 text-xs text-left min-w-32">TUT</th>
-              <th className="px-2 py-2 text-xs text-left min-w-32">Tempo</th>
-              <th className="px-2 py-2 text-xs text-left min-w-32">Rest</th>
+              <th className="px-2 py-2 text-xs text-center min-w-32">Sets</th>
+              <th className="px-2 py-2 text-xs text-center min-w-32">Reps</th>
+              <th className="px-2 py-2 text-xs text-center min-w-32">TUT</th>
+              <th className="px-2 py-2 text-xs text-center min-w-32">Tempo</th>
+              <th className="px-2 py-2 text-xs text-center min-w-32">Rest</th>
               <th className="sticky right-0 bg-gray-100 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500">
                 Actions
               </th>

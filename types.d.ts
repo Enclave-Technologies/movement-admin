@@ -181,6 +181,9 @@ interface PhaseProps {
   onExerciseOrderChange;
   onEditExercise;
   onCancelEdit;
+  client_id;
+  nextSession;
+  progressId;
 }
 
 interface SessionProps {
@@ -190,7 +193,6 @@ interface SessionProps {
   workouts: WorkoutData[];
   onSessionNameChange: (sessionId: string, sessionName: str) => void;
   onSessionDelete: (sessionId: string) => void;
-
   editingExerciseId;
   onExerciseAdd;
   onExerciseUpdate;
@@ -198,6 +200,9 @@ interface SessionProps {
   onExerciseOrderChange;
   onEditExercise;
   onCancelEdit;
+  client_id;
+  nextSession;
+  progressId;
 }
 
 interface SessionExerciseProps {
@@ -262,25 +267,25 @@ interface AddFormProps {
 }
 
 interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
+  $collectionId: string;
+  $createdAt: string;
+  $databaseId: string;
+  $id: string;
+  $permissions: any[];
+  $updatedAt: string;
+  exercises_count: number;
+  trainers_count: number;
+  users_count: number;
 }
 
 interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
+  $collectionId: string;
+  $createdAt: string;
+  $databaseId: string;
+  $id: string;
+  $permissions: any[];
+  $updatedAt: string;
+  exercises_count: number;
+  trainers_count: number;
+  users_count: number;
 }

@@ -7,6 +7,7 @@ import {
   FaChevronUp,
   FaPlus,
   FaTrash,
+  FaChevronRight,
 } from "react-icons/fa";
 import { ID } from "appwrite";
 import { on } from "events";
@@ -30,9 +31,12 @@ const PhaseComponent: FC<PhaseProps> = ({
   onExerciseOrderChange,
   onEditExercise,
   onCancelEdit,
+  client_id,
+  nextSession,
+  progressId,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
   const [phaseName, setPhaseName] = useState(phase.phaseName);
   const [showPhaseDeleteConfirm, setShowPhaseDeleteConfirm] = useState(false);
 
@@ -82,9 +86,25 @@ const PhaseComponent: FC<PhaseProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md border w-full border-gray-200 ">
+    <div className="bg-white rounded-lg shadow-sm border w-full border-gray-200 ">
       <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-        <div className="flex items-center w-1/2">
+        <div className="flex items-center w-1/2 gap-4">
+          <div className="px-1 py-1 flex justify-end">
+            <button
+              className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+            >
+              {isCollapsed ? (
+                <>
+                  <FaChevronRight className="text-lg" />
+                </>
+              ) : (
+                <>
+                  <FaChevronUp className="text-lg" />
+                </>
+              )}
+            </button>
+          </div>
           {isEditing ? (
             <input
               type="text"
@@ -95,7 +115,7 @@ const PhaseComponent: FC<PhaseProps> = ({
               ref={inputRef}
             />
           ) : (
-            <>
+            <div className="flex flex-row gap-2">
               <span className="font-medium">{phaseName}</span>
               <button
                 className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
@@ -126,7 +146,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                 <FaCopy />
                 {/* <span className="hidden lg:flex">Copy</span> */}
               </button>
-            </>
+            </div>
           )}
 
           {showPhaseDeleteConfirm && (
@@ -167,22 +187,6 @@ const PhaseComponent: FC<PhaseProps> = ({
                             Active
                         </span>
                     )} */}
-          <div className="px-1 py-1 flex justify-end">
-            <button
-              className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
-              onClick={() => setIsCollapsed(!isCollapsed)}
-            >
-              {isCollapsed ? (
-                <>
-                  <FaChevronDown className="text-lg" />
-                </>
-              ) : (
-                <>
-                  <FaChevronUp className="text-lg" />
-                </>
-              )}
-            </button>
-          </div>
         </div>
       </div>
       <div
@@ -219,6 +223,9 @@ const PhaseComponent: FC<PhaseProps> = ({
                 onExerciseOrderChange={onExerciseOrderChange}
                 onEditExercise={onEditExercise}
                 onCancelEdit={onCancelEdit}
+                client_id={client_id}
+                nextSession={nextSession}
+                progressId={progressId}
               />
             ))
         )}

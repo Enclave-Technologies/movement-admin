@@ -19,6 +19,8 @@ const WorkoutPlan = ({
   workouts,
   clientPhases,
   setClientPhases,
+  nextSession,
+  progressId,
 }) => {
   const { userData } = useUser();
   const [editingExerciseId, setEditingExerciseId] = useState(null);
@@ -289,7 +291,7 @@ const WorkoutPlan = ({
     <div className="uppercase">
       <div className="flex justify-between">
         <button
-          className="text-sm flex items-center justify-center mt-4 px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
+          className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
           onClick={handleAddPhase}
         >
           <FaPlus />
@@ -297,7 +299,7 @@ const WorkoutPlan = ({
         </button>
       </div>
       {/* <DemoTable exercises={workouts} /> */}
-      <div className="mt-8">
+      <div className="mt-4">
         <div className="w-full space-y-4">
           {clientPhases?.length === 0 ? (
             <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
@@ -331,6 +333,9 @@ const WorkoutPlan = ({
                 onExerciseOrderChange={handleExerciseOrderChange}
                 onEditExercise={handleEditExercise}
                 onCancelEdit={handleCancelEdit}
+                client_id={client_id}
+                nextSession={nextSession}
+                progressId={progressId}
               />
             ))
           )}
