@@ -116,6 +116,21 @@ export async function register(state, formData) {
                 gender: gender,
             }
         );
+
+        await database.createDocument(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_USERS,
+            uid,
+            {
+                auth_id: uid,
+                firstName,
+                lastName,
+                email,
+                phone,
+                trainer_id: uid,
+                imageUrl: null,
+            }
+        );
     } catch (error) {
         console.log(error);
         users.delete(uid);
