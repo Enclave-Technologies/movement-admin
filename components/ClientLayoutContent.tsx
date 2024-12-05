@@ -9,7 +9,7 @@ const ClientLayoutContent = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
 
   const handleBack = () => {
-    router.back();
+    window.location.href = `/users`;
   };
 
   if (userError) {
@@ -32,13 +32,6 @@ const ClientLayoutContent = ({ children }: { children: React.ReactNode }) => {
   return (
     <div className="relative min-h-screen">
       <div className="flex-grow p-2 sm:p-2 bg-gray-50 flex flex-col items-start gap-2">
-        <button
-          onClick={handleBack}
-          className="flex items-center justify-center"
-        >
-          <IoIosArrowBack className="text-black text-2xl font-bold hover:text-green-500" />
-          <p>Back</p>
-        </button>
         {children}
       </div>
     </div>

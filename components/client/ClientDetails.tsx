@@ -68,21 +68,22 @@ const ClientDetails = ({ client_id }) => {
 
     const { nextSession, sessionLogs, progressId } = clientPhases.data;
     setNextSession(nextSession[0]);
-    setSessionLog(sessionLogs);
+    const reversedLogs = sessionLogs.reverse();
+    setSessionLog(reversedLogs);
     setProgressId(progressId);
     setFetchingWorkouts(false);
   }
 
   return (
     <TrainerProvider>
-      <div className="flex flex-col items-start w-full gap-2">
+      <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
         <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-        <div className="p-4 bg-white w-full shadow-md rounded-lg overflow-hidden pt-6">
+        <div className="p-8 bg-white w-full">
           {selectedTab == "workout-history" && (
             <SessionLogTable
               dataLoading={fetchingWorkouts}
               handleViewSession={null}
-              sessions={sessionLog.reverse()}
+              sessions={sessionLog}
             />
           )}
           {selectedTab == "goals" && (
@@ -113,7 +114,7 @@ const ClientDetails = ({ client_id }) => {
 
 const Tabs = ({ selectedTab, setSelectedTab }) => {
   return (
-    <div className="flex flex-row items-center justify-between bg-white rounded-lg w-full shadow-lg overflow-hidden">
+    <div className="flex flex-row items-center justify-between bg-white rounded-lg w-full border-b-[1px] border-gray-200">
       <Tab
         isSelected={selectedTab === "workout-history"}
         label={"Workout History"}
@@ -159,7 +160,7 @@ const Tab = ({ label, onClick, isSelected, icon }) => {
       onClick={onClick}
     >
       {icon}
-      <p>{label}</p>
+      <p className={`${isSelected ? "font-semibold" : ""}`}>{label}</p>
     </div>
   );
 };

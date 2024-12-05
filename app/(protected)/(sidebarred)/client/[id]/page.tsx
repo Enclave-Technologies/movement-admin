@@ -66,7 +66,7 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   return (
     <div className="flex flex-col min-h-screen items-center justify-between bg-gray-50 text-black w-full">
-      <div className="text-center mt-4 flex flex-col gap-4 w-full">
+      <div className="text-center flex flex-col gap-4 w-full">
         {userLoading ? (
           <div className="flex flex-col gap-4 p-4">
             <div className="flex flex-col sm:flex-row gap-12 items-center sm:items-start">
@@ -83,8 +83,8 @@ const Page = ({ params }: { params: { id: string } }) => {
         ) : userError ? (
           <p>Error: {userError.message}</p>
         ) : (
-          <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-sm">
-            <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 items-center sm:items-start">
+          <div className="flex flex-col gap-4 py-4 rounded-lg">
+            <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 items-start sm:items-start">
               <div className="relative">
                 <Image
                   src={
