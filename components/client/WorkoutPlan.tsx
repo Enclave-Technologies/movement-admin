@@ -9,40 +9,19 @@ import Spinner from "@/components/Spinner";
 import PhaseComponent from "@/components/PhaseComponent";
 import { FaPlus, FaSave } from "react-icons/fa";
 import DemoTable from "@/components/DemoTable";
-import Link from "next/link";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const Page = ({ params }: { params: { id: string } }) => {
+const WorkoutPlan = ({
+  pageLoading,
+  setPageLoading,
+  client_id,
+  workouts,
+  clientPhases,
+  setClientPhases,
+}) => {
   const { userData } = useUser();
-  const page_title = ["Workout Plan"];
-  const [clientPhases, setClientPhases] = useState<Phase[]>();
-  const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
-  const [pageLoading, setPageLoading] = useState(true);
   const [editingExerciseId, setEditingExerciseId] = useState(null);
-
-  useEffect(() => {
-    async function loadData() {
-      setPageLoading(true);
-      try {
-        const clientPhases = await axios.get(
-          `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${params.id}`,
-          { withCredentials: true }
-        );
-        const workouts = await axios.get(
-          `${API_BASE_URL}/mvmt/v1/trainer/workouts`,
-          { withCredentials: true }
-        );
-        setClientPhases(clientPhases.data.phases);
-        setWorkouts(workouts.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setPageLoading(false);
-      }
-    }
-    loadData();
-  }, []);
 
   const handleAddPhase = () => {
     // Logic to add a new phase
@@ -104,7 +83,7 @@ const Page = ({ params }: { params: { id: string } }) => {
       const response = await axios.post(
         `${API_BASE_URL}/mvmt/v1/client/phases`,
         {
-          client_id: params.id,
+          client_id: client_id,
           data,
         },
         { withCredentials: true }
@@ -300,29 +279,27 @@ const Page = ({ params }: { params: { id: string } }) => {
 
   if (pageLoading) {
     return (
-      <div className="ml-12">
+      <div className="">
         <BreadcrumbLoading />
-        <Spinner />
       </div>
     );
   }
-  return (
-    <div className="uppercase">
-      <div className="ml-12 flex justify-between">
-        <Breadcrumb
-          homeImage={userData?.imageUrl}
-          homeTitle={userData?.name}
-          customTexts={page_title}
-        />
 
-        {/* <button className="bg-green-500 hover:bg-green-900 text-white px-5 py-1 h-12 rounded-md transition-colors duration-300">
-                    Save
-                </button> */}
+  return (
+    <div className="">
+      <div className="flex justify-between">
+        <button
+          className="text-sm flex items-center justify-center mt-4 px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
+          onClick={handleAddPhase}
+        >
+          <FaPlus />
+          Add Phase
+        </button>
       </div>
       {/* <DemoTable exercises={workouts} /> */}
-      <div className="mt-4">
+      <div className="mt-8">
         <div className="w-full space-y-4">
-          {clientPhases.length === 0 ? (
+          {clientPhases?.length === 0 ? (
             <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
               <p className="text-gray-500 text-sm font-medium uppercase">
                 No phases added yet
@@ -332,7 +309,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               </p>
             </div>
           ) : (
-            clientPhases.map((phase) => (
+            clientPhases?.map((phase) => (
               <PhaseComponent
                 key={phase.phaseId}
                 phase={phase}
@@ -359,15 +336,17 @@ const Page = ({ params }: { params: { id: string } }) => {
           )}
         </div>
       </div>
-      <button
-        className="flex items-center justify-center w-full mt-4 px-4 py-2 secondary-btn uppercase gap-5 bg-green-500 text-white"
-        onClick={handleAddPhase}
-      >
-        <FaPlus className="text-lg" />
-        Add Phase
-      </button>
+      {/* <pre>{JSON.stringify(clientPhases, null, 2)}</pre> */}
+      {/* <div className="fixed bottom-4 right-4 z-50">
+        <button
+          className="bg-green-500/75 hover:bg-green-500/100 text-white p-4 rounded-full shadow-md transition-colors duration-300 touchscreen-button"
+          onClick={handleDataSubmit}
+        >
+          <FaSave className="text-5xl" />
+        </button>
+      </div> */}
     </div>
   );
 };
 
-export default Page;
+export default WorkoutPlan;

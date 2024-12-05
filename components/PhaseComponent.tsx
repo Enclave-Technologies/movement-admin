@@ -138,7 +138,7 @@ const PhaseComponent: FC<PhaseProps> = ({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <div className="relative inline-block w-14 align-middle select-none">
+          <div className="relative inline-block w-12 align-middle select-none">
             <input
               type="checkbox"
               name="toggle"
@@ -149,12 +149,12 @@ const PhaseComponent: FC<PhaseProps> = ({
             />
             <label
               htmlFor={`toggle-${phase.phaseId}`}
-              className={`block overflow-hidden h-8 rounded-full cursor-pointer relative transition-colors duration-200 ease-in-out ${
+              className={`block overflow-hidden h-6 rounded-full cursor-pointer relative transition-colors duration-200 ease-in-out ${
                 phase.phaseId === activePhaseId ? "bg-green-500" : "bg-gray-300"
               }`}
             >
               <span
-                className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in ${
+                className={`absolute left-1 top-1 h-4 w-4 rounded-full bg-white shadow-md transform transition-transform duration-200 ease-in ${
                   phase.phaseId === activePhaseId ? "translate-x-6" : ""
                 }`}
               />

@@ -15,7 +15,7 @@ const Breadcrumb = ({ homeImage, homeTitle, customTexts }) => {
   const previousScreen = segments[segments.length - 2];
 
   return (
-    <nav className="flex gap-8" aria-label="Breadcrumb">
+    <nav className="mt-6 flex gap-8" aria-label="Breadcrumb">
       <ol className="inline-flex items-center space-x-1 md:space-x-3">
         <li>
           <Link

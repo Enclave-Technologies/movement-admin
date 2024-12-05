@@ -6,6 +6,8 @@ import LinkTile from "@/components/LinkTile";
 import { defaultProfileURL } from "@/configs/constants";
 import axios from "axios";
 import Link from "next/link";
+import RecentWorkoutHistory from "@/components/client/RecentWorkoutHistory";
+import ClientDetails from "@/components/client/ClientDetails";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -62,10 +64,10 @@ const Page = ({ params }: { params: { id: string } }) => {
   }, [params.id]);
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-between bg-gray-100 text-black w-full">
-      <div className="text-center mt-4 flex flex-col gap-8 w-full">
+    <div className="flex flex-col min-h-screen items-center justify-between bg-gray-50 text-black w-full">
+      <div className="text-center mt-4 flex flex-col gap-4 w-full">
         {userLoading ? (
-          <div className="flex flex-col gap-4 p-4 bg-gray-100">
+          <div className="flex flex-col gap-4 p-4">
             <div className="flex flex-col sm:flex-row gap-12 items-center sm:items-start">
               <div className="relative">
                 <div className="rounded-full aspect-square w-52 sm:w-40 bg-gray-300 animate-pulse"></div>
@@ -80,7 +82,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         ) : userError ? (
           <p>Error: {userError.message}</p>
         ) : (
-          <div className="flex flex-col gap-4 py-4 bg-gray-100">
+          <div className="flex flex-col gap-4 p-4 bg-white rounded-lg shadow-sm">
             <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 items-center sm:items-start">
               <div className="relative">
                 <Image
@@ -92,59 +94,31 @@ const Page = ({ params }: { params: { id: string } }) => {
                   // src={
                   //     userData?.imageUrl || defaultProfileURL
                   // }
-                  height={80}
-                  width={80}
+                  height={72}
+                  width={72}
                   alt={`${userData?.name} image`}
                   className="rounded-full aspect-square 
                                 object-cover border-2 border-gray-200
                                 "
                 />
               </div>
-              <div className="flex flex-col items-start space-y-1">
-                <h2 className="text-lg md:text-2xl lg:text-3xl font-bold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
+              <div className="flex flex-col items-start">
+                <h2 className="text-lg md:text-2xl lg:text-xl font-bold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
                   {userData?.name}
                 </h2>
-                <p className="text-sm md:text-base lg:text-lg text-gray-600">
+                <p className="text-base text-gray-600">
                   {userData?.email || "-"}
                 </p>
-                <p className="text-sm md:text-base lg:text-lg text-gray-600">
+                <p className="text-base text-gray-600">
                   {userData?.phone || "-"}
                 </p>
               </div>
             </div>
           </div>
         )}
-        <div className="bg-white shadow-md flex flex-col items-start gap-2 rounded-lg p-4">
-          <Link href="/workout-history">Workout History</Link>
-          <div className="flex flex-row justify-between w-full">
-            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
-              <p>28/11/2024</p>
-              <p>Phase 1, Cutting</p>
-            </div>
-            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
-              <p>28/11/2024</p>
-              <p>Phase 1, Cutting</p>
-            </div>
-            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
-              <p>28/11/2024</p>
-              <p>Phase 1, Cutting</p>
-            </div>
-            <div className="border-2 border-gray-400 flex-1 flex flex-col items-center justify-center">
-              <p>28/11/2024</p>
-              <p>Phase 1, Cutting</p>
-            </div>
-            <div className="flex flex-col justify-between border-2 border-gray-400 flex-1">
-              <div>
-                <p>Upcoming Session</p>
-                <p>Phase 1, Bulking</p>
-              </div>
-              <button className="bg-green-500 text-white px-4 py-2 rounded-md">
-                Start Workout
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {/* <RecentWorkoutHistory client_id={params.id} /> */}
+        <ClientDetails client_id={params.id} />
+        {/* <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {LinkTileData.map((tile, index) => (
             <LinkTile
               key={index}
@@ -155,7 +129,7 @@ const Page = ({ params }: { params: { id: string } }) => {
               className="flex flex-col items-center justify-between gap-0 p-4 bg-gray-200 border-2 rounded-xl border-primary w-full h-32"
             />
           ))}
-        </div>
+        </div> */}
       </div>
     </div>
   );
