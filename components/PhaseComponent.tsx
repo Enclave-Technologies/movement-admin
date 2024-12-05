@@ -73,6 +73,7 @@ const PhaseComponent: FC<PhaseProps> = ({
       sessionTime: "0",
     };
     onAddSession(phase.phaseId, newSession);
+    setIsCollapsed(false);
   };
 
   const handleCopySession = (session) => {
