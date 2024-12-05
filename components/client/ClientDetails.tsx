@@ -82,7 +82,7 @@ const ClientDetails = ({ client_id }) => {
             <SessionLogTable
               dataLoading={fetchingWorkouts}
               handleViewSession={null}
-              sessions={sessionLog}
+              sessions={sessionLog.reverse()}
             />
           )}
           {selectedTab == "goals" && (

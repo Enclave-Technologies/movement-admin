@@ -8,6 +8,7 @@ import {
   AccordionItemState,
 } from "react-accessible-accordion";
 import BreadcrumbLoading from "./BreadcrumbLoading";
+import { FaChevronRight, FaChevronUp } from "react-icons/fa";
 
 const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
   const formatDateTime = (dateTimeString) => {
@@ -52,35 +53,34 @@ const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
             className="bg-white shadow-md rounded-lg mb-4"
           >
             <AccordionItemHeading>
-              <AccordionItemButton className="px-6 py-4 bg-gray-100 rounded-t-lg flex justify-between items-center cursor-pointer hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75">
-                <div className="flex items-center">
+              <AccordionItemButton className="w-full px-6 py-4 bg-gray-100 rounded-t-lg flex justify-between items-center cursor-pointer hover:bg-gray-200 focus:outline-none focus-visible:ring focus-visible:ring-gray-500 focus-visible:ring-opacity-75">
+                <div className="flex items-center w-full">
                   <AccordionItemState>
-                    {({ expanded }) => (
-                      <svg
-                        className={`w-6 h-6 text-gray-500 transform transition-transform duration-300 ${
-                          expanded ? "rotate-180" : ""
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    )}
+                    {({ expanded }) =>
+                      !expanded ? (
+                        <>
+                          <FaChevronRight className="text-base" />
+                        </>
+                      ) : (
+                        <>
+                          <FaChevronUp className="text-base" />
+                        </>
+                      )
+                    }
                   </AccordionItemState>
-                  <h2 className="text-lg font-bold text-gray-800 uppercase ml-4">
-                    {new Date(session.startDate).toLocaleString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </h2>
+                  <div className="flex flex-row justify-between items-center w-full">
+                    <h2 className="text-base font-bold text-gray-800 uppercase ml-4">
+                      {session.phases.phaseName} -{" "}
+                      {session.sessions.sessionName}
+                    </h2>
+                    <h2 className="text-base font-bold text-gray-600 ml-4">
+                      {new Date(session.startDate).toLocaleString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </h2>
+                  </div>
                 </div>
               </AccordionItemButton>
             </AccordionItemHeading>
