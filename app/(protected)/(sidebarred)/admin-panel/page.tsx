@@ -18,7 +18,7 @@ import {
 import { useFormState } from "react-dom";
 import Toast from "@/components/Toast";
 import Spinner from "@/components/Spinner";
-import RegisterForm from "@/components/RegisterForm";
+import RegisterForm from "@/components/RegisterTrainerForm";
 import AddClientForm from "@/components/AddClientForm";
 import axios from "axios";
 import AddExerciseForm from "@/components/AddExerciseForm";
@@ -567,10 +567,7 @@ const AdminPanel = () => {
                             </AccordionItemButton>
                         </AccordionItemHeading>
                         <AccordionItemPanel>
-                            <TrainerTable
-                                pageTitle={""}
-                                trainers={allTrainers}
-                            />
+                            {/* <TrainerTable pageTitle={""} trainers={allTrainers} /> */}
                         </AccordionItemPanel>
                     </AccordionItem>
                 )}

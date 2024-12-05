@@ -5,9 +5,15 @@ import React, { useState, useMemo } from "react";
 import Image from "next/image";
 import { defaultProfileURL } from "@/configs/constants";
 import { useRouter } from "next/navigation";
+import Searchbar from "./pure-components/Searchbar";
 
-const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
-    const [search, setSearch] = useState("");
+const ClientsTable = ({
+    search,
+    setSearch,
+    clients,
+    fetchMoreData,
+    hasMore,
+}) => {
     const router = useRouter();
 
     const filteredClients = useMemo(() => {
@@ -28,26 +34,11 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
         router.push(`client/${client.uid}`);
     };
 
+    // return "Table here";
+
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full">
-                <div
-                    className="border border-gray-400 rounded-2xl overflow-hidden 
-                h-12 w-full p-2 m-2 mt-6"
-                >
-                    <input
-                        className="w-full h-full focus:outline-none bg-gray-100"
-                        value={search}
-                        placeholder="Search clients by name, email, or phone"
-                        onChange={(e) => {
-                            console.log(e.target.value);
-                            setSearch(e.target.value);
-                        }}
-                    />
-                </div>
-                <h1 className="text-3xl font-bold text-black mt-5 mb-5 ml-2 leading-tight">
-                    {pageTitle}
-                </h1>
                 <InfiniteScroll
                     dataLength={clients.length}
                     next={fetchMoreData}
@@ -63,25 +54,23 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                         </p>
                     }
                 >
-                    <table className="w-full text-left">
+                    <table className="w-full text-left rounded-md overflow-hidden">
                         <thead>
                             <tr className="bg-green-500 text-white">
-                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap"></th>
-                                <th className="font-normal pl-5 pr-4 h-12  whitespace-nowrap">
-                                    Client Name
+                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"></th>
+                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
+                                    Full Name
                                 </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
                                     Email
                                 </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
+                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
                                     Phone Number
                                 </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
-                                    Trainer Name
+                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
+                                    Trainer
                                 </th>
-                                <th className="font-normal pl-5 pr-4  whitespace-nowrap">
-                                    Action
-                                </th>
+                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"></th>
                             </tr>
                         </thead>
                         <tbody className="border-t-2 border-white">
@@ -91,8 +80,7 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                     key={index}
                                     className={`${
                                         index % 2 ? "bg-gray-50" : "bg-gray-200"
-                                    } h-12 touch-action-none cursor-pointer`}
-                                    onClick={() => handleRowClick(client)}
+                                    } h-12 touch-action-none`}
                                 >
                                     <td className="pl-5">
                                         <div className="w-10 h-10">
@@ -111,23 +99,26 @@ const ClientsTable = ({ clients, fetchMoreData, hasMore, pageTitle }) => {
                                             />
                                         </div>
                                     </td>
-                                    <td className="pl-5 whitespace-nowrap">
+                                    <td
+                                        className="pl-5 whitespace-nowrap cursor-pointer text-sm font-semibold underline"
+                                        onClick={() => handleRowClick(client)}
+                                    >
                                         {client.name}
                                     </td>
-                                    <td className="pl-5 whitespace-nowrap">
+                                    <td className="pl-5 whitespace-nowrap text-sm">
                                         {client.email || "-"}
                                     </td>
-                                    <td className="pl-5 whitespace-nowrap">
+                                    <td className="pl-5 whitespace-nowrap text-sm">
                                         {client.phone || "-"}
                                     </td>
-                                    <td className="pl-5 whitespace-nowrap">
+                                    <td className="pl-5 whitespace-nowrap text-sm">
                                         {client.trainer_name || "Not Assigned"}
                                     </td>
-                                    <td className="pl-5 whitespace-nowrap">
+                                    <td className="pl-5 whitespace-nowrap uppercase text-sm">
                                         <Link href={`client/${client.uid}`}>
                                             <p
                                                 className="text-sm underline
-                                             text-green-500 hover:text-gold-500"
+                                               text-green-500 hover:text-gold-500"
                                             >
                                                 View Details
                                             </p>

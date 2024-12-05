@@ -6,8 +6,7 @@ import GoalList from "@/components/GoalList";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { TrainerProvider } from "@/context/TrainerContext";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+import { API_BASE_URL } from "@/configs/constants";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser();

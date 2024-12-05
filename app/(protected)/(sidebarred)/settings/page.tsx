@@ -12,9 +12,7 @@ import ProfileImage from "@/components/ProfileImage";
 import AccountSettings from "@/components/AccountSettings";
 import ChangePassword from "@/components/ChangePassword";
 import Toast from "@/components/Toast";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
 const SettingsPage = () => {
     const [pageLoading, setPageLoading] = useState(true);
     const [uploading, setUploading] = useState(false);

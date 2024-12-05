@@ -26,7 +26,7 @@
         "**/*.ts",
         "**/*.tsx",
         ".next/types/**/*.ts",
-        "app/(protected)/client/[id]"
+        "app/(protected)/(sidebarred)/client/[id]"
     ],
     "exclude": ["node_modules"]
 }

@@ -9,9 +9,7 @@ import Spinner from "@/components/Spinner";
 import PhaseComponent from "@/components/PhaseComponent";
 import { FaPlus, FaSave } from "react-icons/fa";
 import DemoTable from "@/components/DemoTable";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser();
     const page_title = ["Workout Plan"];
