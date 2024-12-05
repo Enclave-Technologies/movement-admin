@@ -24,8 +24,6 @@ const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
     });
   };
 
-  console.log({ dataLoading });
-
   if (dataLoading) {
     return (
       <div className="">

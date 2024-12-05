@@ -67,7 +67,7 @@ const ClientDetails = ({ client_id }) => {
     );
 
     const { nextSession, sessionLogs, progressId } = clientPhases.data;
-    setNextSession(nextSession[0]);
+    setNextSession(nextSession?.[0]);
     const reversedLogs = sessionLogs.reverse();
     setSessionLog(reversedLogs);
     setProgressId(progressId);

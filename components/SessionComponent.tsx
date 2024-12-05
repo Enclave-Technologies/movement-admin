@@ -3,7 +3,9 @@ import {
   FaChevronDown,
   FaChevronRight,
   FaChevronUp,
+  FaCopy,
   FaEdit,
+  FaPlus,
   FaTrash,
 } from "react-icons/fa";
 import SessionExerciseComponent from "./SessionExerciseComponent";
@@ -11,6 +13,7 @@ import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import { useRouter } from "next/navigation";
 import { API_BASE_URL } from "@/configs/constants";
 import axios from "axios";
+import TooltipButton from "./pure-components/TooltipButton";
 
 const SessionComponent: FC<SessionProps> = ({
   index,
@@ -29,6 +32,7 @@ const SessionComponent: FC<SessionProps> = ({
   client_id,
   nextSession,
   progressId,
+  handleCopySession,
 }) => {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
@@ -93,7 +97,7 @@ const SessionComponent: FC<SessionProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-md p-4 pr-0 border-b-[1px] border-gray-300 flex flex-col gap-4">
+    <div className="bg-white p-4 pr-0 border-b-[1px] border-gray-300 flex flex-col gap-4">
       <div className="flex items-center justify-between container-class relative">
         <div className="">
           {isEditing ? (
@@ -124,20 +128,39 @@ const SessionComponent: FC<SessionProps> = ({
                 </button>
                 <div className="flex items-center gap-1">
                   <span className="font-medium">{sessionName}</span>
-                  <button
+                  <TooltipButton
+                    tooltip="Rename Session"
                     className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
                     onClick={() => {
                       setIsEditing(true);
                     }}
                   >
                     <FaEdit />
-                  </button>
-                  <button
+                  </TooltipButton>
+                  <TooltipButton
+                    tooltip="Delete Session"
                     className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
                     onClick={handleSessionDelete}
                   >
                     <FaTrash />
-                  </button>
+                  </TooltipButton>
+                  <TooltipButton
+                    tooltip="Duplicate Session"
+                    className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                    onClick={() => handleCopySession(session)}
+                  >
+                    <FaCopy />
+                  </TooltipButton>
+                  <TooltipButton
+                    tooltip="Add Exercise"
+                    className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                    onClick={() => {
+                      onExerciseAdd(phaseId, session.sessionId);
+                    }}
+                  >
+                    <FaPlus />
+                    {/* <span className="hidden lg:flex">Copy</span> */}
+                  </TooltipButton>
                 </div>
               </div>
               {showSessionDeleteConfirm && (

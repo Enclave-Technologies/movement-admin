@@ -68,7 +68,7 @@ const Page = ({ params }: { params: { id: string } }) => {
         );
 
         const { nextSession, sessionLogs, progressId } = clientPhases.data;
-        setNextSession(nextSession[0]);
+        setNextSession(nextSession?.[0]);
         setSessionLog(sessionLogs);
         setProgressId(progressId);
       } catch (e) {

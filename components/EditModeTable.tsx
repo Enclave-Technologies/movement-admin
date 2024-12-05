@@ -69,12 +69,12 @@ const EditModeTable: FC<EditableTableProps> = ({
               <th className="px-2 py-2 text-xs text-center min-w-64">
                 Short Description
               </th>
-              <th className="px-2 py-2 text-xs text-center min-w-32">Sets</th>
-              <th className="px-2 py-2 text-xs text-center min-w-32">Reps</th>
-              <th className="px-2 py-2 text-xs text-center min-w-32">TUT</th>
-              <th className="px-2 py-2 text-xs text-center min-w-32">Tempo</th>
-              <th className="px-2 py-2 text-xs text-center min-w-32">Rest</th>
-              <th className="sticky right-0 bg-gray-100 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500">
+              <th className="px-2 py-2 text-xs text-center min-w-48">Sets</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Reps</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">TUT</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Tempo</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Rest</th>
+              <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500 flex justify-center">
                 Actions
               </th>
             </tr>

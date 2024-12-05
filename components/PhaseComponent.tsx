@@ -8,10 +8,12 @@ import {
   FaPlus,
   FaTrash,
   FaChevronRight,
+  FaSave,
 } from "react-icons/fa";
 import { ID } from "appwrite";
 import { on } from "events";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import TooltipButton from "./pure-components/TooltipButton";
 
 const PhaseComponent: FC<PhaseProps> = ({
   phase,
@@ -39,6 +41,7 @@ const PhaseComponent: FC<PhaseProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [phaseName, setPhaseName] = useState(phase.phaseName);
   const [showPhaseDeleteConfirm, setShowPhaseDeleteConfirm] = useState(false);
+  const [tooltipText, setTooltipText] = useState("");
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -66,6 +69,17 @@ const PhaseComponent: FC<PhaseProps> = ({
       sessionId: ID.unique(),
       sessionName: "Untitled Session",
       exercises: [],
+      sessionOrder: phase.sessions.length + 1,
+      sessionTime: "0",
+    };
+    onAddSession(phase.phaseId, newSession);
+  };
+
+  const handleCopySession = (session) => {
+    const newSession: MovementSession = {
+      sessionId: ID.unique(),
+      sessionName: `${session.sessionName} (Copy)`,
+      exercises: session.exercises,
       sessionOrder: phase.sessions.length + 1,
       sessionTime: "0",
     };
@@ -106,26 +120,39 @@ const PhaseComponent: FC<PhaseProps> = ({
             </button>
           </div>
           {isEditing ? (
-            <input
-              type="text"
-              className="w-full px-3 py-2 text-gray-700 rounded-md border focus:outline-none "
-              value={phaseName}
-              onChange={handlePhaseNameChange}
-              onBlur={handlePhaseNameSubmit}
-              ref={inputRef}
-            />
+            <div className="flex w-full items-center gap-2">
+              <input
+                type="text"
+                className="w-full px-3 py-2 text-gray-700 rounded-md border focus:outline-none "
+                value={phaseName}
+                onChange={handlePhaseNameChange}
+                onBlur={handlePhaseNameSubmit}
+                ref={inputRef}
+              />
+              <TooltipButton
+                tooltip="Save Phase Name"
+                className="ml-2 text-green-500 hover:text-green-800 focus:outline-none focus:ring focus:ring-green-500"
+                onClick={() => {
+                  setIsEditing(false);
+                }}
+              >
+                <FaSave />
+              </TooltipButton>
+            </div>
           ) : (
             <div className="flex flex-row gap-2">
               <span className="font-medium">{phaseName}</span>
-              <button
+              <TooltipButton
+                tooltip="Rename Phase"
                 className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
                 onClick={() => {
                   setIsEditing(true);
                 }}
               >
                 <FaEdit />
-              </button>
-              <button
+              </TooltipButton>
+              <TooltipButton
+                tooltip="Delete Phase"
                 className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
                 // onClick={() => {
                 //     const isConfirmed = window.confirm(
@@ -138,14 +165,23 @@ const PhaseComponent: FC<PhaseProps> = ({
                 onClick={handleDeletePhase}
               >
                 <FaTrash />
-              </button>
-              <button
+              </TooltipButton>
+              <TooltipButton
+                tooltip="Duplicate Phase"
                 className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
                 onClick={() => handleCopyPhase(phase.phaseId)}
               >
                 <FaCopy />
                 {/* <span className="hidden lg:flex">Copy</span> */}
-              </button>
+              </TooltipButton>
+              <TooltipButton
+                tooltip="Add Session"
+                className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                onClick={handleAddSession}
+              >
+                <FaPlus />
+                {/* <span className="hidden lg:flex">Copy</span> */}
+              </TooltipButton>
             </div>
           )}
 
@@ -226,6 +262,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                 client_id={client_id}
                 nextSession={nextSession}
                 progressId={progressId}
+                handleCopySession={handleCopySession}
               />
             ))
         )}

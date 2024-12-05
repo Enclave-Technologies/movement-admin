@@ -203,6 +203,7 @@ interface SessionProps {
   client_id;
   nextSession;
   progressId;
+  handleCopySession;
 }
 
 interface SessionExerciseProps {
