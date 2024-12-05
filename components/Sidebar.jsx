@@ -67,7 +67,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
 
   return (
     <div
-      className={`sticky top-0 left-0 h-screen bg-white text-primary shadow-lg z-40 pt-4 ${
+      className={`sticky top-0 left-0 h-screen bg-white text-primary z-40 pt-4 ${
         isCollapsed ? "w-16" : "w-64"
       } transition-all duration-300`}
     >
