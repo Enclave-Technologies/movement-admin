@@ -302,20 +302,20 @@ export async function registerClient(state, formData) {
 }
 
 export async function login(state, formData) {
-    console.log("1. LOGIN", formData);
+    console.log("1. LOGIN");
     // 1. Validate fields
     const validatedResult = LoginFormSchema.safeParse({
         email: formData.get("email"),
         password: formData.get("password"),
     });
-    console.log("2. LOGIN", validatedResult);
+
     if (!validatedResult.success) {
         // Handle validation errors
         const errors = validatedResult.error.formErrors.fieldErrors;
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("3. LOGIN");
+    console.log("2. LOGIN");
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {
@@ -365,7 +365,7 @@ export async function login(state, formData) {
         // const cookie = cookies().get(SESSION_COOKIE_NAME);
         // console.log("Cookie set:", cookie);
 
-        console.log("4. LOGIN");
+        console.log("3. LOGIN");
     } catch (error) {
         console.error(error);
         if (
@@ -426,10 +426,7 @@ export async function logout() {
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
 
-        const cookie_recheck = JSON.parse(
-            cookies().get(SESSION_COOKIE_NAME)?.value
-        );
-
+        const cookie_recheck = cookies()?.get(SESSION_COOKIE_NAME)?.value;
         console.log("Rechecking if cookie still exists! ->", cookie_recheck);
 
         // Redirect to the login page
