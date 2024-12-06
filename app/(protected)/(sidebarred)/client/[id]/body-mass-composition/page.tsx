@@ -1,9 +1,12 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/ClientContext"; // Import the custom hook
 import Breadcrumb from "@/components/Breadcrumb";
 import axios from "axios";
+import { API_BASE_URL, BMC_COLUMNS } from "@/configs/constants";
+import EditableTable from "@/components/pure-components/EditableTable";
+import { ID } from "appwrite";
 
 const dummyData = [
     {
@@ -35,11 +38,10 @@ const dummyData = [
     },
 ];
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser(); // Access the user data from Context
     const page_title = ["BMI Records"];
+    const [bmiRecords, setBmiRecords] = useState([]);
 
     useEffect(() => {
         async function fetchData() {
@@ -48,19 +50,64 @@ const Page = ({ params }: { params: { id: string } }) => {
                     `${API_BASE_URL}/mvmt/v1/client/bmc?client_id=${params.id}`,
                     { withCredentials: true }
                 );
-                const data = response.data;
-                console.log(data);
+                setBmiRecords(response.data);
             } catch (error) {
                 console.error(error);
             }
         }
 
         fetchData();
-    });
+    }, []);
+
+    function addNewEmptyRecord() {
+        console.log(bmiRecords);
+        setBmiRecords([
+            {
+                $id: ID.unique(),
+                // users: params.id,
+                DATE: new Date().toISOString().slice(0, 10),
+                HEIGHT: 0,
+                WEIGHT: 0,
+                CHIN: 0,
+                CHEEK: 0,
+                PEC: 0,
+                BICEPS: 0,
+                TRICEPS: 0,
+                SUBSCAP: 0,
+                MIDAX: 0,
+                SUPRA: 0,
+                "UPPER-THIGH": 0,
+                UBMIL: 0,
+                KNEE: 0,
+                CALF: 0,
+                QUAD: 0,
+            },
+            ...bmiRecords,
+        ]);
+        // bmiRecords.push({});
+    }
 
     return (
-        <div>
-            <div className="ml-12">
+        <div className="mt-16">
+            <div className="w-full flex flex-row items-center justify-between mb-4">
+                <h1 className="text-xl font-bold text-black ml-2 leading-tight">
+                    Body Mass Composition
+                </h1>
+                <button
+                    onClick={() => {
+                        addNewEmptyRecord();
+                    }}
+                    className="bg-primary text-white py-2 px-4 rounded-md"
+                >
+                    + Add New Record
+                </button>
+            </div>
+            <EditableTable
+                data={bmiRecords}
+                emptyText="No BMI Records found"
+                headerColumns={BMC_COLUMNS}
+            />
+            {/* <div className="ml-12">
                 <Breadcrumb
                     homeImage={userData?.imageUrl}
                     homeTitle={userData?.name}
@@ -77,7 +124,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                     </button>
                 </div>
 
-                {/* Table with Header and Rows */}
+
                 <div className="overflow-x-auto">
                     <table className="w-full border-separate border border-gray-300">
                         <thead className="bg-[#005B40] text-white">
@@ -156,13 +203,13 @@ const Page = ({ params }: { params: { id: string } }) => {
                     <p className="text-sm sm:text-base">+ Create New Entry</p>
                 </div>
 
-                {/* Back Button at the Bottom Left */}
+                
                 <div className="mt-auto flex justify-start">
                     <button className="text-white w-36 bg-[#006847] rounded-md py-1 sm:w-40 sm:py-2">
                         Back
                     </button>
                 </div>
-            </div>
+            </div> */}
         </div>
     );
 };

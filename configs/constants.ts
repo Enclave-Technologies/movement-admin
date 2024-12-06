@@ -49,3 +49,21 @@ export const getDescriptionFromMotion = (motion: string) => {
             return "";
     }
 };
+export const BMC_COLUMNS = [
+    "DATE",
+    "HEIGHT",
+    "WEIGHT",
+    "CHIN",
+    "CHEEK",
+    "PEC",
+    "BICEPS",
+    "TRICEPS",
+    "SUBSCAP",
+    "MIDAX",
+    "SUPRA",
+    "UPPER-THIGH",
+    "UBMIL",
+    "KNEE",
+    "CALF",
+    "QUAD",
+];

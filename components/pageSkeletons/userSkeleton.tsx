@@ -32,7 +32,7 @@ const UserSkeleton = ({
                     <div className="w-full">
                         <table className="w-full text-left rounded-md overflow-hidden">
                             <thead className="">
-                                <tr className="bg-green-500 text-white">
+                                <tr className="bg-gray-200 text-black">
                                     {tableHeaders.map((header, index) => {
                                         return (
                                             <th
