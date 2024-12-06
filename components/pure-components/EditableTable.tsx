@@ -1,10 +1,39 @@
 "use client";
 import React, { useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
 
 const EditableTable = ({ headerColumns, data, emptyText }) => {
     const [rowToDelete, setRowToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
-    const [editingRowId, setEditingRoweId] = useState(null);
+    const [editingRowId, setEditingRowId] = useState(null);
+    const [editedData, setEditedData] = useState({});
+
+    const handleEditRow = (rowId) => {
+        setEditingRowId(rowId);
+        setEditedData(data.find((row) => row.$id === rowId));
+    };
+
+    const handleUpdateRow = (rowId) => {
+        // Update the data array with the edited data
+        const updatedData = data.map((row) =>
+            row.$id === rowId ? editedData : row
+        );
+        // const editedData = data.filter((row) =>
+        //     row.$id === rowId ? editedData : row
+        // );
+        // ... existing code ...
+
+        console.log(editedData);
+
+        setEditingRowId(null);
+        setEditedData({});
+    };
+
+    const handleInputChange = (event, field) => {
+        setEditedData({
+            ...editedData,
+            [field]: event.target.value,
+        });
+    };
 
     if (data.length === 0)
         return (
@@ -44,19 +73,50 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
                                 rowIndex % 2 ? "bg-white" : "bg-gray-100"
                             } h-12 touch-action-none hover:bg-gray-200`}
                         >
-                            {Object.values(row).map((value: any, colIndex) =>
-                                editingRowId === value.$id ? (
-                                    <></>
-                                ) : (
-                                    colIndex > 0 && (
-                                        <>
+                            {Object.keys(row).map((key, colIndex) =>
+                                editingRowId === row.$id ? (
+                                    <>
+                                        {colIndex === 0 && (
                                             <td className="sticky left-0 bg-white z-10 px-2 py-2 items-center justify-center">
                                                 <button
-                                                    // onClick={() =>
-                                                    //     onEditExercise(
-                                                    //         exercise.id
-                                                    //     )
-                                                    // }
+                                                    onClick={() =>
+                                                        handleUpdateRow(row.$id)
+                                                    }
+                                                    className="text-green-500 hover:text-green-700 mr-2"
+                                                >
+                                                    <FaSave />
+                                                </button>
+                                            </td>
+                                        )}
+                                        {colIndex > 0 && (
+                                            <td
+                                                key={colIndex}
+                                                className="px-1 py-2"
+                                            >
+                                                <div className="flex items-center text-center justify-center gap-1">
+                                                    <input
+                                                        type="text"
+                                                        value={editedData[key]}
+                                                        onChange={(e) =>
+                                                            handleInputChange(
+                                                                e,
+                                                                key
+                                                            )
+                                                        }
+                                                        className="w-full text-center px-0 py-1 border rounded"
+                                                    />
+                                                </div>
+                                            </td>
+                                        )}
+                                    </>
+                                ) : (
+                                    <>
+                                        {colIndex === 0 && (
+                                            <td className="sticky left-0 bg-white z-10 px-2 py-2 items-center justify-center">
+                                                <button
+                                                    onClick={() =>
+                                                        handleEditRow(row.$id)
+                                                    }
                                                     className="text-blue-500 hover:text-blue-700 mr-2"
                                                 >
                                                     <FaEdit />
@@ -73,14 +133,16 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
                                                     <FaTrash />
                                                 </button>
                                             </td>
+                                        )}
+                                        {colIndex > 0 && (
                                             <td
                                                 key={colIndex}
                                                 className="pl-5 whitespace-nowrap cursor-pointer text-sm font-semibold"
                                             >
-                                                {value}
+                                                {row[key]}
                                             </td>
-                                        </>
-                                    )
+                                        )}
+                                    </>
                                 )
                             )}
                         </tr>
