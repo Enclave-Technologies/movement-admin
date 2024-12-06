@@ -290,3 +290,15 @@ interface CountsDocument {
   trainers_count: number;
   users_count: number;
 }
+
+interface CountsDocument {
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    $permissions: any[];
+    $updatedAt: string;
+    exercises_count: number;
+    trainers_count: number;
+    users_count: number;
+}
