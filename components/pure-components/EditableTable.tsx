@@ -143,6 +143,7 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
                                             </td>
                                         )}
                                     </>
+
                                 )
                             )}
                         </tr>

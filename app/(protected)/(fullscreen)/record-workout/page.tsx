@@ -19,6 +19,8 @@ const RecordWorkout = () => {
     const [sessionInformation, setSessionInformation] = useState(null);
     const [exerciseData, setExerciseData] = useState([]);
     const [savingState, setSavingState] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
 
     const toggleAccordion = (exId: string) => {
         setOpenExercises((prevOpenExercises) => {
@@ -97,6 +99,26 @@ const RecordWorkout = () => {
         );
     };
 
+    const handleRemoveSet = (exerciseId, setIndex) => {
+        setExerciseData((prevExerciseData) =>
+            prevExerciseData.map((exercise) => {
+                if (exercise.id === exerciseId) {
+                    return {
+                        ...exercise,
+                        sets: exercise.sets.filter(
+                            (_, index) => index !== setIndex
+                        ),
+                    };
+                }
+                return exercise;
+            })
+        );
+    };
+
+    const handleExit = () => {
+        window.location.href = `/client/${clientId}`;
+    };
+
     return (
         <Suspense
             fallback={
@@ -121,7 +143,32 @@ const RecordWorkout = () => {
             ) : (
                 <div className="min-h-screen bg-green-800 flex flex-col items-center">
                     <div className="flex flex-col w-full max-w-full mx-auto">
+                        {showDeleteDialog && (
+                            <ConfirmationDialog
+                                title={`Unsaved changes will be lost`}
+                                message={`Are you sure you want to exit this page?`}
+                                button1={
+                                    <button
+                                        className="hover:underline"
+                                        onClick={() =>
+                                            setShowDeleteDialog(false)
+                                        }
+                                    >
+                                        Cancel
+                                    </button>
+                                }
+                                button2={
+                                    <button
+                                        onClick={handleExit}
+                                        className="min-w-24 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                                    >
+                                        Exit
+                                    </button>
+                                }
+                            />
+                        )}
                         <WorkoutRecordHeader
+                            setShowDeleteDialog={setShowDeleteDialog}
                             phaseName={sessionInformation["phases.phaseName"]}
                             sessionName={sessionInformation["sessionName"]}
                             startTime={""}
@@ -138,6 +185,7 @@ const RecordWorkout = () => {
                                 handleExerciseNotesChange
                             }
                             handleAddSet={handleAddSet}
+                            handleRemoveSet={handleRemoveSet}
                         />
                     </div>
                 </div>

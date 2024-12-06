@@ -8,36 +8,6 @@ import { API_BASE_URL, BMC_COLUMNS } from "@/configs/constants";
 import EditableTable from "@/components/pure-components/EditableTable";
 import { ID } from "appwrite";
 
-// const dummyData = [
-//     {
-//         date: "01/01/2024",
-//         height: "5'8\"",
-//         weight: "150 lbs",
-//         chin: "14 in",
-//         cheek: "12 in",
-//         pec: "38 in",
-//         bice: "12 in",
-//     },
-//     {
-//         date: "01/02/2024",
-//         height: "5'7\"",
-//         weight: "145 lbs",
-//         chin: "13 in",
-//         cheek: "11 in",
-//         pec: "37 in",
-//         bice: "11 in",
-//     },
-//     {
-//         date: "01/03/2024",
-//         height: "5'6\"",
-//         weight: "160 lbs",
-//         chin: "15 in",
-//         cheek: "13 in",
-//         pec: "40 in",
-//         bice: "13 in",
-//     },
-// ];
-
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser(); // Access the user data from Context
     const page_title = ["BMI Records"];
