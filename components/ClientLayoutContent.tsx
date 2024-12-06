@@ -31,7 +31,7 @@ const ClientLayoutContent = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <div className="relative min-h-screen">
-      <div className="flex-grow p-2 sm:p-2 bg-gray-50 flex flex-col items-start gap-2">
+      <div className="flex-grow bg-gray-50 flex flex-col items-start gap-2">
         {children}
       </div>
     </div>

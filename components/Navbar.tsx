@@ -7,23 +7,31 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import Searchbar from "./pure-components/Searchbar";
 import SearchResults from "./pure-components/SearchResults";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
+import TrainerInfo from "./TrainerInfo";
+import { useTrainer } from "@/context/TrainerContext";
+import Image from "next/image";
+import { defaultProfileURL } from "@/configs/constants";
 
 const Navbar = () => {
-  const [loading, setLoading] = useState(false);
+  const [loadingLogout, setLoadingLogout] = useState(false);
   const [search, setSearch] = useState("");
   const { users } = useGlobalContext();
   const [showResults, setShowResults] = useState(false);
   const searchBarRef = useRef(null);
+  const {
+    trainerData,
+    trainerLoading: loading,
+    trainerError: error,
+  } = useTrainer();
 
   const handleLogout = async () => {
-    setLoading(true);
+    setLoadingLogout(true);
     try {
       await logout();
-      // redirection is being handled in the backend
     } catch (error) {
       console.error("Logout failed:", error);
     } finally {
-      setLoading(false);
+      setLoadingLogout(false);
     }
   };
 
@@ -59,14 +67,16 @@ const Navbar = () => {
 
   return (
     <nav className="w-full bg-white z-50">
-      <div
-        ref={searchBarRef}
-        className="w-full flex flex-col justify-between items-center px-6 py-4 relative"
-      >
-        <Searchbar search={search} setSearch={setSearch} />
-        {search.length > 0 && showResults && (
-          <SearchResults results={results} setSearch={setSearch} />
-        )}
+      <div className="w-full flex justify-between items-center relative pr-6">
+        <div
+          ref={searchBarRef}
+          className="relative flex flex-col items-center px-6 py-4 flex-1 max-w-[600px]"
+        >
+          <Searchbar search={search} setSearch={setSearch} />
+          {search.length > 0 && showResults && (
+            <SearchResults results={results} setSearch={setSearch} />
+          )}
+        </div>
         {/* <div className="flex space-x-4">
           <button
             type="submit"
