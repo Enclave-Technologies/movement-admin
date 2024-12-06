@@ -122,6 +122,7 @@ const RecordWorkout = () => {
                 <div className="min-h-screen bg-green-800 flex flex-col items-center">
                     <div className="flex flex-col w-full max-w-full mx-auto">
                         <WorkoutRecordHeader
+                            setShowDeleteDialog={() => {}}
                             phaseName={sessionInformation["phases.phaseName"]}
                             sessionName={sessionInformation["sessionName"]}
                             startTime={""}
@@ -130,6 +131,7 @@ const RecordWorkout = () => {
                         />
 
                         <WorkoutRecordBody
+                            handleRemoveSet={() => {}}
                             workoutRecords={exerciseData}
                             toggleAccordion={toggleAccordion}
                             openExercises={openExercises}
