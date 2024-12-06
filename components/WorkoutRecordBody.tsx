@@ -1,184 +1,167 @@
 import React from "react";
+import { BiTrash } from "react-icons/bi";
 import { BsTriangleFill } from "react-icons/bs";
+import { FaChevronUp } from "react-icons/fa";
 
 const WorkoutRecordBody = ({
-    workoutRecords,
-    toggleAccordion,
-    openExercises,
-    handleSetChange,
-    handleExerciseNotesChange,
-    handleAddSet,
+  workoutRecords,
+  toggleAccordion,
+  openExercises,
+  handleSetChange,
+  handleExerciseNotesChange,
+  handleAddSet,
+  handleRemoveSet,
 }) => {
-    return (
-        <div>
-            {workoutRecords.map((exercise) => (
-                <div
-                    key={exercise.id}
-                    className="text-white uppercase mt-1  border-b border-white my-2"
-                >
-                    <div
-                        className="cursor-pointer text-white flex justify-between 
-                items-center px-4 py-4 rounded-lg text-lg
+  return (
+    <div className="">
+      {workoutRecords.map((exercise) => (
+        <div
+          key={exercise.id}
+          className="flex flex-row items-center justify-center text-white uppercase mt-1  border-b border-gray-400 my-2"
+        >
+          <div className="max-w-[920px] w-full pb-4">
+            <div
+              className="cursor-pointer text-white flex justify-between 
+                items-start p-2 rounded-lg text-lg 
                 "
-                        onClick={() => toggleAccordion(exercise.id)}
-                    >
-                        <span>
-                            {exercise.marker}. {exercise.ShortDescription}
-                        </span>
-                        <span
-                            className={`ml-2 transition-transform text-white ${
-                                openExercises.includes(exercise.id)
-                                    ? ""
-                                    : "rotate-180"
-                            }`}
-                        >
-                            <BsTriangleFill />
-                        </span>
+              onClick={() => toggleAccordion(exercise.id)}
+            >
+              <div className="flex flex-col items-start justify-start">
+                <span>
+                  {exercise.marker}. {exercise.ShortDescription}
+                </span>
+                <div className="text-gray-400">{exercise.setRep}</div>
+              </div>
+              <span
+                className={`transition-transform text-white my-2 ${
+                  openExercises.includes(exercise.id) ? "" : "rotate-180"
+                }`}
+              >
+                <FaChevronUp className="text-lg" />
+              </span>
+            </div>
+
+            {openExercises.includes(exercise.id) && (
+              <div
+                className={`transition-all duration-300 py-8 ${
+                  openExercises.includes(exercise.id)
+                    ? "max-h-screen"
+                    : "max-h-0"
+                }`}
+              >
+                <div className="bg-green-800 rounded-lg">
+                  {/* <pre>{JSON.stringify(exercise, null, 2)}</pre> */}
+                  <div className="flex w-full flex-row flex-wrap items-start justify-between">
+                    <div className="w-2/3 pr-4">
+                      <table className="font-sans text-white table-auto w-full border-[1px] border-gray-400">
+                        <thead>
+                          <tr className="border-[1px] border-gray-400">
+                            <th className="p-2 border-[1px] border-gray-400">
+                              SET
+                            </th>
+                            <th className="p-2 border-[1px] border-gray-400">
+                              REPS
+                            </th>
+                            <th className="p-2 border-[1px] border-gray-400">
+                              WEIGHT (KG)
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {exercise.sets.map((set, setIdx) => (
+                            <tr
+                              key={set.id}
+                              className="border-[1px] border-gray-400"
+                            >
+                              <td className="p-2 text-center border-[1px] border-gray-400">
+                                {setIdx + 1}
+                              </td>
+                              <td className="p-2 text-center border-[1px] border-gray-400">
+                                <input
+                                  type="number"
+                                  step="1"
+                                  value={set.reps}
+                                  onChange={(e) =>
+                                    handleSetChange(
+                                      exercise.id,
+                                      set.id,
+                                      "reps",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full text-center bg-transparent uppercase rounded-3xl p-2 focus:outline-none"
+                                />
+                              </td>
+                              <td className="p-2 text-center border-[1px] border-gray-400">
+                                <input
+                                  type="number"
+                                  step="0.01"
+                                  value={set.weight || 0}
+                                  onChange={(e) =>
+                                    handleSetChange(
+                                      exercise.id,
+                                      set.id,
+                                      "weight",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full text-center uppercase bg-transparent  rounded-3xl p-2  focus:outline-none"
+                                />
+                              </td>
+                              <td
+                                className="p-2 text-center border-[1px] border-gray-400 bg-red-700 text-white cursor-pointer"
+                                onClick={() => {
+                                  handleRemoveSet(exercise.id, setIdx);
+                                }}
+                              >
+                                <button>
+                                  <BiTrash size={20} />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                          <tr>
+                            <td className="border-[1px] border-gray-400"></td>
+                            <td className="" colSpan={3}>
+                              <button
+                                className="w-full"
+                                onClick={() => handleAddSet(exercise.id)}
+                              >
+                                <div
+                                  className="w-full px-16 py-2 text-white
+                            hover:bg-green-300 hover:text-black font-semibold"
+                                >
+                                  Add Set
+                                </div>
+                              </button>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
                     </div>
-
-                    {openExercises.includes(exercise.id) && (
-                        <div
-                            className={`transition-all duration-300 ${
-                                openExercises.includes(exercise.id)
-                                    ? "max-h-screen"
-                                    : "max-h-0"
-                            }`}
-                        >
-                            <div className="mt-2 bg-green-800 p-4 rounded-lg">
-                                {/* <pre>{JSON.stringify(exercise, null, 2)}</pre> */}
-                                <div className="text-sm text-gray-200 pb-4">
-                                    {exercise.setRep}
-                                </div>
-                                <div className="flex w-full">
-                                    <div className="w-2/3 pr-4">
-                                        <table className="font-sans text-white table-auto w-full">
-                                            <thead>
-                                                <tr>
-                                                    <th className="p-2 ">
-                                                        SET
-                                                    </th>
-                                                    <th className="p-2">
-                                                        REPS
-                                                    </th>
-                                                    <th className="p-2">
-                                                        WEIGHT (KG)
-                                                    </th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {exercise.sets.map(
-                                                    (set, setIdx) => (
-                                                        <tr
-                                                            key={set.id}
-                                                            className=""
-                                                        >
-                                                            <td className="p-2 text-center">
-                                                                {setIdx + 1}
-                                                            </td>
-                                                            <td className="p-2 text-center">
-                                                                <input
-                                                                    type="number"
-                                                                    step="1"
-                                                                    value={
-                                                                        set.reps
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleSetChange(
-                                                                            exercise.id,
-                                                                            set.id,
-                                                                            "reps",
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                    className="w-full text-center bg-transparent border uppercase rounded-3xl p-2 border-gray-600 focus:outline-none"
-                                                                />
-                                                            </td>
-                                                            <td className="p-2 text-center">
-                                                                <input
-                                                                    type="number"
-                                                                    step="0.01"
-                                                                    value={
-                                                                        set.weight
-                                                                    }
-                                                                    onChange={(
-                                                                        e
-                                                                    ) =>
-                                                                        handleSetChange(
-                                                                            exercise.id,
-                                                                            set.id,
-                                                                            "weight",
-                                                                            e
-                                                                                .target
-                                                                                .value
-                                                                        )
-                                                                    }
-                                                                    className="w-full text-center uppercase bg-transparent border rounded-3xl p-2 border-gray-600 focus:outline-none"
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    )
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div className="w-1/3 pl-4">
-                                        <div className="flex flex-col h-full justify-between">
-                                            <div className="mb-4">
-                                                <label className="text-white">
-                                                    Notes
-                                                </label>
-                                                <textarea
-                                                    value={exercise.notes}
-                                                    onChange={(e) =>
-                                                        handleExerciseNotesChange(
-                                                            exercise.id,
-                                                            e.target.value
-                                                        )
-                                                    }
-                                                    className="w-full h-full uppercase p-2 mt-2 bg-transparent border border-gray-600 focus:outline-none"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between mt-4">
-                                    <div className="flex gap-4">
-                                        <button
-                                            className="rounded-xl px-16 py-2 bg-green-300 text-green-800 border hover:border-solid hover:border-green-300 
-                            hover:bg-green-800 hover:text-green-300 font-semibold"
-                                            onClick={() =>
-                                                handleAddSet(exercise.id)
-                                            }
-                                        >
-                                            Add Set
-                                        </button>
-                                        {/* <button
-                                        className="border border-solid rounded-xl px-16 py-2 border-green-300 text-green-300 
-                            hover:bg-green-300 hover:text-green-800 font-semibold"
-                                    >
-                                        Add Note
-                                    </button> */}
-                                    </div>
-
-                                    {/* <button className="border border-solid rounded-xl font-semibold px-16 py-2 border-white text-white hover:bg-white hover:text-gray-900">
-                                        Confirm
-                                    </button> */}
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    <div className="h-full flex-1">
+                      <textarea
+                        placeholder="Notes"
+                        value={exercise.notes}
+                        onChange={(e) =>
+                          handleExerciseNotesChange(exercise.id, e.target.value)
+                        }
+                        className="w-full h-full p-2 bg-transparent border border-gray-400 focus:outline-none bg-black"
+                      />
+                    </div>
+                  </div>
                 </div>
-            ))}
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
 
-            {/* <pre className="text-white">
+      {/* <pre className="text-white">
                 {JSON.stringify(workoutRecords, null, 2)}
             </pre> */}
-        </div>
-    );
+    </div>
+  );
 };
 
 export default WorkoutRecordBody;

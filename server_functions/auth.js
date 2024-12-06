@@ -116,21 +116,6 @@ export async function register(state, formData) {
                 gender: gender,
             }
         );
-
-        await database.createDocument(
-            process.env.NEXT_PUBLIC_DATABASE_ID,
-            process.env.NEXT_PUBLIC_COLLECTION_USERS,
-            uid,
-            {
-                auth_id: uid,
-                firstName,
-                lastName,
-                email,
-                phone,
-                trainer_id: uid,
-                imageUrl: null,
-            }
-        );
     } catch (error) {
         console.log(error);
         users.delete(uid);
@@ -215,7 +200,7 @@ export async function registerClient(state, formData) {
             }
 
             // Now check, if trainer_doc and user_doc.total === 0
-            // If yes, create user doc, send sucess
+            // If yes, create user doc, send success
             // else raise email is registered error
             if (trainer_doc && user_doc.total === 0) {
                 await database.createDocument(
@@ -230,7 +215,6 @@ export async function registerClient(state, formData) {
                         phone,
                         trainer_id: trainerId,
                         imageUrl: null,
-                        gender: gender,
                     }
                 );
                 return {
@@ -267,7 +251,7 @@ export async function registerClient(state, formData) {
         };
     }
 
-    // 4. If that is successful, create the trainer object
+    // 4. If that is successful, create the client object
     try {
         await database.createDocument(
             process.env.NEXT_PUBLIC_DATABASE_ID,

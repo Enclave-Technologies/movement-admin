@@ -5,7 +5,7 @@ export default async function Home() {
 
     return (
         // Use only tailwind CSS
-        <div className="min-h-screen bg-gray-100">
+        <div className="min-h-screen bg-gray-50">
             {username ? (
                 <div className="mt-20 text-center text-2xl font-bold">
                     Hello, {username.name}

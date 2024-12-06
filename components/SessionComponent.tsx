@@ -1,118 +1,205 @@
 import React, { FC, useEffect, useRef, useState } from "react";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import {
+  FaChevronDown,
+  FaChevronRight,
+  FaChevronUp,
+  FaCopy,
+  FaEdit,
+  FaPlus,
+  FaTrash,
+} from "react-icons/fa";
 import SessionExerciseComponent from "./SessionExerciseComponent";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import { useRouter } from "next/navigation";
+import { API_BASE_URL } from "@/configs/constants";
+import axios from "axios";
+import TooltipButton from "./pure-components/TooltipButton";
 
 const SessionComponent: FC<SessionProps> = ({
-    phaseId,
-    session,
-    workouts,
-    onSessionDelete,
-    onSessionNameChange,
-    editingExerciseId,
-    onExerciseAdd,
-    onExerciseUpdate,
-    onExerciseDelete,
-    onExerciseOrderChange,
-    onEditExercise,
-    onCancelEdit,
+  index,
+  phaseId,
+  session,
+  workouts,
+  onSessionDelete,
+  onSessionNameChange,
+  editingExerciseId,
+  onExerciseAdd,
+  onExerciseUpdate,
+  onExerciseDelete,
+  onExerciseOrderChange,
+  onEditExercise,
+  onCancelEdit,
+  client_id,
+  nextSession,
+  progressId,
+  handleCopySession,
 }) => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [sessionName, setSessionName] = useState(session.sessionName);
-    const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
-        useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
+  const [isEditing, setIsEditing] = useState(false);
+  const [sessionName, setSessionName] = useState(session.sessionName);
+  const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
+    useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (isEditing && inputRef.current) {
-            inputRef.current.focus();
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing, inputRef]);
+
+  const handleSessionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSessionName(e.target.value);
+  };
+
+  const handleSessionNameSubmit = () => {
+    onSessionNameChange(session.sessionId, sessionName);
+    setIsEditing(false);
+  };
+
+  const handleSessionDelete = () => {
+    setShowSessionDeleteConfirm(true); // Show confirmation dialog
+  };
+
+  const confirmSessionDelete = () => {
+    onSessionDelete(session.sessionId); // Perform delete
+    setShowSessionDeleteConfirm(false); // Close dialog
+  };
+
+  const cancelSessionDelete = () => {
+    setShowSessionDeleteConfirm(false); // Just close the dialog
+  };
+
+  const handleStartSession = async () => {
+    // e.preventDefault();
+    try {
+      // setPageLoading(true);
+      // setWorkoutPressed(true);
+      console.log("Preparing to start workout...");
+      const response = await axios.post(
+        `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
+        {
+          progress_id: progressId,
+        },
+        {
+          withCredentials: true,
         }
-    }, [isEditing, inputRef]);
+      );
+      router.push(
+        `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
+      );
+    } catch (e) {
+      console.error("Failed to start workout:", e);
+    } finally {
+      // setWorkoutPressed(false);
+      // setPageLoading(false);
+    }
+  };
 
-    const handleSessionNameChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        setSessionName(e.target.value);
-    };
-
-    const handleSessionNameSubmit = () => {
-        onSessionNameChange(session.sessionId, sessionName);
-        setIsEditing(false);
-    };
-
-    const handleSessionDelete = () => {
-        setShowSessionDeleteConfirm(true); // Show confirmation dialog
-    };
-
-    const confirmSessionDelete = () => {
-        onSessionDelete(session.sessionId); // Perform delete
-        setShowSessionDeleteConfirm(false); // Close dialog
-    };
-
-    const cancelSessionDelete = () => {
-        setShowSessionDeleteConfirm(false); // Just close the dialog
-    };
-
-    return (
-        <div className="bg-white rounded-md shadow-sm border border-gray-200 p-4 mb-4 ">
-            <div className="flex items-center justify-between container-class relative">
-                <div className="">
-                    {isEditing ? (
-                        <input
-                            type="text"
-                            className="w-full px-3 py-2 text-gray-700 rounded-md border focus:outline-none"
-                            value={sessionName}
-                            onChange={handleSessionNameChange}
-                            onBlur={handleSessionNameSubmit}
-                            ref={inputRef}
-                        />
-                    ) : (
-                        <div className="flex items-center">
-                            <span className="font-medium">{sessionName}</span>
-                            <button
-                                className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
-                                onClick={() => {
-                                    setIsEditing(true);
-                                }}
-                            >
-                                <FaEdit />
-                            </button>
-                            <button
-                                className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
-                                onClick={handleSessionDelete}
-                            >
-                                <FaTrash />
-                            </button>
-                            {showSessionDeleteConfirm && (
-                                <DeleteConfirmationDialog
-                                    title={`Session: ${session.sessionName}`}
-                                    confirmDelete={confirmSessionDelete}
-                                    cancelDelete={cancelSessionDelete}
-                                />
-                            )}
-                        </div>
-                    )}
-                </div>
-
-                <div className="text-gray-500 text-sm">
-                    {session.sessionTime || "0"} mins
-                </div>
-            </div>
-            <SessionExerciseComponent
-                phaseId={phaseId}
-                sessionId={session.sessionId}
-                exercises={session.exercises}
-                workouts={workouts}
-                editingExerciseId={editingExerciseId}
-                onExerciseAdd={onExerciseAdd}
-                onExerciseUpdate={onExerciseUpdate}
-                onExerciseDelete={onExerciseDelete}
-                onExerciseOrderChange={onExerciseOrderChange}
-                onEditExercise={onEditExercise}
-                onCancelEdit={onCancelEdit}
+  return (
+    <div className="bg-white p-4 pr-0 border-b-[1px] border-gray-300 flex flex-col gap-4">
+      <div className="flex items-center justify-between container-class relative">
+        <div className="">
+          {isEditing ? (
+            <input
+              type="text"
+              className="w-full px-3 py-2 text-gray-700 rounded-md border focus:outline-none"
+              value={sessionName}
+              onChange={handleSessionNameChange}
+              onBlur={handleSessionNameSubmit}
+              ref={inputRef}
             />
+          ) : (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
+                <button
+                  className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
+                  onClick={() => setIsCollapsed(!isCollapsed)}
+                >
+                  {isCollapsed ? (
+                    <>
+                      <FaChevronRight className="text-lg" />
+                    </>
+                  ) : (
+                    <>
+                      <FaChevronUp className="text-lg" />
+                    </>
+                  )}
+                </button>
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">{sessionName}</span>
+                  <TooltipButton
+                    tooltip="Rename Session"
+                    className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
+                    onClick={() => {
+                      setIsEditing(true);
+                    }}
+                  >
+                    <FaEdit />
+                  </TooltipButton>
+                  <TooltipButton
+                    tooltip="Delete Session"
+                    className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
+                    onClick={handleSessionDelete}
+                  >
+                    <FaTrash />
+                  </TooltipButton>
+                  <TooltipButton
+                    tooltip="Duplicate Session"
+                    className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                    onClick={() => handleCopySession(session)}
+                  >
+                    <FaCopy />
+                  </TooltipButton>
+                  <TooltipButton
+                    tooltip="Add Exercise"
+                    className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                    onClick={() => {
+                      onExerciseAdd(phaseId, session.sessionId);
+                    }}
+                  >
+                    <FaPlus />
+                    {/* <span className="hidden lg:flex">Copy</span> */}
+                  </TooltipButton>
+                </div>
+              </div>
+              {showSessionDeleteConfirm && (
+                <DeleteConfirmationDialog
+                  title={`Session: ${session.sessionName}`}
+                  confirmDelete={confirmSessionDelete}
+                  cancelDelete={cancelSessionDelete}
+                />
+              )}
+            </div>
+          )}
         </div>
-    );
+        <div className="flex flex-row items-center gap-4">
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded-md"
+            onClick={handleStartSession}
+          >
+            Start Session
+            {/* ( {session.sessionTime || "0"} mins) */}
+          </button>
+        </div>
+      </div>
+      {!isCollapsed && (
+        <SessionExerciseComponent
+          phaseId={phaseId}
+          sessionId={session.sessionId}
+          exercises={session.exercises}
+          workouts={workouts}
+          editingExerciseId={editingExerciseId}
+          onExerciseAdd={onExerciseAdd}
+          onExerciseUpdate={onExerciseUpdate}
+          onExerciseDelete={onExerciseDelete}
+          onExerciseOrderChange={onExerciseOrderChange}
+          onEditExercise={onEditExercise}
+          onCancelEdit={onCancelEdit}
+        />
+      )}
+    </div>
+  );
 };
 
 export default SessionComponent;
