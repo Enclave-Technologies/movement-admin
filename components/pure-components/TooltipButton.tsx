@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 
 const TooltipButton = ({ tooltip, children, ...props }) => {
