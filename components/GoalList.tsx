@@ -6,9 +6,8 @@ import { goalTypes } from "@/configs/constants";
 import axios from "axios";
 import { GoalListSkeleton } from "./GoalListSkeleton";
 import EditGoalModal from "./EditGoalModal";
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
+import { API_BASE_URL } from "@/configs/constants";
+import { FaEdit, FaPlus } from "react-icons/fa";
 const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
@@ -18,6 +17,8 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         trainerLoading: loading,
         trainerError: error,
     } = useTrainer();
+
+    console.log(trainerData);
 
     const updateGoalInBackend = useCallback(
         async (id: string, completed: boolean) => {
@@ -52,7 +53,9 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
             try {
                 await axios.delete(
                     `${API_BASE_URL}/mvmt/v1/client/goals/${goalId}`,
-                    { withCredentials: true }
+                    {
+                        withCredentials: true,
+                    }
                 );
                 const updatedGoals = goals.map((category) => ({
                     ...category,
@@ -229,27 +232,28 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
     }
 
     return (
-        <div>
-            <div className="w-full flex flex-row justify-end gap-4">
+        <div className="flex flex-col gap-8">
+            <div className="w-full flex flex-row justify-start gap-4">
                 <button
                     className={`
-        px-4 py-2 rounded-md font-semibold text-sm
+        px-4 py-2 rounded-md text-sm
         transition-all duration-200 ease-in-out
         focus:outline-none focus:ring-2 focus:ring-offset-2
         ${
             isEditMode
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "secondary-btn"
+                : "flex items-center justify-center uppercase gap-2 bg-green-500 text-white"
         }
     `}
                     onClick={() => setIsModalOpen(true)}
                     disabled={isEditMode}
                 >
-                    {isEditMode ? "Exit Edit Mode to Add" : "Add Goal"}
+                    {!isEditMode && <FaPlus />}{" "}
+                    {isEditMode ? "Exit Edit Mode to Add" : `Add Goal`}
                 </button>
 
                 <button
-                    className="secondary-btn px-4 py-2 rounded-md font-semibold text-sm
+                    className="flex items-center justify-center uppercase secondary-btn gap-2 px-4 py-2 rounded-md text-sm
         transition-all duration-200 ease-in-out
         focus:outline-none focus:ring-2 focus:ring-offset-2"
                     // {`secondary-btn ${
@@ -257,6 +261,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                     // }`}
                     onClick={() => setIsEditMode(!isEditMode)}
                 >
+                    {!isEditMode && <FaEdit />}{" "}
                     {isEditMode ? "Done Editing" : "Edit Goals"}
                 </button>
             </div>

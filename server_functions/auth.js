@@ -27,7 +27,9 @@ export async function register(state, formData) {
         email: formData.get("email"),
         jobTitle: formData.get("jobTitle"),
         role: formData.get("role"),
+        gender: formData.get("gender"),
     });
+
     if (!validatedResult.success) {
         // Handle validation errors
         const errors = validatedResult.error.formErrors.fieldErrors;
@@ -35,7 +37,7 @@ export async function register(state, formData) {
     }
 
     console.log(validatedResult.data);
-    const { firstName, lastName, phone, email, jobTitle, role } =
+    const { firstName, lastName, phone, email, jobTitle, role, gender } =
         validatedResult.data;
 
     // 2. Try creating with details
@@ -62,7 +64,7 @@ export async function register(state, formData) {
         }
     }
 
-    // // 3. If successful in creating team association
+    // 3. If successful in creating team association
     try {
         const teamList = await teams.list();
         for (const team of teamList.teams) {
@@ -94,6 +96,8 @@ export async function register(state, formData) {
                 lastName: lastName,
                 jobTitle: jobTitle,
                 phone: phone,
+                email: email,
+                gender: gender,
             }
         );
 
@@ -109,6 +113,7 @@ export async function register(state, formData) {
                 phone,
                 trainer_id: uid,
                 imageUrl: null,
+                gender: gender,
             }
         );
     } catch (error) {
@@ -140,6 +145,7 @@ export async function registerClient(state, formData) {
         phone: formData.get("phone"),
         email: formData.get("email"),
         trainerId: formData.get("trainerId"),
+        gender: formData.get("gender"),
     });
     if (!validatedResult.success) {
         // Handle validation errors
@@ -148,7 +154,7 @@ export async function registerClient(state, formData) {
     }
 
     console.log(validatedResult.data);
-    const { firstName, lastName, phone, email, trainerId } =
+    const { firstName, lastName, phone, email, trainerId, gender } =
         validatedResult.data;
 
     // 2. Try creating with details
@@ -194,7 +200,7 @@ export async function registerClient(state, formData) {
             }
 
             // Now check, if trainer_doc and user_doc.total === 0
-            // If yes, create user doc, send sucess
+            // If yes, create user doc, send success
             // else raise email is registered error
             if (trainer_doc && user_doc.total === 0) {
                 await database.createDocument(
@@ -225,7 +231,7 @@ export async function registerClient(state, formData) {
         }
     }
 
-    // // 3. If successful in creating team association
+    // 3. If successful in creating team association
     try {
         const teamList = await teams.list();
         for (const team of teamList.teams) {
@@ -245,7 +251,7 @@ export async function registerClient(state, formData) {
         };
     }
 
-    // 4. If that is successful, create the trainer object
+    // 4. If that is successful, create the client object
     try {
         await database.createDocument(
             process.env.NEXT_PUBLIC_DATABASE_ID,
@@ -258,6 +264,7 @@ export async function registerClient(state, formData) {
                 email,
                 phone,
                 trainer_id: trainerId,
+                gender: gender,
             }
         );
     } catch (error) {
@@ -271,9 +278,6 @@ export async function registerClient(state, formData) {
         };
     }
 
-    // reset the form
-    // Reset the form fields
-
     return {
         success: true,
         errors: {},
@@ -282,20 +286,20 @@ export async function registerClient(state, formData) {
 }
 
 export async function login(state, formData) {
-    console.log("1. LOGIN", formData);
+    console.log("1. LOGIN");
     // 1. Validate fields
     const validatedResult = LoginFormSchema.safeParse({
         email: formData.get("email"),
         password: formData.get("password"),
     });
-    console.log("2. LOGIN", validatedResult);
+
     if (!validatedResult.success) {
         // Handle validation errors
         const errors = validatedResult.error.formErrors.fieldErrors;
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("3. LOGIN");
+    console.log("2. LOGIN");
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {
@@ -338,14 +342,14 @@ export async function login(state, formData) {
             secure: true,
             expires: new Date(session.expire),
             path: "/",
-            domain: "enclave.live",
+            // domain: "enclave.live",
         });
 
         // Retrieve and log the cookie
         // const cookie = cookies().get(SESSION_COOKIE_NAME);
         // console.log("Cookie set:", cookie);
 
-        console.log("4. LOGIN");
+        console.log("3. LOGIN");
     } catch (error) {
         console.error(error);
         if (
@@ -379,7 +383,7 @@ export async function login(state, formData) {
         };
     }
 
-    redirect("/");
+    redirect("/my-clients");
 }
 
 export async function logout() {
@@ -401,15 +405,12 @@ export async function logout() {
             sameSite: "None",
             secure: true,
             path: "/",
-            domain: "enclave.live",
+            //   domain: "enclave.live",
         });
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
 
-        const cookie_recheck = JSON.parse(
-            cookies().get(SESSION_COOKIE_NAME)?.value
-        );
-
+        const cookie_recheck = cookies()?.get(SESSION_COOKIE_NAME)?.value;
         console.log("Rechecking if cookie still exists! ->", cookie_recheck);
 
         // Redirect to the login page
@@ -424,7 +425,7 @@ export async function logout() {
             sameSite: "None",
             secure: true,
             path: "/",
-            domain: "enclave.live",
+            //   domain: "enclave.live",
         });
 
         console.log(`Cookie ${SESSION_COOKIE_NAME} deleted after error`);
@@ -528,19 +529,18 @@ export async function updatePassword(state, formData) {
 }
 
 export async function addWorkout(state, formData) {
+    console.log("Form data:");
+    for (const [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`);
+    }
+
     // 1. Validate fields
     const validatedResult = exerciseSchema.safeParse({
-        motion: formData.get("motion"),
-        specificDescription: formData.get("specificDescription"),
-        recommendedRepsMin: parseInt(formData.get("recommendedRepsMin")),
-        recommendedRepsMax: parseInt(formData.get("recommendedRepsMax")),
-        recommendedSetsMin: parseInt(formData.get("recommendedSetsMin")),
-        recommendedSetsMax: parseInt(formData.get("recommendedSetsMax")),
-        tempo: formData.get("tempo"),
-        tut: parseInt(formData.get("tut")),
-        recommendedRestMin: parseInt(formData.get("recommendedRestMin")),
-        recommendedRestMax: parseInt(formData.get("recommendedRestMax")),
-        shortDescription: formData.get("shortDescription"),
+        Motion: formData.get("Motion"),
+        targetArea: formData.get("targetArea"),
+        fullName: formData.get("fullName"),
+        shortName: formData.get("shortName"),
+        authorization: formData.get("authorization"),
     });
 
     if (!validatedResult.success) {
@@ -549,22 +549,10 @@ export async function addWorkout(state, formData) {
         return { success: false, errors };
     }
 
-    console.log(validatedResult.data);
-    const {
-        motion,
-        specificDescription,
-        recommendedRepsMin,
-        recommendedRepsMax,
-        recommendedSetsMin,
-        recommendedSetsMax,
-        tempo,
-        tut,
-        recommendedRestMin,
-        recommendedRestMax,
-        shortDescription,
-    } = validatedResult.data;
+    const { Motion, targetArea, fullName, shortName, authorization } =
+        validatedResult.data;
 
-    // 2. Try creating with details
+    // // 2. Try creating with details
     try {
         const cookie = JSON.parse(cookies().get(SESSION_COOKIE_NAME)?.value);
 
@@ -577,19 +565,11 @@ export async function addWorkout(state, formData) {
             process.env.NEXT_PUBLIC_COLLECTION_EXERCISES,
             uid,
             {
-                Motion: motion.toUpperCase(),
-                SpecificDescription: specificDescription.toUpperCase(),
-                RecommendedRepsMin: recommendedRepsMin,
-                RecommendedRepsMax: recommendedRepsMax,
-                RecommendedSetsMin: recommendedSetsMin,
-                RecommendedSetsMax: recommendedSetsMax,
-                Tempo: tempo,
-                TUT: tut,
-                RecommendedRestMin: recommendedRestMin,
-                RecommendedRestMax: recommendedRestMax,
-                ShortDescription: shortDescription.toUpperCase(),
-                videoURL: "",
-                approved: false,
+                motion: Motion,
+                targetArea,
+                fullName,
+                shortName,
+                approved: authorization === "Admins",
             }
         );
         console.log(createdDoc);
@@ -639,6 +619,6 @@ export async function addWorkout(state, formData) {
     return {
         success: true,
         errors: {},
-        message: `Exercise ${shortDescription} added successfully!`,
+        message: `Exercise ${formData.get("fullName")} added successfully!`,
     };
 }
