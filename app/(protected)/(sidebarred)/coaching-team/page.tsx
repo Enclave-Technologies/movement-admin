@@ -80,11 +80,11 @@ const CoachingTeam = () => {
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                <Searchbar
+                {/* <Searchbar
                     search={search}
                     setSearch={setSearch}
                     placeholder="Search trainer by name, email, phone or title"
-                />
+                /> */}
 
                 <div className="w-full flex flex-row items-center justify-between">
                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">

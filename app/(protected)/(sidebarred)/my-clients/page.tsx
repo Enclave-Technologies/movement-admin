@@ -108,7 +108,6 @@ export default function AllClients() {
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                <Searchbar search={search} setSearch={setSearch} />
                 <div className="w-full flex flex-row items-center justify-between">
                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">
                         My Clients

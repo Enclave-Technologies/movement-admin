@@ -13,13 +13,13 @@ const UserSkeleton = ({
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                <div
+                {/* <div
                     className="border bg-white border-gray-300 rounded-full overflow-hidden 
                 h-12 w-full px-4 p-2 flex flex-row justify-start items-center gap-2 text-gray-500 animate-pulse"
                 >
                     <IoSearch className="text-gray-400" size={20} />{" "}
                     {searchLoadingText}
-                </div>
+                </div> */}
                 <div className="w-full flex flex-row items-center justify-between">
                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">
                         {pageTitle}

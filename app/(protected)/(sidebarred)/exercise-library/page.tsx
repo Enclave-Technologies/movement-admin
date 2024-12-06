@@ -86,11 +86,11 @@ const ExerciseLibrary = () => {
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                <Searchbar
+                {/* <Searchbar
                     search={search}
                     setSearch={setSearch}
                     placeholder="Search by motion, target area or name"
-                />
+                /> */}
                 <div className="w-full flex flex-row items-center justify-between">
                     <span className="text-lg font-bold ml-4">
                         Exercise List
