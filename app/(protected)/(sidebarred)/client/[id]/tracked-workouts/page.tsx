@@ -149,6 +149,7 @@ const Page = ({ params }: { params: { id: string } }) => {
             <section>
                 <h3 className="font-bold mb-2 uppercase">Workout History</h3>
                 <SessionLogTable
+                    dataLoading={pageLoading}
                     handleViewSession={handleViewSession}
                     sessions={sessionLog}
                 />

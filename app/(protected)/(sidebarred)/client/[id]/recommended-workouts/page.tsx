@@ -346,6 +346,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                     ) : (
                         clientPhases?.map((phase) => (
                             <PhaseComponent
+                                client_id={params.id}
+                                nextSession={null}
+                                progressId={"123456"}
                                 key={phase.phaseId}
                                 phase={phase}
                                 workouts={workouts}
