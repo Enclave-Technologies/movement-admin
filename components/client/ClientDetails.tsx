@@ -11,6 +11,7 @@ import { MdChangeHistory } from "react-icons/md";
 import { IoDocumentText, IoDocumentTextOutline } from "react-icons/io5";
 import { TbTargetArrow } from "react-icons/tb";
 import { IoIosBody } from "react-icons/io";
+import BodyMassComposition from "./BodyMassComposition";
 
 const ClientDetails = ({ client_id }) => {
   const { userData } = useUser();
@@ -105,6 +106,9 @@ const ClientDetails = ({ client_id }) => {
               nextSession={nextSession}
               progressId={progressId}
             />
+          )}
+          {selectedTab == "body-mass-composition" && (
+            <BodyMassComposition client_id={client_id} />
           )}
         </div>
       </div>
