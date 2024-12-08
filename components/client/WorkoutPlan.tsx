@@ -421,7 +421,6 @@ const WorkoutPlan = ({
 
     return (
         <div className="">
-            <pre>{JSON.stringify(clientPhases, null, 2)}</pre>
             <div className="flex justify-between">
                 <button
                     className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"

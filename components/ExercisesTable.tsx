@@ -13,7 +13,7 @@ const ExercisesTable = ({
     const [updatingExercise, setUpdatingExercise] = useState<string | null>(
         null
     );
-    console.log("WHATS MY TEAM? ", trainerDetails?.team.name);
+
     // const filteredExercises = useMemo(() => {
     //     return exercises.filter((exercise) => {
     //         return (
@@ -70,12 +70,6 @@ const ExercisesTable = ({
             "Target Area",
             "Exercise",
             "Shortend Name",
-            // "Bias",
-            // "Lengthened / Shortened",
-            // "Impliment",
-            // "Grip",
-            // "Angle",
-            // "Support",
             "Status",
         ].map((header, index) => {
             if (header == "Status") {
