@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
 
-const EditableTable = ({ headerColumns, data, emptyText }) => {
+const EditableTable = ({ headerColumns, data, emptyText, handleSaveBmc }) => {
     const [rowToDelete, setRowToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
     const [editingRowId, setEditingRowId] = useState(null);
     const [editedData, setEditedData] = useState({});
@@ -12,17 +12,14 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
         setEditedData(data.find((row) => row.$id === rowId));
     };
 
-    const handleUpdateRow = (rowId) => {
+    const handleUpdateRow = async (rowId) => {
+        // Find the edited row
+        // const editedRow = data.find((row) => row.$id === rowId);
         // Update the data array with the edited data
         const updatedData = data.map((row) =>
             row.$id === rowId ? editedData : row
         );
-        // const editedData = data.filter((row) =>
-        //     row.$id === rowId ? editedData : row
-        // );
-        // ... existing code ...
-
-        console.log(editedData);
+        await handleSaveBmc(editedData);
 
         setEditingRowId(null);
         setEditedData({});
@@ -77,7 +74,10 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
                                 editingRowId === row.$id ? (
                                     <>
                                         {colIndex === 0 && (
-                                            <td className="sticky left-0 bg-white z-10 px-2 py-2 items-center justify-center">
+                                            <td
+                                                className="sticky left-0 bg-white z-10 px-2 py-2 items-center justify-center"
+                                                key={colIndex}
+                                            >
                                                 <button
                                                     onClick={() =>
                                                         handleUpdateRow(row.$id)
@@ -143,7 +143,6 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
                                             </td>
                                         )}
                                     </>
-
                                 )
                             )}
                         </tr>
