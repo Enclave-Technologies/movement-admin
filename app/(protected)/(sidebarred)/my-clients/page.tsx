@@ -12,38 +12,6 @@ import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { getCurrentUser } from "@/server_functions/auth";
 import { API_BASE_URL } from "@/configs/constants";
 
-const fetchData = async (
-    lastId: number,
-    isFetching: boolean,
-    setIsFetching: React.Dispatch<React.SetStateAction<boolean>>,
-    setClients: React.Dispatch<React.SetStateAction<Client[]>>,
-    setPageLoading: React.Dispatch<React.SetStateAction<boolean>>,
-    setTotalPages: React.Dispatch<React.SetStateAction<number>>,
-    countDoc: CountsDocument
-) => {
-    const current_user = await getCurrentUser();
-
-    if (isFetching) return; // Prevent multiple simultaneous fetches
-    setIsFetching(true);
-    setPageLoading(true);
-
-    const response = await axios.get(
-        `${API_BASE_URL}/mvmt/v1/trainer/clients?tid=${current_user?.$id}&pageNo=${lastId}&limit=${LIMIT}`,
-        {
-            withCredentials: true, // Include cookies in the request
-        }
-    );
-    // // const newItems = await response.json();
-    const newItems = response.data;
-
-    setClients(newItems);
-
-    setTotalPages(Math.ceil(newItems.length / LIMIT));
-
-    setIsFetching(false);
-    setPageLoading(false);
-};
-
 export default function AllClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
     const [lastId, setLastId] = useState<number>(1); // State to hold the last ID of the fetched clients
@@ -53,21 +21,34 @@ export default function AllClients() {
     const [search, setSearch] = useState("");
     const [pageLoading, setPageLoading] = useState(true);
     const [showRightModal, setShowRightModal] = useState(false);
-    const { countDoc } = useGlobalContext();
+    const { countDoc, users, reloadData } = useGlobalContext();
 
     useEffect(() => {
-        if (countDoc) {
-            fetchData(
-                lastId,
-                isFetching,
-                setIsFetching,
-                setClients,
-                setPageLoading,
-                setTotalPages,
-                countDoc
-            );
-        }
-    }, [lastId, countDoc]);
+        const fetchData = async () => {
+            if (users) {
+                const current_user = await getCurrentUser();
+                const myClients = users.filter(
+                    (user) =>
+                        user.trainer_id === current_user?.$id &&
+                        (user.name
+                            .toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                            user.email
+                                ?.toLowerCase()
+                                .includes(search.toLowerCase()) ||
+                            user.phone
+                                ?.toLowerCase()
+                                .includes(search.toLowerCase()))
+                );
+
+                setTotalPages(Math.ceil(myClients.length / LIMIT));
+                const startIndex = (lastId - 1) * LIMIT;
+                const endIndex = startIndex + LIMIT;
+                setClients(myClients.slice(startIndex, endIndex));
+            }
+        };
+        fetchData();
+    }, [users, lastId, search]);
 
     const rightModal = () => {
         return (
@@ -78,24 +59,12 @@ export default function AllClients() {
                     setShowRightModal(false);
                 }}
             >
-                <AddUserForm
-                    fetchData={() =>
-                        fetchData(
-                            lastId,
-                            isFetching,
-                            setIsFetching,
-                            setClients,
-                            setPageLoading,
-                            setTotalPages,
-                            countDoc
-                        )
-                    }
-                />
+                <AddUserForm fetchData={reloadData} />
             </RightModal>
         );
     };
 
-    if (pageLoading)
+    if (users.length === 0)
         return (
             <UserSkeleton
                 button_text="Add User"
@@ -121,7 +90,6 @@ export default function AllClients() {
                         + Add User
                     </button>
                 </div>
-
                 <div className="w-full overflow-x-auto">
                     <UsersTable clients={clients} search={search} />
                 </div>

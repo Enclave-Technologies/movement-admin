@@ -9,15 +9,15 @@ import Table from "./Table";
 const UsersTable = ({ search, clients }) => {
     const router = useRouter();
 
-    const filteredClients = useMemo(() => {
-        return clients.filter((client) => {
-            return (
-                client.name.toLowerCase().includes(search.toLowerCase()) ||
-                client.email?.toLowerCase().includes(search.toLowerCase()) ||
-                client.phone?.toLowerCase().includes(search.toLowerCase())
-            );
-        });
-    }, [clients, search]);
+    // const filteredClients = useMemo(() => {
+    //     return clients.filter((client) => {
+    //         return (
+    //             client.name.toLowerCase().includes(search.toLowerCase()) ||
+    //             client.email?.toLowerCase().includes(search.toLowerCase()) ||
+    //             client.phone?.toLowerCase().includes(search.toLowerCase())
+    //         );
+    //     });
+    // }, [clients, search]);
 
     const handleRowClick = (client) => {
         // Implement the action you want to execute on double-click
@@ -43,7 +43,7 @@ const UsersTable = ({ search, clients }) => {
     }, []);
 
     const rows = useMemo(() => {
-        return filteredClients.map((client, index) => (
+        return clients.map((client, index) => (
             <tr
                 key={index}
                 className={`${
@@ -89,7 +89,7 @@ const UsersTable = ({ search, clients }) => {
                 </td>
             </tr>
         ));
-    }, [filteredClients]);
+    }, [clients]);
 
     if (clients.length === 0) {
         return (

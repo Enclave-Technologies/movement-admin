@@ -22,31 +22,39 @@ const ExerciseLibrary = () => {
     const [showRightModal, setShowRightModal] = useState(false);
     const { countDoc, exercises, reloadData } = useGlobalContext();
 
-    const fetchData = async () => {
-        setPageLoading(true);
-        setTotalPages(Math.ceil(countDoc.exercises_count / LIMIT));
-        const details = await fetchUserDetails();
-        setTrainerDetails(details);
-        if (currentPage === 1) {
-            setAllExercises(exercises);
-        } else {
-            const response = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/admin/exercises?pageNo=${currentPage}&limit=${LIMIT}`,
-                {
-                    withCredentials: true, // Include cookies in the request
-                }
-            );
-            const newItems = response.data;
-            setAllExercises(newItems);
-        }
-        setPageLoading(false);
-    };
-
     useEffect(() => {
-        if (countDoc && exercises) {
-            fetchData();
-        }
-    }, [currentPage, countDoc]);
+        const fetchData = async () => {
+            setPageLoading(true);
+            const details = await fetchUserDetails();
+            setTrainerDetails(details);
+            if (exercises) {
+                const filteredExercises = exercises.filter(
+                    (exercise) =>
+                        exercise.fullName
+                            .toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        exercise.shortName
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        exercise.motion
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        exercise.targetArea
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase())
+                );
+                console.log(exercises.length);
+                console.log(Math.ceil(filteredExercises.length / LIMIT));
+
+                setTotalPages(Math.ceil(filteredExercises.length / LIMIT));
+                const startIndex = (currentPage - 1) * LIMIT;
+                const endIndex = startIndex + LIMIT;
+                setAllExercises(filteredExercises.slice(startIndex, endIndex));
+                setPageLoading(false);
+            }
+        };
+        fetchData();
+    }, [exercises, currentPage, search]);
 
     const rightModal = () => {
         return (
@@ -65,7 +73,7 @@ const ExerciseLibrary = () => {
         );
     };
 
-    if (pageLoading)
+    if (exercises.length === 0)
         return (
             <UserSkeleton
                 button_text="Add Exercise"
