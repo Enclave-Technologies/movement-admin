@@ -14,7 +14,7 @@ export const StoreProvider = ({ children }) => {
     const [countDoc, setCountDoc] = useState(null);
     const fetchUsers = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/trainer/clients?pageNo=1&limit=${LIMIT}`,
+            `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=1000`,
             {
                 withCredentials: true, // Include cookies in the request
             }
@@ -24,7 +24,7 @@ export const StoreProvider = ({ children }) => {
 
     const fetchExercises = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${LIMIT}`,
+            `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=1000`,
             {
                 withCredentials: true,
             }
@@ -34,7 +34,7 @@ export const StoreProvider = ({ children }) => {
 
     const fetchTrainers = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/trainerIds?limit=${LIMIT}`,
+            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=1000`,
             {
                 withCredentials: true, // Include cookies in the request
             }

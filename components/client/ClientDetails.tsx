@@ -38,7 +38,7 @@ const ClientDetails = ({ client_id }) => {
                 { withCredentials: true }
             );
             const workouts = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/admin/exercises`,
+                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=1000&approved=true`,
                 { withCredentials: true }
             );
             setClientPhases(clientPhases.data.phases);

@@ -4,16 +4,6 @@ import { useMemo, useState } from "react";
 import Table from "./Table";
 
 const TrainerTable = ({ trainers, search }) => {
-    const filteredTrainers = useMemo(() => {
-        return trainers.filter((trainer) => {
-            return (
-                trainer.name.toLowerCase().includes(search.toLowerCase()) ||
-                trainer.jobTitle.toLowerCase().includes(search.toLowerCase()) ||
-                trainer.email?.toLowerCase().includes(search.toLowerCase()) ||
-                trainer.phone?.toLowerCase().includes(search.toLowerCase())
-            );
-        });
-    }, [trainers, search]);
 
     const head = useMemo(() => {
         const headers = ["", "Name", "Title", "Email", "Phone"];
@@ -30,7 +20,7 @@ const TrainerTable = ({ trainers, search }) => {
     }, []);
 
     const rows = useMemo(() => {
-        return filteredTrainers.map((trainer, index) => {
+        return trainers.map((trainer, index) => {
             return (
                 <tr
                     key={index}
@@ -64,7 +54,7 @@ const TrainerTable = ({ trainers, search }) => {
                 </tr>
             );
         });
-    }, [filteredTrainers]);
+    }, [trainers]);
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <Table rows={rows} head={head} />

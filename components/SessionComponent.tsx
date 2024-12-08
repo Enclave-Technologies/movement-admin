@@ -1,12 +1,12 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import {
-  FaChevronDown,
-  FaChevronRight,
-  FaChevronUp,
-  FaCopy,
-  FaEdit,
-  FaPlus,
-  FaTrash,
+    FaChevronDown,
+    FaChevronRight,
+    FaChevronUp,
+    FaCopy,
+    FaEdit,
+    FaPlus,
+    FaTrash,
 } from "react-icons/fa";
 import SessionExerciseComponent from "./SessionExerciseComponent";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
@@ -16,31 +16,32 @@ import axios from "axios";
 import TooltipButton from "./pure-components/TooltipButton";
 
 const SessionComponent: FC<SessionProps> = ({
-  index,
-  phaseId,
-  session,
-  workouts,
-  onSessionDelete,
-  onSessionNameChange,
-  editingExerciseId,
-  onExerciseAdd,
-  onExerciseUpdate,
-  onExerciseDelete,
-  onExerciseOrderChange,
-  onEditExercise,
-  onCancelEdit,
-  client_id,
-  nextSession,
-  progressId,
-  handleCopySession,
+    index,
+    phaseId,
+    session,
+    workouts,
+    onSessionDelete,
+    onSessionNameChange,
+    editingExerciseId,
+    onExerciseAdd,
+    onExerciseUpdate,
+    handleExerciseSave,
+    onExerciseDelete,
+    onExerciseOrderChange,
+    onEditExercise,
+    onCancelEdit,
+    client_id,
+    nextSession,
+    progressId,
+    handleCopySession,
 }) => {
-  const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
-  const [sessionName, setSessionName] = useState(session.sessionName);
-  const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
-    useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const inputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
+    const [isEditing, setIsEditing] = useState(false);
+    const [sessionName, setSessionName] = useState(session.sessionName);
+    const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
+        useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
+    const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -70,97 +71,124 @@ const SessionComponent: FC<SessionProps> = ({
     setShowSessionDeleteConfirm(false); // Just close the dialog
   };
 
-  const handleStartSession = async () => {
-    // e.preventDefault();
-    try {
-      // setPageLoading(true);
-      // setWorkoutPressed(true);
-      console.log("Preparing to start workout...");
-      const response = await axios.post(
-        `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
-        {
-          progress_id: progressId,
-        },
-        {
-          withCredentials: true,
+    const handleStartSession = async () => {
+        // e.preventDefault();
+        try {
+            // setPageLoading(true);
+            // setWorkoutPressed(true);
+            console.log("Preparing to start workout...");
+            const response = await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
+                {
+                    progress_id: progressId,
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+            router.push(
+                `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
+            );
+        } catch (e) {
+            console.error("Failed to start workout:", e);
+        } finally {
+            // setWorkoutPressed(false);
+            // setPageLoading(false);
         }
-      );
-      router.push(
-        `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
-      );
-    } catch (e) {
-      console.error("Failed to start workout:", e);
-    } finally {
-      // setWorkoutPressed(false);
-      // setPageLoading(false);
-    }
-  };
+    };
 
-  return (
-    <div className="bg-white p-4 pr-0 border-b-[1px] border-gray-300 flex flex-col gap-4">
-      <div className="flex items-center justify-between container-class relative">
-        <div className="">
-          {isEditing ? (
-            <input
-              type="text"
-              className="w-full px-3 py-2 text-gray-700 rounded-md border focus:outline-none"
-              value={sessionName}
-              onChange={handleSessionNameChange}
-              onBlur={handleSessionNameSubmit}
-              ref={inputRef}
-            />
-          ) : (
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2">
-                <button
-                  className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
-                  onClick={() => setIsCollapsed(!isCollapsed)}
-                >
-                  {isCollapsed ? (
-                    <>
-                      <FaChevronRight className="text-lg" />
-                    </>
-                  ) : (
-                    <>
-                      <FaChevronUp className="text-lg" />
-                    </>
-                  )}
-                </button>
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">{sessionName}</span>
-                  <TooltipButton
-                    tooltip="Rename Session"
-                    className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
-                    onClick={() => {
-                      setIsEditing(true);
-                    }}
-                  >
-                    <FaEdit />
-                  </TooltipButton>
-                  <TooltipButton
-                    tooltip="Delete Session"
-                    className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
-                    onClick={handleSessionDelete}
-                  >
-                    <FaTrash />
-                  </TooltipButton>
-                  <TooltipButton
-                    tooltip="Duplicate Session"
-                    className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
-                    onClick={() => handleCopySession(session)}
-                  >
-                    <FaCopy />
-                  </TooltipButton>
-                  <TooltipButton
-                    tooltip="Add Exercise"
-                    className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
-                    onClick={() => {
-                      onExerciseAdd(phaseId, session.sessionId);
-                    }}
-                  >
-                    <FaPlus />
-                    {/* <span className="hidden lg:flex">Copy</span> */}
-                  </TooltipButton>
+    return (
+        <div className="bg-white p-4 pr-0 border-b-[1px] border-gray-300 flex flex-col gap-4">
+            <div className="flex items-center justify-between container-class relative">
+                <div className="">
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            className="w-full px-3 py-2 text-gray-700 rounded-md border focus:outline-none"
+                            value={sessionName}
+                            onChange={handleSessionNameChange}
+                            onBlur={handleSessionNameSubmit}
+                            ref={inputRef}
+                        />
+                    ) : (
+                        <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2">
+                                <button
+                                    className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
+                                    onClick={() => setIsCollapsed(!isCollapsed)}
+                                >
+                                    {isCollapsed ? (
+                                        <>
+                                            <FaChevronRight className="text-lg" />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaChevronUp className="text-lg" />
+                                        </>
+                                    )}
+                                </button>
+                                <div className="flex items-center gap-1">
+                                    <span className="font-medium">
+                                        {sessionName}
+                                    </span>
+                                    <TooltipButton
+                                        tooltip="Rename Session"
+                                        className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                        }}
+                                    >
+                                        <FaEdit />
+                                    </TooltipButton>
+                                    <TooltipButton
+                                        tooltip="Delete Session"
+                                        className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
+                                        onClick={handleSessionDelete}
+                                    >
+                                        <FaTrash />
+                                    </TooltipButton>
+                                    <TooltipButton
+                                        tooltip="Duplicate Session"
+                                        className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                                        onClick={() =>
+                                            handleCopySession(session)
+                                        }
+                                    >
+                                        <FaCopy />
+                                    </TooltipButton>
+                                    <TooltipButton
+                                        tooltip="Add Exercise"
+                                        className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                                        onClick={() => {
+                                            onExerciseAdd(
+                                                phaseId,
+                                                session.sessionId
+                                            );
+                                        }}
+                                    >
+                                        <FaPlus />
+                                        {/* <span className="hidden lg:flex">Copy</span> */}
+                                    </TooltipButton>
+                                </div>
+                            </div>
+                            {showSessionDeleteConfirm && (
+                                <DeleteConfirmationDialog
+                                    title={`Session: ${session.sessionName}`}
+                                    confirmDelete={confirmSessionDelete}
+                                    cancelDelete={cancelSessionDelete}
+                                />
+                            )}
+                        </div>
+                    )}
+                </div>
+                <div className="flex flex-row items-center gap-4">
+                    <button
+                        className="bg-green-500 text-white px-4 py-2 rounded-md"
+                        onClick={handleStartSession}
+                    >
+                        Start Session
+                        {/* ( {session.sessionTime || "0"} mins) */}
+                    </button>
                 </div>
               </div>
               {showSessionDeleteConfirm && (
@@ -171,16 +199,22 @@ const SessionComponent: FC<SessionProps> = ({
                 />
               )}
             </div>
-          )}
-        </div>
-        <div className="flex flex-row items-center gap-4">
-          <button
-            className="bg-green-500 text-white px-4 py-2 rounded-md"
-            onClick={handleStartSession}
-          >
-            Start Session
-            {/* ( {session.sessionTime || "0"} mins) */}
-          </button>
+            {!isCollapsed && (
+                <SessionExerciseComponent
+                    phaseId={phaseId}
+                    sessionId={session.sessionId}
+                    exercises={session.exercises}
+                    workouts={workouts}
+                    editingExerciseId={editingExerciseId}
+                    onExerciseAdd={onExerciseAdd}
+                    onExerciseUpdate={onExerciseUpdate}
+                    onExerciseDelete={onExerciseDelete}
+                    handleExerciseSave={handleExerciseSave}
+                    onExerciseOrderChange={onExerciseOrderChange}
+                    onEditExercise={onEditExercise}
+                    onCancelEdit={onCancelEdit}
+                />
+            )}
         </div>
       </div>
       {!isCollapsed && (
