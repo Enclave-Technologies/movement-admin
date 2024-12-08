@@ -9,24 +9,41 @@ import Spinner from "@/components/Spinner";
 import PhaseComponent from "@/components/PhaseComponent";
 import { FaPlus, FaSave } from "react-icons/fa";
 import DemoTable from "@/components/DemoTable";
-import { API_BASE_URL } from "@/configs/constants";
 
-// const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const WorkoutPlan = ({
-    pageLoading,
-    setPageLoading,
-    client_id,
-    workouts,
-    clientPhases,
-    setClientPhases,
-    nextSession,
-    progressId,
-}) => {
+const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser();
+    const page_title = ["Workout Plan"];
+    const [clientPhases, setClientPhases] = useState<Phase[]>();
+    const [workouts, setWorkouts] = useState<WorkoutData[]>([]);
+    const [pageLoading, setPageLoading] = useState(true);
     const [editingExerciseId, setEditingExerciseId] = useState(null);
 
-    const handleAddPhase = async () => {
+    useEffect(() => {
+        async function loadData() {
+            setPageLoading(true);
+            try {
+                const clientPhases = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/client/phases?client_id=${params.id}`,
+                    { withCredentials: true }
+                );
+                const workouts = await axios.get(
+                    `${API_BASE_URL}/mvmt/v1/trainer/workouts`,
+                    { withCredentials: true }
+                );
+                setClientPhases(clientPhases.data.phases);
+                setWorkouts(workouts.data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setPageLoading(false);
+            }
+        }
+        loadData();
+    }, []);
+
+    const handleAddPhase = () => {
         // Logic to add a new phase
         const newPhase: Phase = {
             phaseId: ID.unique(),
@@ -34,24 +51,10 @@ const WorkoutPlan = ({
             isActive: false,
             sessions: [],
         };
-
-        const modifiedClientPhases = [...clientPhases, newPhase];
-
-        setClientPhases(modifiedClientPhases);
-        const data: DataResponse = {
-            phases: modifiedClientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
+        setClientPhases([...clientPhases, newPhase]);
     };
 
-    const handleCopyPhase = async (phaseId: string) => {
+    const handleCopyPhase = (phaseId: string) => {
         // Find the target phase to be copied
         const targetPhase = clientPhases.find(
             (phase) => phase.phaseId === phaseId
@@ -89,19 +92,7 @@ const WorkoutPlan = ({
             })),
         };
 
-        const modifiedClientPhases = [...clientPhases, newPhase];
-        setClientPhases(modifiedClientPhases);
-        const data: DataResponse = {
-            phases: modifiedClientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
+        setClientPhases([...clientPhases, newPhase]);
         console.log("Copying phase...");
     };
 
@@ -114,7 +105,7 @@ const WorkoutPlan = ({
             const response = await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/phases`,
                 {
-                    client_id: client_id,
+                    client_id: params.id,
                     data,
                 },
                 { withCredentials: true }
@@ -127,75 +118,33 @@ const WorkoutPlan = ({
         }
     };
 
-    const handleActivatePhase = async (
-        phaseId: string,
-        phaseState: boolean
-    ) => {
-        const modifiedPhases = clientPhases.map((phase) => ({
-            ...phase,
-            isActive: phase.phaseId === phaseId ? phaseState : false,
-        }));
-        setClientPhases(modifiedPhases);
-        const data: DataResponse = {
-            phases: modifiedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
+    const handleActivatePhase = (phaseId: string, phaseState: boolean) => {
+        setClientPhases((prevPhases) =>
+            prevPhases.map((phase) => ({
+                ...phase,
+                isActive: phase.phaseId === phaseId ? phaseState : false,
+            }))
         );
     };
 
-    const handlePhaseNameChange = async (
-        phaseId: string,
-        newPhaseName: string
-    ) => {
+    const handlePhaseNameChange = (phaseId: string, newPhaseName: string) => {
         // Update the phase name in the original data
         const updatedPhases = clientPhases.map((p) =>
             p.phaseId === phaseId ? { ...p, phaseName: newPhaseName } : p
         );
         setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
     };
 
-    const onAddSession = async (
-        phaseId: string,
-        newSession: MovementSession
-    ) => {
+    const onAddSession = (phaseId: string, newSession: MovementSession) => {
         const updatedPhases = clientPhases.map((p) =>
             p.phaseId === phaseId
                 ? { ...p, sessions: [...p.sessions, newSession] }
                 : p
         );
-
         setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
     };
 
-    const handleSessionNameChange = async (
+    const handleSessionNameChange = (
         sessionId: string,
         newSessionName: string
     ) => {
@@ -209,37 +158,15 @@ const WorkoutPlan = ({
             ),
         }));
         setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
     };
 
-    const handleSessionDelete = async (sessionId: string) => {
+    const handleSessionDelete = (sessionId: string) => {
         // Remove the session from the original data
         const updatedPhases = clientPhases.map((phase) => ({
             ...phase,
             sessions: phase.sessions.filter((s) => s.sessionId !== sessionId),
         }));
         setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
     };
 
     const handleExerciseAdd = (phaseId: string, sessionId: string) => {
@@ -257,9 +184,9 @@ const WorkoutPlan = ({
                                         {
                                             id: ID.unique(),
                                             exerciseId: "",
-                                            fullName: "",
-                                            motion: "",
-                                            targetArea: "",
+                                            exerciseDescription: "",
+                                            exerciseMotion: "",
+                                            exerciseShortDescription: "",
                                             exerciseVideo: "",
                                             repsMin: 0,
                                             repsMax: 0,
@@ -272,12 +199,6 @@ const WorkoutPlan = ({
                                             exerciseOrder:
                                                 session.exercises.length + 1, // Set the order to the current length + 1
                                             setOrderMarker: "",
-                                            bias: "",
-                                            lenShort: "",
-                                            impliment: "",
-                                            grip: "",
-                                            angle: "",
-                                            support: "",
                                         },
                                     ],
                                 }
@@ -316,24 +237,9 @@ const WorkoutPlan = ({
         );
         setClientPhases(updatedPhases);
     };
-
     const handleEditExercise = (exerciseId) => {
         setEditingExerciseId(exerciseId);
     };
-
-    async function handleExerciseSave() {
-        const data: DataResponse = {
-            phases: clientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-    }
 
     const handleCancelEdit = () => {
         setEditingExerciseId(null);
@@ -393,37 +299,32 @@ const WorkoutPlan = ({
         setClientPhases(updatedPhases);
     };
 
-    const handlePhaseDelete = async (phaseId: string) => {
+    const handlePhaseDelete = (phaseId: string) => {
         const updatedPhases = clientPhases.filter(
             (phase) => phase.phaseId !== phaseId
         );
         setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
     };
 
     if (pageLoading) {
         return (
             <div className="">
                 <BreadcrumbLoading />
+                <Spinner />
             </div>
         );
     }
 
     return (
-        <div className="">
+        <div className="uppercase ">
             <div className="flex justify-between">
+                <Breadcrumb
+                    homeImage={userData?.imageUrl}
+                    homeTitle={userData?.name}
+                    customTexts={page_title}
+                />
                 <button
-                    className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
+                    className="text-sm flex items-center justify-center mt-4 px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
                     onClick={handleAddPhase}
                 >
                     <FaPlus />
@@ -431,7 +332,7 @@ const WorkoutPlan = ({
                 </button>
             </div>
             {/* <DemoTable exercises={workouts} /> */}
-            <div className="mt-4">
+            <div className="mt-8">
                 <div className="w-full space-y-4">
                     {clientPhases?.length === 0 ? (
                         <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
@@ -445,6 +346,9 @@ const WorkoutPlan = ({
                     ) : (
                         clientPhases?.map((phase) => (
                             <PhaseComponent
+                                client_id={params.id}
+                                nextSession={null}
+                                progressId={"123456"}
                                 key={phase.phaseId}
                                 phase={phase}
                                 workouts={workouts}
@@ -463,22 +367,27 @@ const WorkoutPlan = ({
                                 onExerciseAdd={handleExerciseAdd}
                                 onExerciseUpdate={handleExerciseUpdate}
                                 onExerciseDelete={handleExerciseDelete}
-                                handleExerciseSave={handleExerciseSave}
                                 onExerciseOrderChange={
                                     handleExerciseOrderChange
                                 }
                                 onEditExercise={handleEditExercise}
                                 onCancelEdit={handleCancelEdit}
-                                client_id={client_id}
-                                nextSession={nextSession}
-                                progressId={progressId}
                             />
                         ))
                     )}
                 </div>
-        </div>
+            </div>
+            {/* <pre>{JSON.stringify(clientPhases, null, 2)}</pre> */}
+            {/* <div className="fixed bottom-4 right-4 z-50">
+        <button
+          className="bg-green-500/75 hover:bg-green-500/100 text-white p-4 rounded-full shadow-md transition-colors duration-300 touchscreen-button"
+          onClick={handleDataSubmit}
+        >
+          <FaSave className="text-5xl" />
+        </button>
+      </div> */}
         </div>
     );
 };
 
-export default WorkoutPlan;
+export default Page;

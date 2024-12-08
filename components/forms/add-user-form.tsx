@@ -39,26 +39,11 @@ const Option = (props: OptionProps<any, false>) => {
 
 const AddUserForm = ({ fetchData }) => {
     const { trainers } = useGlobalContext();
-    // const [trainers, setTrainers] = useState([]);
     const [clientState, clientAction] = useFormState(registerClient, undefined);
     const ref = useRef<HTMLFormElement>(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
-
-    // useEffect(() => {
-    //     const loadTrainers = async () => {
-    //         const response = await axios.get(
-    //             `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=-1`,
-    //             {
-    //                 withCredentials: true, // Include cookies in the request
-    //             }
-    //         );
-    //         setTrainers(response.data);
-    //     };
-
-    //     loadTrainers();
-    // }, []);
 
     useEffect(() => {
         if (clientState?.success) {
@@ -77,6 +62,7 @@ const AddUserForm = ({ fetchData }) => {
             setShowToast(true);
         }
     }, [clientState, fetchData]);
+
 
     const handleToastClose = () => {
         setShowToast(false);

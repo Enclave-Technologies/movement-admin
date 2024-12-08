@@ -14,22 +14,6 @@ const ExercisesTable = ({
         null
     );
 
-    // const filteredExercises = useMemo(() => {
-    //     return exercises.filter((exercise) => {
-    //         return (
-    //             exercise.fullName
-    //                 .toLowerCase()
-    //                 .includes(search.toLowerCase()) ||
-    //             exercise.shortName
-    //                 ?.toLowerCase()
-    //                 .includes(search.toLowerCase()) ||
-    //             exercise.motion?.toLowerCase().includes(search.toLowerCase()) ||
-    //             exercise.targetArea
-    //                 ?.toLowerCase()
-    //                 .includes(search.toLowerCase())
-    //         );
-    //     });
-    // }, [exercises, search]);
 
     const handleApprovalChange = async (
         exerciseId: string,

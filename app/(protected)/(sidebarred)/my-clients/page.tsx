@@ -90,6 +90,7 @@ export default function AllClients() {
                         + Add User
                     </button>
                 </div>
+
                 <div className="w-full overflow-x-auto">
                     <UsersTable clients={clients} search={search} />
                 </div>

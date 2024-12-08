@@ -8,6 +8,7 @@ import { API_BASE_URL, BMC_COLUMNS } from "@/configs/constants";
 import EditableTable from "@/components/pure-components/EditableTable";
 import { ID } from "appwrite";
 
+
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData } = useUser(); // Access the user data from Context
     const page_title = ["BMI Records"];

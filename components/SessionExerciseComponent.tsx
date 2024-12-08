@@ -107,6 +107,7 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
             </div>
         </div>
     );
+
 };
 
 export default SessionExerciseComponent;

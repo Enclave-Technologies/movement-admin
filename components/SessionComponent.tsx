@@ -43,35 +43,33 @@ const SessionComponent: FC<SessionProps> = ({
     const [isCollapsed, setIsCollapsed] = useState(true);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (isEditing && inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, [isEditing, inputRef]);
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing, inputRef]);
 
-    const handleSessionNameChange = (
-        e: React.ChangeEvent<HTMLInputElement>
-    ) => {
-        setSessionName(e.target.value);
-    };
+  const handleSessionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSessionName(e.target.value);
+  };
 
-    const handleSessionNameSubmit = () => {
-        onSessionNameChange(session.sessionId, sessionName);
-        setIsEditing(false);
-    };
+  const handleSessionNameSubmit = () => {
+    onSessionNameChange(session.sessionId, sessionName);
+    setIsEditing(false);
+  };
 
-    const handleSessionDelete = () => {
-        setShowSessionDeleteConfirm(true); // Show confirmation dialog
-    };
+  const handleSessionDelete = () => {
+    setShowSessionDeleteConfirm(true); // Show confirmation dialog
+  };
 
-    const confirmSessionDelete = () => {
-        onSessionDelete(session.sessionId); // Perform delete
-        setShowSessionDeleteConfirm(false); // Close dialog
-    };
+  const confirmSessionDelete = () => {
+    onSessionDelete(session.sessionId); // Perform delete
+    setShowSessionDeleteConfirm(false); // Close dialog
+  };
 
-    const cancelSessionDelete = () => {
-        setShowSessionDeleteConfirm(false); // Just close the dialog
-    };
+  const cancelSessionDelete = () => {
+    setShowSessionDeleteConfirm(false); // Just close the dialog
+  };
 
     const handleStartSession = async () => {
         // e.preventDefault();
@@ -192,6 +190,14 @@ const SessionComponent: FC<SessionProps> = ({
                         {/* ( {session.sessionTime || "0"} mins) */}
                     </button>
                 </div>
+              </div>
+              {showSessionDeleteConfirm && (
+                <DeleteConfirmationDialog
+                  title={`Session: ${session.sessionName}`}
+                  confirmDelete={confirmSessionDelete}
+                  cancelDelete={cancelSessionDelete}
+                />
+              )}
             </div>
             {!isCollapsed && (
                 <SessionExerciseComponent
@@ -210,7 +216,24 @@ const SessionComponent: FC<SessionProps> = ({
                 />
             )}
         </div>
-    );
+      </div>
+      {!isCollapsed && (
+        <SessionExerciseComponent
+          phaseId={phaseId}
+          sessionId={session.sessionId}
+          exercises={session.exercises}
+          workouts={workouts}
+          editingExerciseId={editingExerciseId}
+          onExerciseAdd={onExerciseAdd}
+          onExerciseUpdate={onExerciseUpdate}
+          onExerciseDelete={onExerciseDelete}
+          onExerciseOrderChange={onExerciseOrderChange}
+          onEditExercise={onEditExercise}
+          onCancelEdit={onCancelEdit}
+        />
+      )}
+    </div>
+  );
 };
 
 export default SessionComponent;

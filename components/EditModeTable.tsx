@@ -19,9 +19,7 @@ const EditModeTable: FC<EditableTableProps> = ({
     onExerciseUpdate,
     onExerciseDelete,
 }) => {
-    const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(
-        null
-    ); // Store the exercise ID for deletion
+  const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
 
     const lenShortOptions = [
         { value: "lengthened", label: "Lengthened" },
@@ -48,17 +46,16 @@ const EditModeTable: FC<EditableTableProps> = ({
     const handleDeleteExercise = (exerciseId: string) => {
         setExerciseToDelete(exerciseId); // Set the ID of the exercise to delete
     };
+  const confirmExerciseDelete = () => {
+    if (exerciseToDelete) {
+      onExerciseDelete(phaseId, sessionId, exerciseToDelete); // Perform delete
+      setExerciseToDelete(null); // Reset the state after confirmation
+    }
+  };
 
-    const confirmExerciseDelete = () => {
-        if (exerciseToDelete) {
-            onExerciseDelete(phaseId, sessionId, exerciseToDelete); // Perform delete
-            setExerciseToDelete(null); // Reset the state after confirmation
-        }
-    };
-
-    const cancelExerciseDelete = () => {
-        setExerciseToDelete(null); // Close dialog
-    };
+  const cancelExerciseDelete = () => {
+    setExerciseToDelete(null); // Close dialog
+  };
 
     return (
         <div>
@@ -498,44 +495,32 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                 </div>
                                             </td>
 
-                                            <td className="px-1 py-2">
-                                                <input
-                                                    className="w-full px-0 text-center py-1 border rounded"
-                                                    value={exercise.TUT || ""}
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                TUT: Number(
-                                                                    e.target
-                                                                        .value
-                                                                ),
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-                                            <td className="px-1 py-2">
-                                                <input
-                                                    className="w-full px-0 text-center py-1 border rounded"
-                                                    value={exercise.tempo || ""}
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                tempo: e.target
-                                                                    .value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-                                            <td className="px-1 py-2">
-                                                {/* <input
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded"
+                          value={exercise.TUT || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              TUT: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded"
+                          value={exercise.tempo || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              tempo: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2">
+                        {/* <input
                                                     className="w-full px-0 text-center py-1 border rounded"
                                                     value={`${exercise.restMin}-${exercise.restMax}`}
                                                     onChange={(e) => {
@@ -708,7 +693,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                 exercise.id
                                                             ) // Pass the exercise ID here
                                                     }
-                                                    className="text-red-500 hover:text-red-700"
+                                                    className="text-red-500 hover:text-red-700 mr-2"
                                                 >
                                                     <FaTrash />
                                                 </button>

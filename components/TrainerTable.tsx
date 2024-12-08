@@ -4,16 +4,6 @@ import { useMemo, useState } from "react";
 import Table from "./Table";
 
 const TrainerTable = ({ trainers, search }) => {
-    // const filteredTrainers = useMemo(() => {
-    //     return trainers.filter((trainer) => {
-    //         return (
-    //             trainer.name.toLowerCase().includes(search.toLowerCase()) ||
-    //             trainer.jobTitle.toLowerCase().includes(search.toLowerCase()) ||
-    //             trainer.email?.toLowerCase().includes(search.toLowerCase()) ||
-    //             trainer.phone?.toLowerCase().includes(search.toLowerCase())
-    //         );
-    //     });
-    // }, [trainers, search]);
 
     const head = useMemo(() => {
         const headers = ["", "Name", "Title", "Email", "Phone"];

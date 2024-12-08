@@ -9,6 +9,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/configs/constants";
 import ConfirmationDialog from "@/components/ConfrmationDialog";
 
+
 const RecordWorkout = () => {
     const [clientId, setClientId] = useState("");
     const [phaseId, setPhaseId] = useState("");
@@ -186,6 +187,7 @@ const RecordWorkout = () => {
                             }
                             handleAddSet={handleAddSet}
                             handleRemoveSet={handleRemoveSet}
+
                         />
                     </div>
                 </div>

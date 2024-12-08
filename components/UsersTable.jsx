@@ -9,16 +9,6 @@ import Table from "./Table";
 const UsersTable = ({ search, clients }) => {
     const router = useRouter();
 
-    // const filteredClients = useMemo(() => {
-    //     return clients.filter((client) => {
-    //         return (
-    //             client.name.toLowerCase().includes(search.toLowerCase()) ||
-    //             client.email?.toLowerCase().includes(search.toLowerCase()) ||
-    //             client.phone?.toLowerCase().includes(search.toLowerCase())
-    //         );
-    //     });
-    // }, [clients, search]);
-
     const handleRowClick = (client) => {
         // Implement the action you want to execute on double-click
         console.log("Client clicked:", client);
