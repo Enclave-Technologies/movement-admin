@@ -7,7 +7,11 @@ import { TrainerProvider } from "@/context/TrainerContext";
 import SessionLogTable from "../SessionLogTable";
 import WorkoutPlan from "./WorkoutPlan";
 import { FaHistory } from "react-icons/fa";
-import { IoDocumentText } from "react-icons/io5";
+import { MdChangeHistory } from "react-icons/md";
+import { IoDocumentText, IoDocumentTextOutline } from "react-icons/io5";
+import { TbTargetArrow } from "react-icons/tb";
+import { IoIosBody } from "react-icons/io";
+import BodyMassComposition from "./BodyMassComposition";
 import Toast from "../Toast";
 import { Tabs } from "./Tabs";
 
@@ -27,11 +31,11 @@ const ClientDetails = ({ client_id }) => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
-    useEffect(() => {
-        fetchTrackedWorkouts();
-        fetchWorkoutPlan();
-        fetchGoals();
-    }, []);
+  useEffect(() => {
+    fetchTrackedWorkouts();
+    fetchWorkoutPlan();
+    fetchGoals();
+  }, []);
 
     async function fetchWorkoutPlan() {
         try {
@@ -50,7 +54,7 @@ const ClientDetails = ({ client_id }) => {
         } finally {
             setDataLoading(false);
         }
-    }
+  }
 
     async function fetchGoals() {
         const response = await axios.get(
@@ -67,9 +71,7 @@ const ClientDetails = ({ client_id }) => {
             `${API_BASE_URL}/mvmt/v1/client/tracked-workouts?client_id=${client_id}`,
             { withCredentials: true }
         );
-
         console.log(clientPhases.data);
-
         const { nextSession, sessionLogs, progressId } = clientPhases.data;
         setNextSession(nextSession?.[0]);
         const reversedLogs = sessionLogs.reverse();
@@ -120,6 +122,9 @@ const ClientDetails = ({ client_id }) => {
                             setToastType={setToastType}
                         />
                     )}
+                  {selectedTab == "body-mass-composition" && (
+            <BodyMassComposition client_id={client_id} />
+          )}
                     {showToast && (
                         <Toast
                             message={toastMessage}
@@ -131,6 +136,5 @@ const ClientDetails = ({ client_id }) => {
             </div>
         </TrainerProvider>
     );
-};
 
 export default ClientDetails;
