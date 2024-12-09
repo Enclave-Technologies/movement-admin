@@ -10,34 +10,6 @@ import { LIMIT } from "@/configs/constants";
 import Pagination from "@/components/pure-components/Pagination";
 import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { API_BASE_URL } from "@/configs/constants";
-const fetchData = async (
-    lastId: number,
-    setClients: React.Dispatch<React.SetStateAction<Client[]>>,
-    setPageLoading: React.Dispatch<React.SetStateAction<boolean>>,
-    setTotalPages: React.Dispatch<React.SetStateAction<number>>,
-    countDoc: CountsDocument,
-    users: Client[]
-) => {
-    setPageLoading(true);
-    setTotalPages(Math.ceil(countDoc.users_count / LIMIT));
-
-    if (lastId === 1) {
-        setClients(users);
-    } else {
-        const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/trainer/clients?pageNo=${lastId}&limit=${LIMIT}`,
-            {
-                withCredentials: true, // Include cookies in the request
-            }
-        );
-
-        const newItems = response.data;
-
-        setClients(newItems);
-    }
-
-    setPageLoading(false);
-};
 
 export default function AllClients() {
     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
@@ -50,17 +22,28 @@ export default function AllClients() {
     const { countDoc, reloadData, users } = useGlobalContext();
 
     useEffect(() => {
-        if (countDoc && users) {
-            fetchData(
-                lastId,
-                setClients,
-                setPageLoading,
-                setTotalPages,
-                countDoc,
-                users
-            );
-        }
-    }, [lastId, countDoc, users]);
+        const fetchData = async () => {
+            if (users) {
+                const myClients = users.filter(
+                    (user) =>
+                        user.name
+                            .toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        user.email
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        user.phone?.toLowerCase().includes(search.toLowerCase())
+                );
+
+                setTotalPages(Math.ceil(myClients.length / LIMIT));
+                const startIndex = (lastId - 1) * LIMIT;
+                const endIndex = startIndex + LIMIT;
+
+                setClients(myClients.slice(startIndex, endIndex));
+            }
+        };
+        fetchData();
+    }, [users, lastId, search]);
 
     const rightModal = () => {
         return (
@@ -76,7 +59,7 @@ export default function AllClients() {
         );
     };
 
-    if (pageLoading)
+    if (users.length === 0)
         return (
             <UserSkeleton
                 button_text="Add User"

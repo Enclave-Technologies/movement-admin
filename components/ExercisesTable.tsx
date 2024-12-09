@@ -14,22 +14,6 @@ const ExercisesTable = ({
         null
     );
 
-    const filteredExercises = useMemo(() => {
-        return exercises.filter((exercise) => {
-            return (
-                exercise.fullName
-                    .toLowerCase()
-                    .includes(search.toLowerCase()) ||
-                exercise.shortName
-                    ?.toLowerCase()
-                    .includes(search.toLowerCase()) ||
-                exercise.motion?.toLowerCase().includes(search.toLowerCase()) ||
-                exercise.targetArea
-                    ?.toLowerCase()
-                    .includes(search.toLowerCase())
-            );
-        });
-    }, [exercises, search]);
 
     const handleApprovalChange = async (
         exerciseId: string,
@@ -70,12 +54,6 @@ const ExercisesTable = ({
             "Target Area",
             "Exercise",
             "Shortend Name",
-            // "Bias",
-            // "Lengthened / Shortened",
-            // "Impliment",
-            // "Grip",
-            // "Angle",
-            // "Support",
             "Status",
         ].map((header, index) => {
             if (header == "Status") {
@@ -102,7 +80,7 @@ const ExercisesTable = ({
     }, []);
 
     const rows = useMemo(() => {
-        return filteredExercises.map((exercise, index) => (
+        return exercises.map((exercise, index) => (
             <tr
                 key={index}
                 className={`${
@@ -148,7 +126,7 @@ const ExercisesTable = ({
                 )}
             </tr>
         ));
-    }, [filteredExercises]);
+    }, [exercises]);
 
     if (exercises.length === 0) {
         return (

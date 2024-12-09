@@ -16,20 +16,14 @@ interface Client {
 }
 
 interface WorkoutData {
-  id: string;
-  Motion: string;
-  SpecificDescription: string;
-  RecommendedRepsMin: number;
-  RecommendedRepsMax: number;
-  RecommendedSetsMin: number;
-  RecommendedSetsMax: number;
-  Tempo: string;
-  TUT: number;
-  RecommendedRestMin: number;
-  RecommendedRestMax: number;
-  ShortDescription: string;
-  videoURL: string;
-  approved: boolean;
+    $id: string;
+    $collectionId: string;
+    approved: boolean;
+    fullName: string;
+    motion: string;
+    targetArea: string;
+    shortName: string;
+    videoUrl: string;
 }
 
 interface EditableRowProps {
@@ -130,22 +124,28 @@ interface GoalTileProps {
 }
 
 interface Exercise {
-  id: string; // $id
-  exerciseId: string;
-  exerciseDescription?: string | null;
-  exerciseMotion: string;
-  exerciseShortDescription?: string | null;
-  exerciseVideo?: string | null;
-  repsMin: number;
-  repsMax: number;
-  setsMin: number;
-  setsMax: number;
-  tempo?: string | null;
-  TUT?: number | null;
-  restMin: number;
-  restMax: number;
-  exerciseOrder: number;
-  setOrderMarker?: string | null;
+    id: string; // $id
+    exerciseId: string;
+    fullName?: string | null;
+    motion: string;
+    targetArea?: string | null;
+    exerciseVideo?: string | null;
+    repsMin: number;
+    repsMax: number;
+    setsMin: number;
+    setsMax: number;
+    tempo?: string | null;
+    TUT?: number | null;
+    restMin: number;
+    restMax: number;
+    exerciseOrder: number;
+    setOrderMarker?: string | null;
+    bias?: string | null;
+    lenShort?: string | null;
+    impliment?: string | null;
+    grip?: string | null;
+    angle?: string | null;
+    support?: string | null;
 }
 
 interface MovementSession {
@@ -164,72 +164,75 @@ interface Phase {
 }
 
 interface PhaseProps {
-  phase: Phase;
-  workouts: WorkoutData[];
-  onPhaseNameChange: (phaseId: string, newPhaseName: string) => void;
-  handleCopyPhase: (phaseId: string) => void;
-  onPhaseDelete: (phaseId: string) => void;
-  onActivatePhase: (phaseId: string, phaseState: boolean) => void;
-  onAddSession: (phaseId: string, newSession: MovementSession) => void;
-  activePhaseId: string | null;
-  onSessionDelete;
-  onSessionNameChange;
-  editingExerciseId;
-  onExerciseAdd;
-  onExerciseUpdate;
-  onExerciseDelete;
-  onExerciseOrderChange;
-  onEditExercise;
-  onCancelEdit;
-  client_id;
-  nextSession;
-  progressId;
+    phase: Phase;
+    workouts: WorkoutData[];
+    onPhaseNameChange: (phaseId: string, newPhaseName: string) => void;
+    handleCopyPhase: (phaseId: string) => void;
+    onPhaseDelete: (phaseId: string) => void;
+    onActivatePhase: (phaseId: string, phaseState: boolean) => void;
+    onAddSession: (phaseId: string, newSession: MovementSession) => void;
+    handleExerciseSave: () => void;
+    activePhaseId: string | null;
+    onSessionDelete;
+    onSessionNameChange;
+    editingExerciseId;
+    onExerciseAdd;
+    onExerciseUpdate;
+    onExerciseDelete;
+    onExerciseOrderChange;
+    onEditExercise;
+    onCancelEdit;
+    client_id;
+    nextSession;
+    progressId;
 }
 
 interface SessionProps {
-  index: number;
-  phaseId: string;
-  session: MovementSession;
-  workouts: WorkoutData[];
-  onSessionNameChange: (sessionId: string, sessionName: str) => void;
-  onSessionDelete: (sessionId: string) => void;
-  editingExerciseId;
-  onExerciseAdd;
-  onExerciseUpdate;
-  onExerciseDelete;
-  onExerciseOrderChange;
-  onEditExercise;
-  onCancelEdit;
-  client_id;
-  nextSession;
-  progressId;
-  handleCopySession;
+    index: number;
+    phaseId: string;
+    session: MovementSession;
+    workouts: WorkoutData[];
+    onSessionNameChange: (sessionId: string, sessionName: str) => void;
+    onSessionDelete: (sessionId: string) => void;
+    handleExerciseSave: () => void;
+    editingExerciseId;
+    onExerciseAdd;
+    onExerciseUpdate;
+    onExerciseDelete;
+    onExerciseOrderChange;
+    onEditExercise;
+    onCancelEdit;
+    client_id;
+    nextSession;
+    progressId;
+    handleCopySession;
 }
 
 interface SessionExerciseProps {
-  phaseId: string;
-  sessionId: string;
-  exercises: Exercise[];
-  workouts: WorkoutData[];
-  onExerciseAdd: (phaseId: string, sessionId: string) => void;
-  onExerciseUpdate: (
-    phaseId: string,
-    sessionId: string,
-    updatedExercise: Exercise
-  ) => void;
-  editingExerciseId: string | null;
-  onExerciseDelete: (
-    phaseId: string,
-    sessionId: string,
-    exerciseId: string
-  ) => void;
-  onExerciseOrderChange: (
-    phaseId: string,
-    sessionId: string,
-    updatedExercises: Exercise[]
-  ) => void;
-  onEditExercise: (exerciseId: string) => void;
-  onCancelEdit: () => void;
+    phaseId: string;
+    sessionId: string;
+    exercises: Exercise[];
+    workouts: WorkoutData[];
+    onExerciseAdd: (phaseId: string, sessionId: string) => void;
+    onExerciseUpdate: (
+        phaseId: string,
+        sessionId: string,
+        updatedExercise: Exercise
+    ) => void;
+    editingExerciseId: string | null;
+    onExerciseDelete: (
+        phaseId: string,
+        sessionId: string,
+        exerciseId: string
+    ) => void;
+    onExerciseOrderChange: (
+        phaseId: string,
+        sessionId: string,
+        updatedExercises: Exercise[]
+    ) => void;
+    handleExerciseSave: () => void;
+    onEditExercise: (exerciseId: string) => void;
+    onCancelEdit: () => void;
 }
 
 interface DataResponse {
@@ -237,23 +240,26 @@ interface DataResponse {
 }
 
 interface EditableTableProps {
-  phaseId: string;
-  sessionId: string;
-  workoutOptions: { value: string; label: string; workout: WorkoutData }[];
-  exercises: Exercise[];
-  editingExerciseId: string | null;
-  onCancelEdit: () => void;
-  onEditExercise: (exerciseId: string) => void;
-  onExerciseUpdate: (
-    phaseId: string,
-    sessionId: string,
-    updatedExercise: any
-  ) => void;
-  onExerciseDelete: (
-    phaseId: string,
-    sessionId: string,
-    exerciseId: string
-  ) => void;
+    phaseId: string;
+    sessionId: string;
+    targetAreas: { value: string; label: string }[];
+    setSelTargetArea: React.Dispatch<React.SetStateAction<string>>;
+    workoutOptions: { value: string; label: string; workout: WorkoutData }[];
+    exercises: Exercise[];
+    handleExerciseSave: () => void;
+    editingExerciseId: string | null;
+    onCancelEdit: () => void;
+    onEditExercise: (exerciseId: string) => void;
+    onExerciseUpdate: (
+        phaseId: string,
+        sessionId: string,
+        updatedExercise: any
+    ) => void;
+    onExerciseDelete: (
+        phaseId: string,
+        sessionId: string,
+        exerciseId: string
+    ) => void;
 }
 
 interface AddClientFormProps {
@@ -289,6 +295,42 @@ interface CountsDocument {
   exercises_count: number;
   trainers_count: number;
   users_count: number;
+}
+
+interface CountsDocument {
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    $permissions: any[];
+    $updatedAt: string;
+    exercises_count: number;
+    trainers_count: number;
+    users_count: number;
+}
+
+interface CountsDocument {
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    $permissions: any[];
+    $updatedAt: string;
+    exercises_count: number;
+    trainers_count: number;
+    users_count: number;
+}
+
+interface CountsDocument {
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    $permissions: any[];
+    $updatedAt: string;
+    exercises_count: number;
+    trainers_count: number;
+    users_count: number;
 }
 
 interface CountsDocument {

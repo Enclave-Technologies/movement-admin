@@ -13,8 +13,6 @@ const EditableTable = ({ headerColumns, data, emptyText, handleSaveBmc }) => {
     };
 
     const handleUpdateRow = async (rowId) => {
-        // Find the edited row
-        // const editedRow = data.find((row) => row.$id === rowId);
         // Update the data array with the edited data
         const updatedData = data.map((row) =>
             row.$id === rowId ? editedData : row

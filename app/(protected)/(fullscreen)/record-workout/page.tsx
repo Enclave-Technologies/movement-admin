@@ -7,6 +7,7 @@ import WorkoutRecordBody from "@/components/WorkoutRecordBody";
 import { ID } from "appwrite";
 import axios from "axios";
 import { API_BASE_URL } from "@/configs/constants";
+import ConfirmationDialog from "@/components/ConfrmationDialog";
 
 const RecordWorkout = () => {
     const [clientId, setClientId] = useState("");
@@ -20,7 +21,6 @@ const RecordWorkout = () => {
     const [exerciseData, setExerciseData] = useState([]);
     const [savingState, setSavingState] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
 
     const toggleAccordion = (exId: string) => {
         setOpenExercises((prevOpenExercises) => {
