@@ -23,30 +23,26 @@ const CoachingTeam = () => {
     const [showRightModal, setShowRightModal] = useState(false);
     const { countDoc, trainers, reloadData } = useGlobalContext();
 
-    async function loadData(pageNo) {
-        setPageLoading(true);
-        setTotalPages(Math.ceil(countDoc.trainers_count / LIMIT));
-        const details = await fetchUserDetails();
-        setTrainerDetails(details);
-        if (pageNo === 1) {
-            setAllTrainers(trainers);
-        } else {
-            const allTrainers = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/admin/trainerIds?pageNo=${pageNo}&limit=${LIMIT}`,
-                {
-                    withCredentials: true, // Include cookies in the request
-                }
-            );
-            setAllTrainers(allTrainers.data);
-        }
-        setPageLoading(false);
-    }
-
     useEffect(() => {
-        if (countDoc && trainers) {
-            loadData(pageNo);
+        if (trainers) {
+            const filteredTrainers = trainers.filter(
+                (trainer) =>
+                    trainer.name.toLowerCase().includes(search.toLowerCase()) ||
+                    trainer.jobTitle
+                        .toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                    trainer.email
+                        ?.toLowerCase()
+                        .includes(search.toLowerCase()) ||
+                    trainer.phone?.toLowerCase().includes(search.toLowerCase())
+            );
+
+            setTotalPages(Math.ceil(filteredTrainers.length / LIMIT));
+            const startIndex = (pageNo - 1) * LIMIT;
+            const endIndex = startIndex + LIMIT;
+            setAllTrainers(filteredTrainers.slice(startIndex, endIndex));
         }
-    }, [pageNo, countDoc]);
+    }, [trainers, pageNo, search]);
 
     const rightModal = () => {
         return (
@@ -64,7 +60,7 @@ const CoachingTeam = () => {
         );
     };
 
-    if (pageLoading) {
+    if (trainers.length === 0) {
         return (
             <UserSkeleton
                 button_text="Add Trainer"

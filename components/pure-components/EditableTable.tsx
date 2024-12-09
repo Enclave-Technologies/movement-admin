@@ -1,34 +1,38 @@
 "use client";
 import React, { useState } from "react";
 import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
+import Spinner from "../Spinner";
+import LoadingSpinner from "../LoadingSpinner";
 
-// TODO: Save Body Mass Composition to Database
-
-const EditableTable = ({ headerColumns, data, emptyText }) => {
-  const [rowToDelete, setRowToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
-  const [editingRowId, setEditingRowId] = useState(null);
-  const [editedData, setEditedData] = useState({});
+const EditableTable = ({
+    headerColumns,
+    data,
+    setData,
+    emptyText,
+    handleSaveBmc,
+}) => {
+    const [rowToDelete, setRowToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
+    const [saving, setSaving] = useState(false);
+    const [editingRowId, setEditingRowId] = useState(null);
+    const [editedData, setEditedData] = useState({});
 
   const handleEditRow = (rowId) => {
     setEditingRowId(rowId);
     setEditedData(data.find((row) => row.$id === rowId));
   };
 
-  const handleUpdateRow = (rowId) => {
-    // Update the data array with the edited data
-    const updatedData = data.map((row) =>
-      row.$id === rowId ? editedData : row
-    );
-    // const editedData = data.filter((row) =>
-    //     row.$id === rowId ? editedData : row
-    // );
-    // ... existing code ...
-
-    console.log(editedData);
-
-    setEditingRowId(null);
-    setEditedData({});
-  };
+    const handleUpdateRow = async (rowId) => {
+        // Update the data array with the edited data
+        // setSaving(true);
+        const updatedData = data.map((row) =>
+            row.$id === rowId ? editedData : row
+        );
+        await handleSaveBmc(editedData);
+        setData(updatedData);
+        setEditingRowId(null);
+        setEditedData({});
+        // setSaving(false);
+    };
 
   const handleInputChange = (event, field) => {
     setEditedData({
@@ -39,6 +43,7 @@ const EditableTable = ({ headerColumns, data, emptyText }) => {
 
   if (data.length === 0)
     return (
+
       <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
         <p className="text-gray-500 text-sm font-medium uppercase">
           {emptyText}
