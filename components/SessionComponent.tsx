@@ -34,6 +34,9 @@ const SessionComponent: FC<SessionProps> = ({
     nextSession,
     progressId,
     handleCopySession,
+    setShowToast,
+    setToastMessage,
+    setToastType,
 }) => {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
@@ -83,14 +86,24 @@ const SessionComponent: FC<SessionProps> = ({
                 `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
                 {
                     progress_id: progressId,
+                    client_id: client_id,
+                    phase_id: phaseId,
+                    session_id: session.sessionId,
                 },
                 {
                     withCredentials: true,
                 }
             );
-            router.push(
-                `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
-            );
+
+            if (response.data.status) {
+                router.push(
+                    `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
+                );
+            } else {
+                setToastMessage(response.data.message);
+                setToastType("error");
+                setShowToast(true);
+            }
         } catch (e) {
             console.error("Failed to start workout:", e);
         } finally {

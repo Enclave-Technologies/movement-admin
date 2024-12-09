@@ -37,6 +37,9 @@ const PhaseComponent: FC<PhaseProps> = ({
     client_id,
     nextSession,
     progressId,
+    setShowToast,
+    setToastMessage,
+    setToastType,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -270,6 +273,9 @@ const PhaseComponent: FC<PhaseProps> = ({
                                 nextSession={nextSession}
                                 progressId={progressId}
                                 handleCopySession={handleCopySession}
+                                setShowToast={setShowToast}
+                                setToastMessage={setToastMessage}
+                                setToastType={setToastType}
                             />
                         ))
                 )}

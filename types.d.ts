@@ -1,18 +1,18 @@
 interface Field {
-  name: string;
-  label: string;
-  type: string;
+    name: string;
+    label: string;
+    type: string;
 }
 
 // Define the Client interface
 interface Client {
-  uid: string;
-  name: string;
-  email: string;
-  phone: string;
-  trainer_name?: string; // Optional property
-  trainer_id?: string;
-  imageUrl?: string;
+    uid: string;
+    name: string;
+    email: string;
+    phone: string;
+    trainer_name?: string; // Optional property
+    trainer_id?: string;
+    imageUrl?: string;
 }
 
 interface WorkoutData {
@@ -27,100 +27,100 @@ interface WorkoutData {
 }
 
 interface EditableRowProps {
-  rowData: SessionExercise;
-  onSave: (editedData: SessionExercise) => void;
-  isEditing: boolean;
-  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
-  allWorkouts: WorkoutData[];
+    rowData: SessionExercise;
+    onSave: (editedData: SessionExercise) => void;
+    isEditing: boolean;
+    setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+    allWorkouts: WorkoutData[];
 }
 
 // Define the interface for a phase dropdown option
 interface PhaseDropdownOption {
-  value: string;
-  label: string;
-  isActive: boolean;
+    value: string;
+    label: string;
+    isActive: boolean;
 }
 
 interface CustomSelectProps {
-  options: PhaseDropdownOption[];
-  onChange: (value: string) => void;
-  selectedOption: PhaseDropdownOption;
+    options: PhaseDropdownOption[];
+    onChange: (value: string) => void;
+    selectedOption: PhaseDropdownOption;
 }
 interface MovSessionDropdownOption {
-  value: string;
-  label: string;
-  phaseId: string;
+    value: string;
+    label: string;
+    phaseId: string;
 }
 
 interface ExSession {
-  sessionName: string;
-  exercises: number;
-  time: string;
+    sessionName: string;
+    exercises: number;
+    time: string;
 }
 
 interface AddExerciseModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onSubmit: (data: any) => void; // Adjust the type of 'data' as needed
+    isOpen: boolean;
+    onClose: () => void;
+    onSubmit: (data: any) => void; // Adjust the type of 'data' as needed
 }
 
 interface TrainerDetails {
-  auth_id: string;
-  firstName: string;
-  lastName: string;
-  imageURL: string | null;
-  jobTitle: string;
-  $id: string;
-  $createdAt: string;
-  $updatedAt: string;
-  $permissions: string[];
-  $databaseId: string;
-  $collectionId: string;
+    auth_id: string;
+    firstName: string;
+    lastName: string;
+    imageURL: string | null;
+    jobTitle: string;
+    $id: string;
+    $createdAt: string;
+    $updatedAt: string;
+    $permissions: string[];
+    $databaseId: string;
+    $collectionId: string;
 }
 
 interface TrainerSettings {
-  $id: string;
-  auth_id: string;
-  firstName: string;
-  lastName: string;
-  imageURL: string | null;
-  jobTitle: string;
-  email: string;
-  phone: string;
-  emailVerification: boolean;
-  phoneVerification: boolean;
-  $createdAt: string;
-  $updatedAt: string;
-  accessedAt: string;
+    $id: string;
+    auth_id: string;
+    firstName: string;
+    lastName: string;
+    imageURL: string | null;
+    jobTitle: string;
+    email: string;
+    phone: string;
+    emailVerification: boolean;
+    phoneVerification: boolean;
+    $createdAt: string;
+    $updatedAt: string;
+    accessedAt: string;
 }
 interface trainerSidebarInfo {
-  name: string;
-  image: string;
-  description: string;
+    name: string;
+    image: string;
+    description: string;
 }
 
 interface CustomSelectProps {
-  options: PhaseDropdownOption[]; //{ value: string; label: string; isActive: boolean }[];
-  onChange: (value: string) => void;
-  selectedOption: PhaseDropdownOption; //{ value: string; label: string; isActive: boolean } | null;
+    options: PhaseDropdownOption[]; //{ value: string; label: string; isActive: boolean }[];
+    onChange: (value: string) => void;
+    selectedOption: PhaseDropdownOption; //{ value: string; label: string; isActive: boolean } | null;
 }
 
 interface SessionRendererProps {
-  selectedPhase: Phase;
-  phases: Phase[];
-  setPhases: (phases: Phase[]) => void;
+    selectedPhase: Phase;
+    phases: Phase[];
+    setPhases: (phases: Phase[]) => void;
 }
 
 interface GoalTileProps {
-  goal: {
-    id: string;
-    description: string;
-    completed: boolean;
-  };
-  onUpdateGoal: (id: string, completed: boolean) => Promise<void>;
-  isEditMode: boolean;
-  onEdit: () => void;
-  onDelete: () => void;
+    goal: {
+        id: string;
+        description: string;
+        completed: boolean;
+    };
+    onUpdateGoal: (id: string, completed: boolean) => Promise<void>;
+    isEditMode: boolean;
+    onEdit: () => void;
+    onDelete: () => void;
 }
 
 interface Exercise {
@@ -149,18 +149,18 @@ interface Exercise {
 }
 
 interface MovementSession {
-  sessionId: string; // $id
-  sessionName: string;
-  sessionOrder: number;
-  sessionTime?: string | null;
-  exercises: Exercise[];
+    sessionId: string; // $id
+    sessionName: string;
+    sessionOrder: number;
+    sessionTime?: string | null;
+    exercises: Exercise[];
 }
 
 interface Phase {
-  phaseId: string; // $id
-  phaseName: string;
-  isActive: boolean;
-  sessions: MovementSession[];
+    phaseId: string; // $id
+    phaseName: string;
+    isActive: boolean;
+    sessions: MovementSession[];
 }
 
 interface PhaseProps {
@@ -185,6 +185,9 @@ interface PhaseProps {
     client_id;
     nextSession;
     progressId;
+    setShowToast;
+    setToastMessage;
+    setToastType;
 }
 
 interface SessionProps {
@@ -206,6 +209,9 @@ interface SessionProps {
     nextSession;
     progressId;
     handleCopySession;
+    setShowToast;
+    setToastMessage;
+    setToastType;
 }
 
 interface SessionExerciseProps {
@@ -236,7 +242,7 @@ interface SessionExerciseProps {
 }
 
 interface DataResponse {
-  phases: Phase[];
+    phases: Phase[];
 }
 
 interface EditableTableProps {
@@ -263,38 +269,38 @@ interface EditableTableProps {
 }
 
 interface AddClientFormProps {
-  action: (event: FormData) => void;
-  state: any;
-  allTrainers: any;
+    action: (event: FormData) => void;
+    state: any;
+    allTrainers: any;
 }
 
 interface AddFormProps {
-  action: (event: FormData) => void;
-  state: any;
+    action: (event: FormData) => void;
+    state: any;
 }
 
 interface CountsDocument {
-  $collectionId: string;
-  $createdAt: string;
-  $databaseId: string;
-  $id: string;
-  $permissions: any[];
-  $updatedAt: string;
-  exercises_count: number;
-  trainers_count: number;
-  users_count: number;
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    $permissions: any[];
+    $updatedAt: string;
+    exercises_count: number;
+    trainers_count: number;
+    users_count: number;
 }
 
 interface CountsDocument {
-  $collectionId: string;
-  $createdAt: string;
-  $databaseId: string;
-  $id: string;
-  $permissions: any[];
-  $updatedAt: string;
-  exercises_count: number;
-  trainers_count: number;
-  users_count: number;
+    $collectionId: string;
+    $createdAt: string;
+    $databaseId: string;
+    $id: string;
+    $permissions: any[];
+    $updatedAt: string;
+    exercises_count: number;
+    trainers_count: number;
+    users_count: number;
 }
 
 interface CountsDocument {

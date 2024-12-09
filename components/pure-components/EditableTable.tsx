@@ -1,9 +1,18 @@
 "use client";
 import React, { useState } from "react";
 import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
+import Spinner from "../Spinner";
+import LoadingSpinner from "../LoadingSpinner";
 
-const EditableTable = ({ headerColumns, data, emptyText, handleSaveBmc }) => {
+const EditableTable = ({
+    headerColumns,
+    data,
+    setData,
+    emptyText,
+    handleSaveBmc,
+}) => {
     const [rowToDelete, setRowToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
+    const [saving, setSaving] = useState(false);
     const [editingRowId, setEditingRowId] = useState(null);
     const [editedData, setEditedData] = useState({});
 
@@ -14,13 +23,15 @@ const EditableTable = ({ headerColumns, data, emptyText, handleSaveBmc }) => {
 
     const handleUpdateRow = async (rowId) => {
         // Update the data array with the edited data
+        // setSaving(true);
         const updatedData = data.map((row) =>
             row.$id === rowId ? editedData : row
         );
         await handleSaveBmc(editedData);
-
+        setData(updatedData);
         setEditingRowId(null);
         setEditedData({});
+        // setSaving(false);
     };
 
     const handleInputChange = (event, field) => {
@@ -82,7 +93,11 @@ const EditableTable = ({ headerColumns, data, emptyText, handleSaveBmc }) => {
                                                     }
                                                     className="text-green-500 hover:text-green-700 mr-2"
                                                 >
-                                                    <FaSave />
+                                                    {setSaving ? (
+                                                        <LoadingSpinner />
+                                                    ) : (
+                                                        <FaSave />
+                                                    )}
                                                 </button>
                                             </td>
                                         )}

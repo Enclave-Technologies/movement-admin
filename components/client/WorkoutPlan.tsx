@@ -22,6 +22,9 @@ const WorkoutPlan = ({
     setClientPhases,
     nextSession,
     progressId,
+    setShowToast,
+    setToastMessage,
+    setToastType,
 }) => {
     const { userData } = useUser();
     const [editingExerciseId, setEditingExerciseId] = useState(null);
@@ -472,11 +475,14 @@ const WorkoutPlan = ({
                                 client_id={client_id}
                                 nextSession={nextSession}
                                 progressId={progressId}
+                                setShowToast={setShowToast}
+                                setToastMessage={setToastMessage}
+                                setToastType={setToastType}
                             />
                         ))
                     )}
                 </div>
-        </div>
+            </div>
         </div>
     );
 };

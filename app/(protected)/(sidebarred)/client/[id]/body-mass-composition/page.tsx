@@ -48,7 +48,6 @@ const Page = ({ params }: { params: { id: string } }) => {
         setBmiRecords([
             {
                 $id: ID.unique(),
-                // users: params.id,
                 DATE: new Date().toISOString().slice(0, 10),
                 HEIGHT: 0,
                 WEIGHT: 0,
@@ -86,8 +85,10 @@ const Page = ({ params }: { params: { id: string } }) => {
                     + Add New Record
                 </button>
             </div>
+
             <EditableTable
                 data={bmiRecords}
+                setData={setBmiRecords}
                 handleSaveBmc={handleSaveBmc}
                 emptyText="No BMI Records found"
                 headerColumns={BMC_COLUMNS}
