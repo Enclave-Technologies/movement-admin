@@ -57,7 +57,7 @@ const BodyMassComposition = ({ client_id }) => {
   }
 
   return (
-    <div className="mt-16 w-full">
+    <div className="w-full">
       <div className="w-full flex flex-row items-center justify-between mb-4">
         <h1 className="text-xl font-bold text-black ml-2 leading-tight">
           Body Mass Composition
