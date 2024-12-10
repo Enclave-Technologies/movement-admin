@@ -31,11 +31,11 @@ const ClientDetails = ({ client_id }) => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
-  useEffect(() => {
-    fetchTrackedWorkouts();
-    fetchWorkoutPlan();
-    fetchGoals();
-  }, []);
+    useEffect(() => {
+        fetchTrackedWorkouts();
+        fetchWorkoutPlan();
+        fetchGoals();
+    }, []);
 
     async function fetchWorkoutPlan() {
         try {
@@ -54,7 +54,7 @@ const ClientDetails = ({ client_id }) => {
         } finally {
             setDataLoading(false);
         }
-  }
+    }
 
     async function fetchGoals() {
         const response = await axios.get(
@@ -111,6 +111,7 @@ const ClientDetails = ({ client_id }) => {
                         <WorkoutPlan
                             pageLoading={dataLoading}
                             setPageLoading={setFetchingWorkouts}
+                            fetchTrackedWorkouts={fetchTrackedWorkouts}
                             client_id={client_id}
                             workouts={workouts}
                             clientPhases={clientPhases}
@@ -122,9 +123,9 @@ const ClientDetails = ({ client_id }) => {
                             setToastType={setToastType}
                         />
                     )}
-                  {selectedTab == "body-mass-composition" && (
-            <BodyMassComposition client_id={client_id} />
-          )}
+                    {selectedTab == "body-mass-composition" && (
+                        <BodyMassComposition client_id={client_id} />
+                    )}
                     {showToast && (
                         <Toast
                             message={toastMessage}
@@ -136,5 +137,6 @@ const ClientDetails = ({ client_id }) => {
             </div>
         </TrainerProvider>
     );
+};
 
 export default ClientDetails;

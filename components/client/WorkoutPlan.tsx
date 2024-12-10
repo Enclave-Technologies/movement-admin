@@ -10,12 +10,14 @@ import PhaseComponent from "@/components/PhaseComponent";
 import { FaPlus, FaSave } from "react-icons/fa";
 import DemoTable from "@/components/DemoTable";
 import { API_BASE_URL } from "@/configs/constants";
+import LoadingSpinner from "../LoadingSpinner";
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const WorkoutPlan = ({
     pageLoading,
     setPageLoading,
+    fetchTrackedWorkouts,
     client_id,
     workouts,
     clientPhases,
@@ -28,6 +30,7 @@ const WorkoutPlan = ({
 }) => {
     const { userData } = useUser();
     const [editingExerciseId, setEditingExerciseId] = useState(null);
+    const [phaseActivation, setPhaseActivation] = useState(false);
 
     const handleAddPhase = async () => {
         // Logic to add a new phase
@@ -134,6 +137,7 @@ const WorkoutPlan = ({
         phaseId: string,
         phaseState: boolean
     ) => {
+        setPhaseActivation(true);
         const modifiedPhases = clientPhases.map((phase) => ({
             ...phase,
             isActive: phase.phaseId === phaseId ? phaseState : false,
@@ -150,6 +154,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+
+        fetchTrackedWorkouts();
+        setPhaseActivation(false);
     };
 
     const handlePhaseNameChange = async (
@@ -423,7 +430,15 @@ const WorkoutPlan = ({
     }
 
     return (
-        <div className="">
+        <div className="w-full h-full">
+            {phaseActivation && (
+                <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center">
+                    <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-between gap-2">
+                        <LoadingSpinner />
+                        <span>Activating/deactivating Phase, Please wait.</span>
+                    </div>
+                </div>
+            )}
             <div className="flex justify-between">
                 <button
                     className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
