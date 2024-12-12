@@ -4,6 +4,7 @@ import { TiCancel } from "react-icons/ti";
 import { InputActionMeta } from "react-select";
 import Select from "react-select";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
+import LoadingSpinner from "./LoadingSpinner";
 
 const EditModeTable: FC<EditableTableProps> = ({
     phaseId,
@@ -18,8 +19,11 @@ const EditModeTable: FC<EditableTableProps> = ({
     onEditExercise,
     onExerciseUpdate,
     onExerciseDelete,
+    savingState,
 }) => {
-  const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
+    const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(
+        null
+    ); // Store the exercise ID for deletion
 
     const lenShortOptions = [
         { value: "lengthened", label: "Lengthened" },
@@ -43,19 +47,19 @@ const EditModeTable: FC<EditableTableProps> = ({
         { value: "none", label: "" },
     ];
 
-    const handleDeleteExercise = (exerciseId: string) => {
+    const handleDeleteExercise = async (exerciseId: string) => {
         setExerciseToDelete(exerciseId); // Set the ID of the exercise to delete
     };
-  const confirmExerciseDelete = () => {
-    if (exerciseToDelete) {
-      onExerciseDelete(phaseId, sessionId, exerciseToDelete); // Perform delete
-      setExerciseToDelete(null); // Reset the state after confirmation
-    }
-  };
+    const confirmExerciseDelete = () => {
+        if (exerciseToDelete) {
+            onExerciseDelete(phaseId, sessionId, exerciseToDelete); // Perform delete
+            setExerciseToDelete(null); // Reset the state after confirmation
+        }
+    };
 
-  const cancelExerciseDelete = () => {
-    setExerciseToDelete(null); // Close dialog
-  };
+    const cancelExerciseDelete = () => {
+        setExerciseToDelete(null); // Close dialog
+    };
 
     return (
         <div>
@@ -191,11 +195,21 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     )}
                                                     onChange={(
                                                         selectedOption
-                                                    ) =>
+                                                    ) => {
+                                                        onExerciseUpdate(
+                                                            phaseId,
+                                                            sessionId,
+                                                            {
+                                                                ...exercise,
+                                                                targetArea:
+                                                                    selectedOption.value,
+                                                            }
+                                                        );
+
                                                         setSelTargetArea(
                                                             selectedOption.value
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
                                                 />
                                             </td>
                                             <td className="px-1 py-2 relative">
@@ -495,32 +509,44 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                 </div>
                                             </td>
 
-                      <td className="px-1 py-2">
-                        <input
-                          className="w-full px-0 text-center py-1 border rounded"
-                          value={exercise.TUT || ""}
-                          onChange={(e) =>
-                            onExerciseUpdate(phaseId, sessionId, {
-                              ...exercise,
-                              TUT: Number(e.target.value),
-                            })
-                          }
-                        />
-                      </td>
-                      <td className="px-1 py-2">
-                        <input
-                          className="w-full px-0 text-center py-1 border rounded"
-                          value={exercise.tempo || ""}
-                          onChange={(e) =>
-                            onExerciseUpdate(phaseId, sessionId, {
-                              ...exercise,
-                              tempo: e.target.value,
-                            })
-                          }
-                        />
-                      </td>
-                      <td className="px-1 py-2">
-                        {/* <input
+                                            <td className="px-1 py-2">
+                                                <input
+                                                    className="w-full px-0 text-center py-1 border rounded"
+                                                    value={exercise.TUT || ""}
+                                                    onChange={(e) =>
+                                                        onExerciseUpdate(
+                                                            phaseId,
+                                                            sessionId,
+                                                            {
+                                                                ...exercise,
+                                                                TUT: Number(
+                                                                    e.target
+                                                                        .value
+                                                                ),
+                                                            }
+                                                        )
+                                                    }
+                                                />
+                                            </td>
+                                            <td className="px-1 py-2">
+                                                <input
+                                                    className="w-full px-0 text-center py-1 border rounded"
+                                                    value={exercise.tempo || ""}
+                                                    onChange={(e) =>
+                                                        onExerciseUpdate(
+                                                            phaseId,
+                                                            sessionId,
+                                                            {
+                                                                ...exercise,
+                                                                tempo: e.target
+                                                                    .value,
+                                                            }
+                                                        )
+                                                    }
+                                                />
+                                            </td>
+                                            <td className="px-1 py-2">
+                                                {/* <input
                                                     className="w-full px-0 text-center py-1 border rounded"
                                                     value={`${exercise.restMin}-${exercise.restMax}`}
                                                     onChange={(e) => {
@@ -601,24 +627,24 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                 </div>
                                             </td>
                                             <td className="sticky right-0 bg-white z-10 px-2 py-2 h-14 flex items-center justify-center border-l-[1px] border-gray-500">
-                                                {/* <button
-                                                    onClick={() =>
-                                                        onCancelEdit()
-                                                    }
-                                                    className="text-red-500 hover:text-red-700 mr-2"
-                                                >
-                                                    <TiCancel className="text-xl" />
-                                                </button> */}
-                                                <button
-                                                    onClick={() => {
-                                                        // TODO: To save the exercise in DB
-                                                        onEditExercise(null);
-                                                        handleExerciseSave();
-                                                    }}
-                                                    className="text-black hover:text-black"
-                                                >
-                                                    <FaSave className="text-lg" />
-                                                </button>
+                                                {savingState ? (
+                                                    <div className="text-black">
+                                                        <LoadingSpinner className="w-4 h-4" />
+                                                    </div>
+                                                ) : (
+                                                    <button
+                                                        onClick={() => {
+                                                            // DONE: Saving to DB
+                                                            onEditExercise(
+                                                                null
+                                                            );
+                                                            handleExerciseSave();
+                                                        }}
+                                                        className="text-black hover:text-black"
+                                                    >
+                                                        <FaSave className="text-lg" />
+                                                    </button>
+                                                )}
                                             </td>
                                         </>
                                     ) : (
@@ -669,34 +695,42 @@ const EditModeTable: FC<EditableTableProps> = ({
                                             </td>
                                             <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">{`${exercise.restMin}-${exercise.restMax}`}</td>
                                             <td className="sticky right-0 bg-white z-10 px-2 py-2 h-10 flex items-center justify-center border-l-[1px] border-gray-500">
-                                                <button
-                                                    onClick={() =>
-                                                        onEditExercise(
-                                                            exercise.id
-                                                        )
-                                                    }
-                                                    className="text-black hover:text-black mr-2"
-                                                >
-                                                    <FaEdit />
-                                                </button>
-                                                <button
-                                                    // onClick={() =>
-                                                    //     onExerciseDelete(
-                                                    //         phaseId,
-                                                    //         sessionId,
-                                                    //         exercise.id
-                                                    //     )
-                                                    // }
-                                                    onClick={
-                                                        () =>
-                                                            handleDeleteExercise(
-                                                                exercise.id
-                                                            ) // Pass the exercise ID here
-                                                    }
-                                                    className="text-red-500 hover:text-red-700 mr-2"
-                                                >
-                                                    <FaTrash />
-                                                </button>
+                                                {savingState ? (
+                                                    <div className="text-black">
+                                                        <LoadingSpinner className="w-4 h-4" />
+                                                    </div>
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={() =>
+                                                                onEditExercise(
+                                                                    exercise.id
+                                                                )
+                                                            }
+                                                            className="text-black hover:text-black mr-2"
+                                                        >
+                                                            <FaEdit />
+                                                        </button>
+                                                        <button
+                                                            // onClick={() =>
+                                                            //     onExerciseDelete(
+                                                            //         phaseId,
+                                                            //         sessionId,
+                                                            //         exercise.id
+                                                            //     )
+                                                            // }
+                                                            onClick={
+                                                                () =>
+                                                                    handleDeleteExercise(
+                                                                        exercise.id
+                                                                    ) // Pass the exercise ID here
+                                                            }
+                                                            className="text-red-500 hover:text-red-700 mr-2"
+                                                        >
+                                                            <FaTrash />
+                                                        </button>
+                                                    </>
+                                                )}
                                             </td>
                                         </>
                                     )}

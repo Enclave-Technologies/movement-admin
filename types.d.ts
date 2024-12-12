@@ -188,6 +188,7 @@ interface PhaseProps {
     setShowToast;
     setToastMessage;
     setToastType;
+    savingState: boolean;
 }
 
 interface SessionProps {
@@ -212,6 +213,7 @@ interface SessionProps {
     setShowToast;
     setToastMessage;
     setToastType;
+    savingState;
 }
 
 interface SessionExerciseProps {
@@ -239,6 +241,7 @@ interface SessionExerciseProps {
     handleExerciseSave: () => void;
     onEditExercise: (exerciseId: string) => void;
     onCancelEdit: () => void;
+    savingState: boolean;
 }
 
 interface DataResponse {
@@ -266,6 +269,7 @@ interface EditableTableProps {
         sessionId: string,
         exerciseId: string
     ) => void;
+    savingState: boolean;
 }
 
 interface AddClientFormProps {

@@ -1,10 +1,14 @@
 import React from "react";
 
-const LoadingSpinner = () => {
+interface LoadingSpinnerProps {
+    className?: string;
+}
+
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ className }) => {
     return (
-        <div className="flex items-center justify-center h-full">
+        <div className={`flex items-center justify-center h-full ${className}`}>
             <svg
-                className="animate-spin h-8 w-8 text-green-500"
+                className="animate-spin h-8 w-8"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
