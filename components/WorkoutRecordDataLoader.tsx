@@ -13,6 +13,7 @@ const SearchParamsLoader = ({
     setSessionInformation,
     setExerciseData,
     setPageLoading,
+    onSave,
 }) => {
     const searchParams = useSearchParams();
 
@@ -45,6 +46,7 @@ const SearchParamsLoader = ({
             setSessionInformation(sessionInfo[0]);
             setWorkoutTrackId(ID.unique());
             setPageLoading(false);
+            onSave();
         }
 
         loadData();
@@ -57,6 +59,7 @@ const SearchParamsLoader = ({
         setSessionInformation,
         setExerciseData,
         setPageLoading,
+        // onSave,
     ]);
 
     return null;

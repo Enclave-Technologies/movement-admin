@@ -67,3 +67,13 @@ export const BMC_COLUMNS = [
     "CALF",
     "QUAD",
 ];
+export const DEFAULT_WORKOUT_VALUES = {
+    repsMin: 8,
+    repsMax: 12,
+    setsMin: 3,
+    setsMax: 5,
+    tempo: "3 0 1 0",
+    TUT: 48,
+    restMin: 45,
+    restMax: 60,
+};

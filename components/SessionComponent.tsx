@@ -40,9 +40,11 @@ const SessionComponent: FC<SessionProps> = ({
     setToastMessage,
     setToastType,
     savingState,
+    isPhaseActive,
 }) => {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
+    const [startingWorkout, setStartingWorkout] = useState(false);
     const [sessionName, setSessionName] = useState(session.sessionName);
     const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
         useState(false);
@@ -82,8 +84,7 @@ const SessionComponent: FC<SessionProps> = ({
     const handleStartSession = async () => {
         // e.preventDefault();
         try {
-            // setPageLoading(true);
-            // setWorkoutPressed(true);
+            setStartingWorkout(true);
             console.log("Preparing to start workout...");
             const response = await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
@@ -98,7 +99,7 @@ const SessionComponent: FC<SessionProps> = ({
                 }
             );
 
-            if (response.data.status) {
+            if (response.status === 200) {
                 router.push(
                     `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
                 );
@@ -117,6 +118,14 @@ const SessionComponent: FC<SessionProps> = ({
 
     return (
         <div className="bg-white p-4 border-b-[1px] border-gray-300 flex flex-col gap-4">
+            {startingWorkout && (
+                <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center">
+                    <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-between gap-2">
+                        <LoadingSpinner />
+                        <span>Starting Workout.</span>
+                    </div>
+                </div>
+            )}
             <div className="flex items-center justify-between container-class relative">
                 <div className="">
                     {isEditing ? (
@@ -157,9 +166,17 @@ const SessionComponent: FC<SessionProps> = ({
                                     )}
                                 </button>
                                 <div className="flex items-center gap-1">
-                                    <span className="font-medium">
-                                        {sessionName}
-                                    </span>
+                                    <div className="font-medium flex flex-col">
+                                        <span>{sessionName} </span>
+                                        {nextSession.$id ===
+                                        session.sessionId ? (
+                                            <span className="text-xs text-gray-400">
+                                                (RECOMMENDED)
+                                            </span>
+                                        ) : (
+                                            ""
+                                        )}
+                                    </div>
                                     {savingState ? (
                                         <LoadingSpinner className="w-4 h-4 ml-2" />
                                     ) : (
@@ -218,11 +235,15 @@ const SessionComponent: FC<SessionProps> = ({
                 </div>
                 <div className="flex flex-row items-center gap-4">
                     <button
-                        className="bg-green-500 text-white px-4 py-2 rounded-md"
+                        className={`${
+                            isPhaseActive
+                                ? "bg-green-500"
+                                : "bg-gray-500 cursor-not-allowed"
+                        } text-white px-4 py-2 rounded-md`}
+                        disabled={!isPhaseActive}
                         onClick={handleStartSession}
                     >
-                        Start Session
-                        {/* ( {session.sessionTime || "0"} mins) */}
+                        {`Start Session`} ({session.sessionTime || "0"} mins)
                     </button>
                 </div>
             </div>

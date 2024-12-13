@@ -315,6 +315,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                                 setToastMessage={setToastMessage}
                                 setToastType={setToastType}
                                 savingState={savingState}
+                                isPhaseActive={phase.isActive}
                             />
                         ))
                 )}

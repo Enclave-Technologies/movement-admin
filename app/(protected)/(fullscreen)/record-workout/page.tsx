@@ -135,6 +135,7 @@ const RecordWorkout = () => {
                 setSessionInformation={setSessionInformation}
                 setExerciseData={setExerciseData}
                 setPageLoading={setPageLoading}
+                onSave={saveToDatabase}
             />
             {pageLoading ? (
                 <div className="bg-green-800">

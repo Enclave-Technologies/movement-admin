@@ -214,6 +214,7 @@ interface SessionProps {
     setToastMessage;
     setToastType;
     savingState;
+    isPhaseActive;
 }
 
 interface SessionExerciseProps {

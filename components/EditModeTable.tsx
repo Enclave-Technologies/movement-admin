@@ -5,6 +5,7 @@ import { InputActionMeta } from "react-select";
 import Select from "react-select";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import LoadingSpinner from "./LoadingSpinner";
+import { DEFAULT_WORKOUT_VALUES } from "@/configs/constants";
 
 const EditModeTable: FC<EditableTableProps> = ({
     phaseId,
@@ -240,14 +241,20 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                         workout.targetArea,
                                                                     exerciseVideo:
                                                                         workout.videoUrl,
-                                                                    repsMin: 3,
-                                                                    repsMax: 5,
-                                                                    setsMin: 8,
-                                                                    setsMax: 12,
-                                                                    tempo: "3 0 1 0",
-                                                                    TUT: 48,
-                                                                    restMin: 45,
-                                                                    restMax: 60,
+                                                                    repsMin:
+                                                                        DEFAULT_WORKOUT_VALUES.repsMin,
+                                                                    repsMax:
+                                                                        DEFAULT_WORKOUT_VALUES.repsMax,
+                                                                    setsMin:
+                                                                        DEFAULT_WORKOUT_VALUES.setsMin,
+                                                                    setsMax:
+                                                                        DEFAULT_WORKOUT_VALUES.setsMax,
+                                                                    tempo: DEFAULT_WORKOUT_VALUES.tempo,
+                                                                    TUT: DEFAULT_WORKOUT_VALUES.TUT,
+                                                                    restMin:
+                                                                        DEFAULT_WORKOUT_VALUES.restMin,
+                                                                    restMax:
+                                                                        DEFAULT_WORKOUT_VALUES.restMax,
                                                                 }
                                                             );
                                                         }
