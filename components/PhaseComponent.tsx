@@ -14,6 +14,7 @@ import { ID } from "appwrite";
 import { on } from "events";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import TooltipButton from "./pure-components/TooltipButton";
+import LoadingSpinner from "./LoadingSpinner";
 
 const PhaseComponent: FC<PhaseProps> = ({
     phase,
@@ -37,6 +38,10 @@ const PhaseComponent: FC<PhaseProps> = ({
     client_id,
     nextSession,
     progressId,
+    setShowToast,
+    setToastMessage,
+    setToastType,
+    savingState,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -81,7 +86,30 @@ const PhaseComponent: FC<PhaseProps> = ({
         const newSession: MovementSession = {
             sessionId: ID.unique(),
             sessionName: `${session.sessionName} (Copy)`,
-            exercises: session.exercises,
+            exercises: session.exercises.map((exercise: Exercise) => ({
+                id: ID.unique(),
+                exerciseId: exercise.exerciseId,
+                fullName: exercise.fullName,
+                motion: exercise.motion,
+                targetArea: exercise.targetArea,
+                exerciseVideo: exercise.exerciseVideo || "",
+                repsMin: exercise.repsMin,
+                repsMax: exercise.repsMax,
+                setsMin: exercise.setsMin,
+                setsMax: exercise.setsMax,
+                tempo: exercise.tempo,
+                TUT: exercise.TUT,
+                restMin: exercise.restMin,
+                restMax: exercise.restMax,
+                exerciseOrder: exercise.exerciseOrder,
+                setOrderMarker: exercise.setOrderMarker,
+                bias: exercise.bias,
+                lenShort: exercise.lenShort,
+                impliment: exercise.impliment,
+                grip: exercise.grip,
+                angle: exercise.angle,
+                support: exercise.support,
+            })),
             sessionOrder: phase.sessions.length + 1,
             sessionTime: "0",
         };
@@ -142,48 +170,58 @@ const PhaseComponent: FC<PhaseProps> = ({
                             </TooltipButton>
                         </div>
                     ) : (
-                        <div className="flex flex-row gap-2">
+                        <div className="flex flex-row gap-2 items-center">
                             <span className="font-medium">{phaseName}</span>
-                            <TooltipButton
-                                tooltip="Rename Phase"
-                                className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
-                                onClick={() => {
-                                    setIsEditing(true);
-                                }}
-                            >
-                                <FaEdit />
-                            </TooltipButton>
-                            <TooltipButton
-                                tooltip="Delete Phase"
-                                className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
-                                // onClick={() => {
-                                //     const isConfirmed = window.confirm(
-                                //         "Are you sure you want to delete this phase?"
-                                //     );
-                                //     if (isConfirmed) {
-                                //         onPhaseDelete(phase.phaseId);
-                                //     }
-                                // }}
-                                onClick={handleDeletePhase}
-                            >
-                                <FaTrash />
-                            </TooltipButton>
-                            <TooltipButton
-                                tooltip="Duplicate Phase"
-                                className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
-                                onClick={() => handleCopyPhase(phase.phaseId)}
-                            >
-                                <FaCopy />
-                                {/* <span className="hidden lg:flex">Copy</span> */}
-                            </TooltipButton>
-                            <TooltipButton
-                                tooltip="Add Session"
-                                className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
-                                onClick={handleAddSession}
-                            >
-                                <FaPlus />
-                                {/* <span className="hidden lg:flex">Copy</span> */}
-                            </TooltipButton>
+                            {savingState ? (
+                                <>
+                                    <LoadingSpinner className="w-4 h-4 ml-2" />
+                                </>
+                            ) : (
+                                <>
+                                    <TooltipButton
+                                        tooltip="Rename Phase"
+                                        className="ml-2 text-gray-400 hover:text-gray-600 focus:outline-none focus:ring focus:ring-green-500"
+                                        onClick={() => {
+                                            setIsEditing(true);
+                                        }}
+                                    >
+                                        <FaEdit />
+                                    </TooltipButton>
+                                    <TooltipButton
+                                        tooltip="Delete Phase"
+                                        className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
+                                        // onClick={() => {
+                                        //     const isConfirmed = window.confirm(
+                                        //         "Are you sure you want to delete this phase?"
+                                        //     );
+                                        //     if (isConfirmed) {
+                                        //         onPhaseDelete(phase.phaseId);
+                                        //     }
+                                        // }}
+                                        onClick={handleDeletePhase}
+                                    >
+                                        <FaTrash />
+                                    </TooltipButton>
+                                    <TooltipButton
+                                        tooltip="Duplicate Phase"
+                                        className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                                        onClick={() =>
+                                            handleCopyPhase(phase.phaseId)
+                                        }
+                                    >
+                                        <FaCopy />
+                                        {/* <span className="hidden lg:flex">Copy</span> */}
+                                    </TooltipButton>
+                                    <TooltipButton
+                                        tooltip="Add Session"
+                                        className="ml-2 text-green-500 hover:text-green-900 focus:outline-none focus:ring focus:ring-green-500"
+                                        onClick={handleAddSession}
+                                    >
+                                        <FaPlus />
+                                        {/* <span className="hidden lg:flex">Copy</span> */}
+                                    </TooltipButton>
+                                </>
+                            )}
                         </div>
                     )}
 
@@ -195,7 +233,11 @@ const PhaseComponent: FC<PhaseProps> = ({
                         />
                     )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div
+                    className={`flex items-center gap-2 ${
+                        isEditing ? "hidden" : ""
+                    }`}
+                >
                     <div className="relative inline-block w-12 align-middle select-none">
                         <input
                             type="checkbox"
@@ -232,9 +274,8 @@ const PhaseComponent: FC<PhaseProps> = ({
                 </div>
             </div>
             <div
-                className={`px-4 py-3 w-full ${isEditing ? "hidden" : ""} ${
-                    isCollapsed ? "hidden" : ""
-                } `}
+                className={`px-4 py-3 w-full ${isEditing ? "hidden" : ""} 
+                    ${isCollapsed ? "hidden" : ""}`}
             >
                 {/* Render session components here */}
                 {phase.sessions.length === 0 ? (
@@ -270,15 +311,27 @@ const PhaseComponent: FC<PhaseProps> = ({
                                 nextSession={nextSession}
                                 progressId={progressId}
                                 handleCopySession={handleCopySession}
+                                setShowToast={setShowToast}
+                                setToastMessage={setToastMessage}
+                                setToastType={setToastType}
+                                savingState={savingState}
+                                isPhaseActive={phase.isActive}
                             />
                         ))
                 )}
-                <button
-                    className="flex items-center justify-center w-full mt-4 px-4 py-2 secondary-btn uppercase gap-5"
-                    onClick={handleAddSession}
-                >
-                    <FaPlus className="text-lg" /> Add Session
-                </button>
+                {savingState ? (
+                    <div className="flex items-center justify-center w-full mt-4 px-4 py-2 h-12 secondary-btn uppercase gap-5">
+                        <LoadingSpinner className="w-5 h-5" />
+                        {/* <span>Adding Session</span> */}
+                    </div>
+                ) : (
+                    <button
+                        className="flex items-center justify-center w-full mt-4 px-4 py-2 h-12 secondary-btn uppercase gap-5"
+                        onClick={handleAddSession}
+                    >
+                        <FaPlus className="text-lg" /> Add Session
+                    </button>
+                )}
             </div>
         </div>
     );

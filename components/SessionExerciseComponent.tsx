@@ -2,6 +2,7 @@ import React, { FC, useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import EditModeTable from "./EditModeTable";
 import DragModeTable from "./DragModeTable";
+import LoadingSpinner from "./LoadingSpinner";
 
 const SessionExerciseComponent: FC<SessionExerciseProps> = ({
     phaseId,
@@ -16,6 +17,7 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
     onExerciseOrderChange,
     onEditExercise,
     onCancelEdit,
+    savingState,
 }) => {
     const [mode, setMode] = useState<"edit" | "draggable">("draggable");
     const [selTargetArea, setSelTargetArea] = useState("");
@@ -91,23 +93,29 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
                 handleExerciseSave={handleExerciseSave}
                 onExerciseUpdate={onExerciseUpdate}
                 onCancelEdit={onCancelEdit}
+                savingState={savingState}
             />
             {/* ) : (
          <DragModeTable exercises={exercises} handleDragEnd={handleDragEnd} />
    )} */}
             <div className="sticky bottom-0 left-0 bg-white shadow-md py-4">
-                <button
-                    className={`flex items-center justify-center w-full rounded mt-4 px-4 py-2
+                {savingState ? (
+                    <div className="w-full secondary-btn flex mt-4 px-4 py-2 items-center justify-center h-12 ">
+                        <LoadingSpinner className="w-4 h-4" />
+                    </div>
+                ) : (
+                    <button
+                        className={`flex h-12 items-center justify-center w-full rounded mt-4 px-4 py-2
                          bg-green-500 text-white hover:bg-green-900 
                          transition-colors duration-200`}
-                    onClick={() => onExerciseAdd(phaseId, sessionId)}
-                >
-                    <FaPlus className="mr-2" /> Add Exercise
-                </button>
+                        onClick={() => onExerciseAdd(phaseId, sessionId)}
+                    >
+                        <FaPlus className="mr-2" /> Add Exercise
+                    </button>
+                )}
             </div>
         </div>
     );
-
 };
 
 export default SessionExerciseComponent;
