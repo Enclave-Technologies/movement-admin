@@ -168,7 +168,7 @@ const SessionComponent: FC<SessionProps> = ({
                                 <div className="flex items-center gap-1">
                                     <div className="font-medium flex flex-col">
                                         <span>{sessionName} </span>
-                                        {nextSession.$id ===
+                                        {nextSession?.$id ===
                                         session.sessionId ? (
                                             <span className="text-xs text-gray-400">
                                                 (RECOMMENDED)
