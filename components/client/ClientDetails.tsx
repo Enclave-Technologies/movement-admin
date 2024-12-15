@@ -11,6 +11,9 @@ import { MdChangeHistory } from "react-icons/md";
 import { IoDocumentText, IoDocumentTextOutline } from "react-icons/io5";
 import { TbTargetArrow } from "react-icons/tb";
 import { IoIosBody } from "react-icons/io";
+import BodyMassComposition from "./BodyMassComposition";
+import Toast from "../Toast";
+import { Tabs } from "./Tabs";
 
 const ClientDetails = ({ client_id }) => {
     const { userData } = useUser();
@@ -24,6 +27,9 @@ const ClientDetails = ({ client_id }) => {
     const [fetchingGoals, setFetchingGoals] = useState(true);
     const [nextSession, setNextSession] = useState(null);
     const [progressId, setProgressId] = useState("");
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState("success");
 
     useEffect(() => {
         fetchTrackedWorkouts();
@@ -65,7 +71,7 @@ const ClientDetails = ({ client_id }) => {
             `${API_BASE_URL}/mvmt/v1/client/tracked-workouts?client_id=${client_id}`,
             { withCredentials: true }
         );
-
+        console.log(clientPhases.data);
         const { nextSession, sessionLogs, progressId } = clientPhases.data;
         setNextSession(nextSession?.[0]);
         const reversedLogs = sessionLogs.reverse();
@@ -73,6 +79,10 @@ const ClientDetails = ({ client_id }) => {
         setProgressId(progressId);
         setFetchingWorkouts(false);
     }
+
+    const handleToastClose = () => {
+        setShowToast(false);
+    };
 
     return (
         <TrainerProvider>
@@ -101,70 +111,31 @@ const ClientDetails = ({ client_id }) => {
                         <WorkoutPlan
                             pageLoading={dataLoading}
                             setPageLoading={setFetchingWorkouts}
+                            fetchTrackedWorkouts={fetchTrackedWorkouts}
                             client_id={client_id}
                             workouts={workouts}
                             clientPhases={clientPhases}
                             setClientPhases={setClientPhases}
                             nextSession={nextSession}
                             progressId={progressId}
+                            setShowToast={setShowToast}
+                            setToastMessage={setToastMessage}
+                            setToastType={setToastType}
+                        />
+                    )}
+                    {selectedTab == "body-mass-composition" && (
+                        <BodyMassComposition client_id={client_id} />
+                    )}
+                    {showToast && (
+                        <Toast
+                            message={toastMessage}
+                            onClose={handleToastClose}
+                            type={toastType}
                         />
                     )}
                 </div>
             </div>
         </TrainerProvider>
-    );
-};
-
-const Tabs = ({ selectedTab, setSelectedTab }) => {
-    return (
-        <div className="flex flex-row items-center justify-between bg-white rounded-lg w-full border-b-[1px] border-gray-200">
-            <Tab
-                isSelected={selectedTab === "workout-history"}
-                label={"Workout History"}
-                onClick={() => {
-                    setSelectedTab("workout-history");
-                }}
-                icon={<MdChangeHistory size={20} />}
-            />
-            <Tab
-                isSelected={selectedTab === "workout-plan"}
-                label={"Workout Plan"}
-                onClick={() => {
-                    setSelectedTab("workout-plan");
-                }}
-                icon={<IoDocumentTextOutline size={20} />}
-            />
-            <Tab
-                isSelected={selectedTab === "goals"}
-                label={"Goals"}
-                onClick={() => {
-                    setSelectedTab("goals");
-                }}
-                icon={<TbTargetArrow size={20} />}
-            />
-            <Tab
-                isSelected={selectedTab === "body-mass-composition"}
-                label={"Body Mass Composition"}
-                onClick={() => {
-                    setSelectedTab("body-mass-composition");
-                }}
-                icon={<IoIosBody size={20} />}
-            />
-        </div>
-    );
-};
-
-const Tab = ({ label, onClick, isSelected, icon }) => {
-    return (
-        <div
-            className={`hover:cursor-pointer flex-1 flex flex-row items-center justify-center py-4 gap-2 ${
-                isSelected ? "bg-green-500 text-white" : "bg-white"
-            }`}
-            onClick={onClick}
-        >
-            {icon}
-            <p className={`${isSelected ? "font-semibold" : ""}`}>{label}</p>
-        </div>
     );
 };
 

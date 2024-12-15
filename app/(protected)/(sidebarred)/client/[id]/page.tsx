@@ -2,15 +2,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useUser } from "@/context/ClientContext";
-import LinkTile from "@/components/LinkTile";
 import { defaultProfileURL } from "@/configs/constants";
 import axios from "axios";
-import Link from "next/link";
-import RecentWorkoutHistory from "@/components/client/RecentWorkoutHistory";
 import ClientDetails from "@/components/client/ClientDetails";
-import { useRouter } from "next/router";
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
-
 
 const LinkTileData = [
     {
@@ -64,41 +59,42 @@ const Page = ({ params }: { params: { id: string } }) => {
         fetchStats();
     }, [params.id]);
 
-  return (
-    <div className="flex flex-col min-h-screen items-center justify-between bg-gray-50 text-black w-full">
-      <div className="text-center flex flex-col gap-8 w-full">
-        {userLoading ? (
-          <div className="flex flex-col gap-4 p-4">
-            <div className="flex flex-col sm:flex-row gap-12 items-center sm:items-start">
-              <div className="relative">
-                <div className="rounded-full aspect-square w-52 sm:w-40 bg-gray-300 animate-pulse"></div>
-              </div>
-              <div className="flex flex-col items-center sm:items-start space-y-1">
-                <div className="h-10 w-48 bg-gray-300 animate-pulse"></div>
-                <div className="h-6 w-64 bg-gray-300 animate-pulse"></div>
-                <div className="h-6 w-64 bg-gray-300 animate-pulse"></div>
-              </div>
-            </div>
-          </div>
-        ) : userError ? (
-          <p>Error: {userError.message}</p>
-        ) : (
-          <div className="flex flex-col gap-4 rounded-lg">
-            <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 items-start sm:items-start">
-              <div className="relative">
-                <Image
-                  src={
-                    userData.imageUrl && userData.imageUrl.trim() !== ""
-                      ? userData.imageUrl
-                      : defaultProfileURL
-                  }
-                  // src={
-                  //     userData?.imageUrl || defaultProfileURL
-                  // }
-                  height={72}
-                  width={72}
-                  alt={`${userData?.name} image`}
-                  className="rounded-full aspect-square 
+    return (
+        <div className="flex flex-col min-h-screen items-center justify-between bg-gray-50 text-black w-full">
+            <div className="text-center flex flex-col gap-8 w-full">
+                {userLoading ? (
+                    <div className="flex flex-col gap-4 p-4">
+                        <div className="flex flex-col sm:flex-row gap-12 items-center sm:items-start">
+                            <div className="relative">
+                                <div className="rounded-full aspect-square w-52 sm:w-40 bg-gray-300 animate-pulse"></div>
+                            </div>
+                            <div className="flex flex-col items-center sm:items-start space-y-1">
+                                <div className="h-10 w-48 bg-gray-300 animate-pulse"></div>
+                                <div className="h-6 w-64 bg-gray-300 animate-pulse"></div>
+                                <div className="h-6 w-64 bg-gray-300 animate-pulse"></div>
+                            </div>
+                        </div>
+                    </div>
+                ) : userError ? (
+                    <p>Error: {userError.message}</p>
+                ) : (
+                    <div className="flex flex-col gap-4 rounded-lg">
+                        <div className="flex flex-col sm:flex-row gap-4 lg:gap-4 items-start sm:items-start">
+                            <div className="relative">
+                                <Image
+                                    src={
+                                        userData.imageUrl &&
+                                        userData.imageUrl.trim() !== ""
+                                            ? userData.imageUrl
+                                            : defaultProfileURL
+                                    }
+                                    // src={
+                                    //     userData?.imageUrl || defaultProfileURL
+                                    // }
+                                    height={72}
+                                    width={72}
+                                    alt={`${userData?.name} image`}
+                                    className="rounded-full aspect-square 
                                 object-cover border-2 border-gray-200
                                 "
                                 />

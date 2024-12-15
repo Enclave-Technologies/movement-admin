@@ -10,23 +10,36 @@ import PhaseComponent from "@/components/PhaseComponent";
 import { FaPlus, FaSave } from "react-icons/fa";
 import DemoTable from "@/components/DemoTable";
 import { API_BASE_URL } from "@/configs/constants";
+import LoadingSpinner from "../LoadingSpinner";
 
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const WorkoutPlan = ({
     pageLoading,
     setPageLoading,
+    fetchTrackedWorkouts,
     client_id,
     workouts,
     clientPhases,
     setClientPhases,
     nextSession,
     progressId,
+    setShowToast,
+    setToastMessage,
+    setToastType,
 }) => {
+    // TODO: Autosave every 2 minutes on this page. Keep a track of what was sent to the backend for saving, and the clientPhases
     const { userData } = useUser();
     const [editingExerciseId, setEditingExerciseId] = useState(null);
+    const [phaseActivation, setPhaseActivation] = useState(false);
+    const [phaseAddingState, setPhaseAddingState] = useState(false);
+    const [savingState, setSavingState] = useState(false);
+    // const [sessionAddingButtonState, setSessionAddingButtonState] =
+    //     useState(false);
+    // const [sessionButtonsState, setSessionButtonsState] = useState(false);
 
     const handleAddPhase = async () => {
+        setPhaseAddingState(true);
         // Logic to add a new phase
         const newPhase: Phase = {
             phaseId: ID.unique(),
@@ -37,7 +50,6 @@ const WorkoutPlan = ({
 
         const modifiedClientPhases = [...clientPhases, newPhase];
 
-        setClientPhases(modifiedClientPhases);
         const data: DataResponse = {
             phases: modifiedClientPhases,
         };
@@ -49,9 +61,13 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setClientPhases(modifiedClientPhases);
+        setPhaseAddingState(false);
     };
 
     const handleCopyPhase = async (phaseId: string) => {
+        setPhaseAddingState(true);
+        setSavingState(true);
         // Find the target phase to be copied
         const targetPhase = clientPhases.find(
             (phase) => phase.phaseId === phaseId
@@ -66,13 +82,13 @@ const WorkoutPlan = ({
             sessions: targetPhase.sessions.map((session) => ({
                 sessionId: ID.unique(),
                 sessionName: `${session.sessionName} (Copy)`,
-                exercises: session.exercises.map((exercise) => ({
+                exercises: session.exercises.map((exercise: Exercise) => ({
                     id: ID.unique(),
                     exerciseId: exercise.exerciseId,
-                    exerciseDescription: exercise.exerciseDescription,
-                    exerciseMotion: exercise.exerciseMotion,
-                    exerciseShortDescription: exercise.exerciseShortDescription,
-                    exerciseVideo: exercise.exerciseVideo,
+                    fullName: exercise.fullName,
+                    motion: exercise.motion,
+                    targetArea: exercise.targetArea,
+                    exerciseVideo: exercise.exerciseVideo || "",
                     repsMin: exercise.repsMin,
                     repsMax: exercise.repsMax,
                     setsMin: exercise.setsMin,
@@ -83,6 +99,12 @@ const WorkoutPlan = ({
                     restMax: exercise.restMax,
                     exerciseOrder: exercise.exerciseOrder,
                     setOrderMarker: exercise.setOrderMarker,
+                    bias: exercise.bias,
+                    lenShort: exercise.lenShort,
+                    impliment: exercise.impliment,
+                    grip: exercise.grip,
+                    angle: exercise.angle,
+                    support: exercise.support,
                 })),
                 sessionTime: session.sessionTime,
                 sessionOrder: session.sessionOrder,
@@ -90,7 +112,6 @@ const WorkoutPlan = ({
         };
 
         const modifiedClientPhases = [...clientPhases, newPhase];
-        setClientPhases(modifiedClientPhases);
         const data: DataResponse = {
             phases: modifiedClientPhases,
         };
@@ -103,34 +124,38 @@ const WorkoutPlan = ({
             { withCredentials: true }
         );
         console.log("Copying phase...");
+        setClientPhases(modifiedClientPhases);
+        setPhaseAddingState(false);
+        setSavingState(false);
     };
 
-    const handleDataSubmit = async () => {
-        try {
-            setPageLoading(true);
-            const data: DataResponse = {
-                phases: clientPhases,
-            };
-            const response = await axios.post(
-                `${API_BASE_URL}/mvmt/v1/client/phases`,
-                {
-                    client_id: client_id,
-                    data,
-                },
-                { withCredentials: true }
-            );
-            console.log(response.data);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setPageLoading(false);
-        }
-    };
+    // const handleDataSubmit = async () => {
+    //     try {
+    //         setPageLoading(true);
+    //         const data: DataResponse = {
+    //             phases: clientPhases,
+    //         };
+    //         const response = await axios.post(
+    //             `${API_BASE_URL}/mvmt/v1/client/phases`,
+    //             {
+    //                 client_id: client_id,
+    //                 data,
+    //             },
+    //             { withCredentials: true }
+    //         );
+    //         console.log(response.data);
+    //     } catch (error) {
+    //         console.error(error);
+    //     } finally {
+    //         setPageLoading(false);
+    //     }
+    // };
 
     const handleActivatePhase = async (
         phaseId: string,
         phaseState: boolean
     ) => {
+        setPhaseActivation(true);
         const modifiedPhases = clientPhases.map((phase) => ({
             ...phase,
             isActive: phase.phaseId === phaseId ? phaseState : false,
@@ -147,17 +172,23 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+
+        fetchTrackedWorkouts();
+        setPhaseActivation(false);
     };
 
     const handlePhaseNameChange = async (
         phaseId: string,
         newPhaseName: string
     ) => {
+        // if (!phaseButtonsState.includes(phaseId)) {
+        //     setPhaseButtonsState([...phaseButtonsState, phaseId]);
+        // }
+        setSavingState(true);
         // Update the phase name in the original data
         const updatedPhases = clientPhases.map((p) =>
             p.phaseId === phaseId ? { ...p, phaseName: newPhaseName } : p
         );
-        setClientPhases(updatedPhases);
         const data: DataResponse = {
             phases: updatedPhases,
         };
@@ -169,19 +200,27 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setClientPhases(updatedPhases);
+        // setPhaseButtonsState(phaseButtonsState.filter((id) => id !== phaseId));
+        setSavingState(false);
     };
 
     const onAddSession = async (
         phaseId: string,
         newSession: MovementSession
     ) => {
+        setSavingState(true);
+
+        console.log(newSession);
+
         const updatedPhases = clientPhases.map((p) =>
             p.phaseId === phaseId
                 ? { ...p, sessions: [...p.sessions, newSession] }
                 : p
         );
 
-        setClientPhases(updatedPhases);
+        console.log(updatedPhases);
+
         const data: DataResponse = {
             phases: updatedPhases,
         };
@@ -193,12 +232,18 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setClientPhases(updatedPhases);
+        // setSessionAddingButtonState(
+        //     sessionAddingButtonState.filter((id) => id != phaseId)
+        // );
+        setSavingState(false);
     };
 
     const handleSessionNameChange = async (
         sessionId: string,
         newSessionName: string
     ) => {
+        setSavingState(true);
         // Update the session name in the original data
         const updatedPhases = clientPhases.map((phase) => ({
             ...phase,
@@ -208,7 +253,6 @@ const WorkoutPlan = ({
                     : s
             ),
         }));
-        setClientPhases(updatedPhases);
         const data: DataResponse = {
             phases: updatedPhases,
         };
@@ -220,6 +264,8 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setClientPhases(updatedPhases);
+        setSavingState(false);
     };
 
     const handleSessionDelete = async (sessionId: string) => {
@@ -243,6 +289,7 @@ const WorkoutPlan = ({
     };
 
     const handleExerciseAdd = (phaseId: string, sessionId: string) => {
+        const newExerciseId = ID.unique();
         // Update the original data with the new exercise
         const updatedPhases = clientPhases.map((phase) =>
             phase.phaseId === phaseId
@@ -255,7 +302,7 @@ const WorkoutPlan = ({
                                     exercises: [
                                         ...session.exercises,
                                         {
-                                            id: ID.unique(),
+                                            id: newExerciseId,
                                             exerciseId: "",
                                             fullName: "",
                                             motion: "",
@@ -287,6 +334,7 @@ const WorkoutPlan = ({
                 : phase
         );
         setClientPhases(updatedPhases);
+        setEditingExerciseId(newExerciseId);
     };
 
     const handleExerciseUpdate = (
@@ -322,6 +370,7 @@ const WorkoutPlan = ({
     };
 
     async function handleExerciseSave() {
+        setSavingState(true);
         const data: DataResponse = {
             phases: clientPhases,
         };
@@ -333,12 +382,14 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setSavingState(false);
     }
 
     const handleCancelEdit = () => {
         setEditingExerciseId(null);
     };
-    const handleExerciseDelete = (
+
+    const handleExerciseDelete = async (
         phaseId: string,
         sessionId: string,
         exerciseId: string
@@ -362,6 +413,17 @@ const WorkoutPlan = ({
                 : phase
         );
         setClientPhases(updatedPhases);
+        const data: DataResponse = {
+            phases: updatedPhases,
+        };
+        await axios.post(
+            `${API_BASE_URL}/mvmt/v1/client/phases`,
+            {
+                client_id: client_id,
+                data,
+            },
+            { withCredentials: true }
+        );
     };
 
     const handleExerciseOrderChange = (
@@ -420,15 +482,32 @@ const WorkoutPlan = ({
     }
 
     return (
-        <div className="">
+        <div className="w-full h-full">
+            {phaseActivation && (
+                <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center">
+                    <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-between gap-2">
+                        <LoadingSpinner />
+                        <span>Activating/deactivating Phase, Please wait.</span>
+                    </div>
+                </div>
+            )}
             <div className="flex justify-between">
-                <button
-                    className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
-                    onClick={handleAddPhase}
-                >
-                    <FaPlus />
-                    Add Phase
-                </button>
+                {phaseAddingState ? (
+                    <div className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-gray-300 text-black cursor-not-allowed">
+                        <div className="h-4 w-4">
+                            <LoadingSpinner className="text-black" />{" "}
+                        </div>{" "}
+                        <span>Adding Phase</span>
+                    </div>
+                ) : (
+                    <button
+                        className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
+                        onClick={handleAddPhase}
+                    >
+                        <FaPlus />
+                        Add Phase
+                    </button>
+                )}
             </div>
             {/* <DemoTable exercises={workouts} /> */}
             <div className="mt-4">
@@ -472,11 +551,15 @@ const WorkoutPlan = ({
                                 client_id={client_id}
                                 nextSession={nextSession}
                                 progressId={progressId}
+                                setShowToast={setShowToast}
+                                setToastMessage={setToastMessage}
+                                setToastType={setToastType}
+                                savingState={savingState}
                             />
                         ))
                     )}
                 </div>
-        </div>
+            </div>
         </div>
     );
 };
