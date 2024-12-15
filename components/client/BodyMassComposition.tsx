@@ -47,6 +47,7 @@ const BodyMassComposition = ({ client_id }) => {
         setBmiRecords([
             {
                 $id: ID.unique(),
+                // users: params.id,
                 DATE: new Date().toISOString().slice(0, 10),
                 HEIGHT: 0,
                 WEIGHT: 0,
@@ -69,6 +70,16 @@ const BodyMassComposition = ({ client_id }) => {
         // bmiRecords.push({});
     }
 
+    async function addBmcToDB(bmcData) {
+        console.log(bmcData);
+
+        await axios.post(
+            `${API_BASE_URL}/mvmt/v1/client/bmc/${client_id}`,
+            { bmiRecord: bmcData },
+            { withCredentials: true }
+        );
+    }
+
     return (
         <div className="w-full">
             <div className="w-full flex flex-row items-center justify-between mb-4">
@@ -84,13 +95,12 @@ const BodyMassComposition = ({ client_id }) => {
                     + Add New Record
                 </button>
             </div>
-
             <EditableTable
-                data={bmiRecords}
                 setData={setBmiRecords}
-                handleSaveBmc={handleSaveBmc}
+                data={bmiRecords}
                 emptyText="No BMI Records found"
                 headerColumns={BMC_COLUMNS}
+                handleSaveBmc={addBmcToDB}
             />
         </div>
     );
