@@ -166,7 +166,7 @@ const SessionComponent: FC<SessionProps> = ({
                                     )}
                                 </button>
                                 <div className="flex items-center gap-1">
-                                    <div className="font-medium flex flex-col">
+                                    <div className="font-medium flex flex-col items-start">
                                         <span>{sessionName} </span>
                                         {nextSession?.$id ===
                                         session.sessionId ? (

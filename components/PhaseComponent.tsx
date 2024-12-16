@@ -11,7 +11,6 @@ import {
     FaSave,
 } from "react-icons/fa";
 import { ID } from "appwrite";
-import { on } from "events";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import TooltipButton from "./pure-components/TooltipButton";
 import LoadingSpinner from "./LoadingSpinner";
