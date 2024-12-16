@@ -3,16 +3,18 @@ import React, { useState } from "react";
 import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
 import Spinner from "../Spinner";
 import LoadingSpinner from "../LoadingSpinner";
+import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 
 const EditableTable = ({
     headerColumns,
     data,
     setData,
     emptyText,
-    handleSaveBmc,
+    handleSave,
+    handleDelete,
 }) => {
-    const [rowToDelete, setRowToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
-    const [saving, setSaving] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [rowToDelete, setRowToDelete] = useState(null); // New state variable
     const [editingRowId, setEditingRowId] = useState(null);
     const [editedData, setEditedData] = useState({});
 
@@ -27,7 +29,7 @@ const EditableTable = ({
         const updatedData = data.map((row) =>
             row.$id === rowId ? editedData : row
         );
-        await handleSaveBmc(editedData);
+        await handleSave(editedData);
         setData(updatedData);
         setEditingRowId(null);
         setEditedData({});
@@ -39,6 +41,22 @@ const EditableTable = ({
             ...editedData,
             [field]: event.target.value,
         });
+    };
+
+    const confirmDeletion = () => {
+        handleDelete(rowToDelete); // Perform delete
+        setShowDeleteConfirm(false); // Close dialog
+        setRowToDelete(null); // Reset rowToDelete
+    };
+
+    const cancelDeletePhase = () => {
+        setShowDeleteConfirm(false); // Just close the dialog
+        setRowToDelete(null); // Reset rowToDelete
+    };
+
+    const handleDeletion = (rowId) => {
+        setRowToDelete(rowId); // Store the ID of the row to delete
+        setShowDeleteConfirm(true); // Show confirmation dialog
     };
 
     if (data.length === 0)
@@ -79,6 +97,13 @@ const EditableTable = ({
                                 !(rowIndex % 2) ? "bg-white" : "bg-gray-100"
                             } h-14 touch-action-none`}
                         >
+                            {showDeleteConfirm && row.$id === rowToDelete && (
+                                <DeleteConfirmationDialog
+                                    title={`record for date ${row.DATE}`}
+                                    confirmDelete={confirmDeletion}
+                                    cancelDelete={cancelDeletePhase}
+                                />
+                            )}
                             {Object.keys(row).map((key, colIndex) =>
                                 editingRowId === row.$id ? (
                                     <>
@@ -109,7 +134,7 @@ const EditableTable = ({
                                                     onClick={() =>
                                                         handleUpdateRow(row.$id)
                                                     }
-                                                    className="text-green-500 hover:text-green-700 mr-2"
+                                                    className="text-black hover:text-black mr-2"
                                                 >
                                                     <FaSave />
                                                 </button>
@@ -133,17 +158,14 @@ const EditableTable = ({
                                                     onClick={() =>
                                                         handleEditRow(row.$id)
                                                     }
-                                                    className="text-blue-500 hover:text-blue-700 mr-2"
+                                                    className="text-black hover:text-black mr-2"
                                                 >
                                                     <FaEdit />
                                                 </button>
                                                 <button
-                                                    // onClick={
-                                                    //     () =>
-                                                    //         handleDeleteExercise(
-                                                    //             exercise.id
-                                                    //         ) // Pass the exercise ID here
-                                                    // }
+                                                    onClick={() =>
+                                                        handleDeletion(row.$id)
+                                                    }
                                                     className="text-red-500 hover:text-red-700"
                                                 >
                                                     <FaTrash />

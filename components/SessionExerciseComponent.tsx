@@ -23,6 +23,7 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
   const [selTargetArea, setSelTargetArea] = useState("");
 
   const targetAreas = workouts.reduce((acc, workout) => {
+    console.log({ workout });
     const { targetArea } = workout;
     if (targetArea === undefined) return acc;
     const capitalizedLabel =
