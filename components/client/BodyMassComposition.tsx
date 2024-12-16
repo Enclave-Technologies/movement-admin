@@ -6,11 +6,18 @@ import axios from "axios";
 import { API_BASE_URL, BMC_COLUMNS } from "@/configs/constants";
 import EditableTable from "@/components/pure-components/EditableTable";
 import { ID } from "appwrite";
+import Toast from "../Toast";
 
 const BodyMassComposition = ({ client_id }) => {
     const { userData } = useUser(); // Access the user data from Context
-    const page_title = ["BMI Records"];
     const [bmiRecords, setBmiRecords] = useState([]);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState("success");
+
+    const handleToastClose = () => {
+        setShowToast(false);
+    };
 
     async function handleSaveBmc(bmcRecord) {
         try {
@@ -70,6 +77,37 @@ const BodyMassComposition = ({ client_id }) => {
         // bmiRecords.push({});
     }
 
+    async function handleDeleteBmc(bmcId) {
+        const toBeDeletedRecord = bmiRecords.filter(
+            (record) => record.$id !== bmcId
+        );
+        try {
+            setBmiRecords((prevRecords) =>
+                prevRecords.filter((record) => record.$id !== bmcId)
+            );
+            const response = await axios.delete(
+                `${API_BASE_URL}/mvmt/v1/client/bmc/${bmcId}`,
+                { withCredentials: true }
+            );
+            if (response.status === 200) {
+                setToastMessage("Deleted record successfully!");
+                setToastType("success");
+                setShowToast(true);
+            } else {
+                setToastMessage("Could not delete record!");
+                setToastType("error");
+                setShowToast(true);
+                setBmiRecords([...bmiRecords, toBeDeletedRecord]);
+            }
+        } catch (error) {
+            console.error("Error deleting BMC record:", error);
+            setToastMessage("Could not delete record!");
+            setToastType("error");
+            setShowToast(true);
+            setBmiRecords([...bmiRecords, toBeDeletedRecord]);
+        }
+    }
+
     async function addBmcToDB(bmcData) {
         console.log(bmcData);
 
@@ -100,8 +138,16 @@ const BodyMassComposition = ({ client_id }) => {
                 data={bmiRecords}
                 emptyText="No BMI Records found"
                 headerColumns={BMC_COLUMNS}
-                handleSaveBmc={addBmcToDB}
+                handleSave={addBmcToDB}
+                handleDelete={handleDeleteBmc}
             />
+            {showToast && (
+                <Toast
+                    message={toastMessage}
+                    onClose={handleToastClose}
+                    type={toastType}
+                />
+            )}
         </div>
     );
 };
