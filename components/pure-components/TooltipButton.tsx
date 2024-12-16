@@ -7,6 +7,7 @@ const TooltipButton = ({ tooltip, children, ...props }) => {
     <div className="relative">
       <button
         {...props}
+        className={`${props.className} flex flex-row items-center gap-1`}
         onMouseEnter={() => {
           setShowTooltip(true);
         }}
