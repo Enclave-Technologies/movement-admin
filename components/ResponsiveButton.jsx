@@ -3,6 +3,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import { useFormStatus } from "react-dom";
 
 const SignupButton = ({ label }) => {
+    // const pending = true;
     const { pending } = useFormStatus();
     // console.log("Pending state:", pending);
 
@@ -18,7 +19,7 @@ const SignupButton = ({ label }) => {
         >
             {pending ? (
                 <div className="flex items-center justify-center">
-                    <LoadingSpinner />{" "}
+                    <LoadingSpinner className="w-4 h-4 aspect-square" />{" "}
                     <span className="ml-2">Submitting...</span>
                 </div>
             ) : (
