@@ -180,33 +180,25 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                     )}
                     <button
                         type="submit"
-                        className="w-full py-2 border border-transparent 
-                        rounded-md shadow-sm text-sm font-medium text-white
-                         bg-gold-500 hover:bg-green-500 hover:border-gold-500 
-                         focus:outline-none focus:ring-2 focus:ring-offset-2
-                          focus:ring-gold-500 transform hover:-translate-y-0.5"
+                        className="w-full h-12 py-2 border border-transparent 
+                                rounded-md shadow-sm text-sm font-medium text-white
+                                bg-gold-500 hover:bg-green-500 hover:border-gold-500 
+                                focus:outline-none focus:ring-2 focus:ring-offset-2
+                                focus:ring-gold-500 transform hover:-translate-y-0.5"
                         disabled={loadingLogout}
                         onClick={handleLogout}
                     >
                         {loadingLogout ? (
-                            <div className="flex items-center justify-center select-none">
-                                <LoadingSpinner />
+                            <div className="flex items-center justify-center select-none gap-2">
+                                <LoadingSpinner className="w-4 h-4 aspect-square" />
                                 {!isCollapsed && (
                                     <span className="ml-2">Logging Out...</span>
                                 )}
                             </div>
                         ) : (
-                            <div
-                                className={`flex items-center px-3 select-none ${
-                                    isCollapsed ? "gap-0" : "gap-2"
-                                }`}
-                            >
-                                <IoLogOutOutline
-                                    className={`w-6 h-6 stroke-2 ${
-                                        isCollapsed ? "mr-0" : "mr-2"
-                                    }`}
-                                />
-                                {!isCollapsed && "Logout"}
+                            <div className="flex items-center justify-center select-none gap-2">
+                                <IoLogOutOutline className="w-6 h-6 stroke-2" />
+                                {!isCollapsed && <span>Logout</span>}
                             </div>
                         )}
                     </button>
