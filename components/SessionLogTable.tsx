@@ -68,8 +68,8 @@ const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
                                     </AccordionItemState>
                                     <div className="flex flex-row justify-between items-center w-full">
                                         <h2 className="text-base font-bold text-gray-800 uppercase ml-4">
-                                            {session.phases.phaseName} -{" "}
-                                            {session.sessions.sessionName}
+                                            {session.phaseName} -{" "}
+                                            {session.sessionName}
                                         </h2>
                                         <h2 className="text-base font-bold text-gray-600 ml-4">
                                             {new Date(
@@ -91,7 +91,7 @@ const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
                                         Phase
                                     </h3>
                                     <p className="text-gray-600  uppercase">
-                                        {session.phases.phaseName}
+                                        {session.phaseName}
                                     </p>
                                 </div>
                                 <div>
@@ -99,7 +99,7 @@ const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
                                         Session
                                     </h3>
                                     <p className="text-gray-600  uppercase">
-                                        {session.sessions.sessionName}
+                                        {session.sessionName}
                                     </p>
                                 </div>
                                 <div>
@@ -130,7 +130,7 @@ const SessionLogTable = ({ sessions, handleViewSession, dataLoading }) => {
                                     >
                                         <h4 className="text-lg font-bold text-gray-800 mb-2  uppercase">
                                             Exercise {index + 1}:{" "}
-                                            {exercise.exercises.fullName}
+                                            {exercise.exerciseName}
                                         </h4>
                                         <div className="grid grid-cols-3 gap-4">
                                             <div>
