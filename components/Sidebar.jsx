@@ -182,9 +182,9 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                         type="submit"
                         className="w-full h-12 py-2 border border-transparent 
                                 rounded-md shadow-sm text-sm font-medium text-white
-                                bg-gold-500 hover:bg-green-500 hover:border-gold-500 
+                                bg-green-500 hover:bg-green-900
                                 focus:outline-none focus:ring-2 focus:ring-offset-2
-                                focus:ring-gold-500 transform hover:-translate-y-0.5"
+                                transition duration-3000 ease-in-out transform"
                         disabled={loadingLogout}
                         onClick={handleLogout}
                     >
