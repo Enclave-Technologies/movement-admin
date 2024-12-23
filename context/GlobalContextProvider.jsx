@@ -1,8 +1,8 @@
 "use client";
-import { LIMIT } from "@/configs/constants";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { API_BASE_URL } from "@/configs/constants";
+
 // Create the User Context
 const StoreContext = createContext();
 
@@ -60,7 +60,9 @@ export const StoreProvider = ({ children }) => {
     };
 
     useEffect(() => {
-        reloadData();
+        const intervalId = setInterval(reloadData, 120 * 60 * 1000); // 120 minutes
+        reloadData(); // Initial fetch
+        return () => clearInterval(intervalId); // Clean up
     }, []);
 
     return (

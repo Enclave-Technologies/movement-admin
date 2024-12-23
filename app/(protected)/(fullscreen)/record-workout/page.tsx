@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import Spinner from "@/components/Spinner";
 import SearchParamsLoader from "@/components/WorkoutRecordDataLoader";
 import WorkoutRecordHeader from "@/components/WorkoutRecordHeader";
@@ -19,6 +19,7 @@ const RecordWorkout = () => {
     const [openExercises, setOpenExercises] = useState([]);
     const [sessionInformation, setSessionInformation] = useState(null);
     const [exerciseData, setExerciseData] = useState([]);
+    const [savedExerciseData, setSavedExerciseData] = useState([]);
     const [savingState, setSavingState] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -64,18 +65,34 @@ const RecordWorkout = () => {
 
     const saveToDatabase = async () => {
         try {
-            setSavingState(true);
-            await axios.post(
-                `${API_BASE_URL}/mvmt/v1/client/workout-tracker`,
-                { clientId, phaseId, sessionId, exerciseData, workoutTrackId },
-                { withCredentials: true }
-            );
+            if (exerciseData.length > 0 && exerciseData !== savedExerciseData) {
+                setSavingState(true);
+                await axios.post(
+                    `${API_BASE_URL}/mvmt/v1/client/workout-tracker`,
+                    {
+                        clientId,
+                        phaseId,
+                        sessionId,
+                        exerciseData,
+                        workoutTrackId,
+                    },
+                    { withCredentials: true }
+                );
+                setSavedExerciseData(exerciseData);
+            }
         } catch (error) {
             console.error("Error saving workout data:", error);
         } finally {
             setSavingState(false);
         }
     };
+
+    useEffect(() => {
+        if (exerciseData.length > 0 && exerciseData !== savedExerciseData) {
+            saveToDatabase();
+            setSavedExerciseData(exerciseData);
+        }
+    }, []);
 
     const handleAddSet = (exerciseId) => {
         const currentTime = new Date().toISOString();
@@ -132,9 +149,13 @@ const RecordWorkout = () => {
                 setPhaseId={setPhaseId}
                 setSessionId={setSessionId}
                 setWorkoutTrackId={setWorkoutTrackId}
+                workoutTrackId={workoutTrackId}
                 setSessionInformation={setSessionInformation}
+                sessionInformation={sessionInformation}
                 setExerciseData={setExerciseData}
+                exerciseData={exerciseData}
                 setPageLoading={setPageLoading}
+                pageLoading={pageLoading}
                 onSave={saveToDatabase}
             />
             {pageLoading ? (

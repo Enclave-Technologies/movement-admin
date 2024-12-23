@@ -99,20 +99,19 @@ const SessionComponent: FC<SessionProps> = ({
                 }
             );
 
-            if (response.status === 200) {
+            if (response.data.status) {
                 router.push(
                     `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
                 );
             } else {
                 setToastMessage(response.data.message);
                 setToastType("error");
+                setStartingWorkout(false);
                 setShowToast(true);
             }
         } catch (e) {
             console.error("Failed to start workout:", e);
         } finally {
-            // setWorkoutPressed(false);
-            // setPageLoading(false);
         }
     };
 

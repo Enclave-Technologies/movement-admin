@@ -4,7 +4,7 @@ import axios from "axios";
 import { API_BASE_URL } from "@/configs/constants";
 import { useUser } from "@/context/ClientContext";
 import { TrainerProvider } from "@/context/TrainerContext";
-import SessionLogTable from "../SessionLogTable";
+import WorkoutHistoryTable from "../WorkoutHistoryTable";
 import WorkoutPlan from "./WorkoutPlan";
 import { FaHistory } from "react-icons/fa";
 import { MdChangeHistory } from "react-icons/md";
@@ -90,7 +90,7 @@ const ClientDetails = ({ client_id }) => {
         <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
         <div className="p-8 bg-white w-full">
           {selectedTab == "workout-history" && (
-            <SessionLogTable
+            <WorkoutHistoryTable
               dataLoading={fetchingWorkouts}
               handleViewSession={null}
               sessions={sessionLog}
