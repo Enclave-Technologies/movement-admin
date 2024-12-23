@@ -13,9 +13,14 @@ const SearchParamsLoader = ({
     setSessionInformation,
     setExerciseData,
     setPageLoading,
+    exerciseData,
+    sessionInformation,
+    workoutTrackId,
+    pageLoading,
     onSave,
 }) => {
     const searchParams = useSearchParams();
+    const [dataLoaded, setDataLoaded] = useState(false);
 
     useEffect(() => {
         async function loadData() {
@@ -46,7 +51,6 @@ const SearchParamsLoader = ({
             setSessionInformation(sessionInfo[0]);
             setWorkoutTrackId(ID.unique());
             setPageLoading(false);
-            onSave();
         }
 
         loadData();
@@ -59,7 +63,26 @@ const SearchParamsLoader = ({
         setSessionInformation,
         setExerciseData,
         setPageLoading,
-        // onSave,
+    ]);
+
+    useEffect(() => {
+        if (
+            !dataLoaded &&
+            exerciseData &&
+            sessionInformation &&
+            workoutTrackId &&
+            !pageLoading
+        ) {
+            onSave();
+            setDataLoaded(true);
+        }
+    }, [
+        exerciseData,
+        sessionInformation,
+        workoutTrackId,
+        pageLoading,
+        dataLoaded,
+        onSave,
     ]);
 
     return null;

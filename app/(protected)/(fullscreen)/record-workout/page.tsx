@@ -132,9 +132,13 @@ const RecordWorkout = () => {
                 setPhaseId={setPhaseId}
                 setSessionId={setSessionId}
                 setWorkoutTrackId={setWorkoutTrackId}
+                workoutTrackId={workoutTrackId}
                 setSessionInformation={setSessionInformation}
+                sessionInformation={sessionInformation}
                 setExerciseData={setExerciseData}
+                exerciseData={exerciseData}
                 setPageLoading={setPageLoading}
+                pageLoading={pageLoading}
                 onSave={saveToDatabase}
             />
             {pageLoading ? (
