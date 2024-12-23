@@ -107,320 +107,301 @@ const EditModeTable: FC<EditableTableProps> = ({
           </p>
         </div>
       ) : (
-        <DndContext
-          onDragEnd={handleDragEnd}
-          collisionDetection={closestCenter}
-        >
-          <table className="min-w-full bg-white table-fixed">
-            <thead className="bg-gray-200 text-black">
-              <tr>
-                <th className="px-2 py-2 text-xs text-center min-w-32">
-                  Order
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-64">
-                  Motion
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-64">
-                  Target Area
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-64">
-                  Description
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">Bias</th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">
-                  Lengthened / Shortened
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">
-                  Impliment
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">Grip</th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">
-                  Angle
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">
-                  Support
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">Sets</th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">Reps</th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">TUT</th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">
-                  Tempo
-                </th>
-                <th className="px-2 py-2 text-xs text-center min-w-48">Rest</th>
+        <table className="min-w-full bg-white table-fixed">
+          <thead className="bg-gray-200 text-black">
+            <tr>
+              <th className="px-2 py-2 text-xs text-center min-w-32">Order</th>
+              <th className="px-2 py-2 text-xs text-center min-w-64">Motion</th>
+              <th className="px-2 py-2 text-xs text-center min-w-64">
+                Target Area
+              </th>
+              <th className="px-2 py-2 text-xs text-center min-w-64">
+                Description
+              </th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Bias</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">
+                Lengthened / Shortened
+              </th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">
+                Impliment
+              </th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Grip</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Angle</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">
+                Support
+              </th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Sets</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Reps</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">TUT</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Tempo</th>
+              <th className="px-2 py-2 text-xs text-center min-w-48">Rest</th>
 
-                <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500 flex justify-center">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <SortableContext
-                items={exercises.sort(
-                  (a, b) => a.exerciseOrder - b.exerciseOrder
-                )}
-                strategy={verticalListSortingStrategy}
-              >
-                {exercises
-                  .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
-                  .map((exercise) => (
-                    <DraggableRow id={exercise.id} key={exercise.id}>
-                      {editingExerciseId === exercise.id ? (
-                        <>
-                          <td></td>
-                          <td className="px-1 py-2">
-                            <input
-                              autoFocus
-                              className="w-full text-center px-0 py-1 border rounded"
-                              value={exercise.setOrderMarker || ""}
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  setOrderMarker: e.target.value,
-                                })
-                              }
-                            />
-                          </td>
-                          <td className="px-1 py-2">
-                            <input
-                              className="w-full px-0 text-center py-1 border rounded cursor-not-allowed bg-gray-100"
-                              disabled
-                              value={exercise.motion}
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  motion: e.target.value,
-                                })
-                              }
-                            />
-                          </td>
-                          <td className="px-1 py-2 relative">
-                            <Select
-                              options={targetAreas}
-                              value={targetAreas.find(
-                                (option) => option.value === exercise.targetArea
-                              )}
-                              onChange={(selectedOption) => {
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  targetArea: selectedOption.value,
-                                });
+              <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500 flex justify-center">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {exercises
+              .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
+              .map((exercise) => (
+                <>
+                  {editingExerciseId === exercise.id ? (
+                    <tr>
+                      <td className="px-1 py-2">
+                        <input
+                          autoFocus
+                          className="w-full text-center px-0 py-1 border rounded"
+                          value={exercise.setOrderMarker || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              setOrderMarker: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded cursor-not-allowed bg-gray-100"
+                          disabled
+                          value={exercise.motion}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              motion: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2 relative">
+                        <Select
+                          options={targetAreas}
+                          value={targetAreas.find(
+                            (option) => option.value === exercise.targetArea
+                          )}
+                          onChange={(selectedOption) => {
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              targetArea: selectedOption.value,
+                            });
 
-                                setSelTargetArea(selectedOption.value);
-                              }}
-                            />
-                          </td>
-                          {/* <td className="w-2"></td> */}
-                          <td className="px-1 py-2 relative">
-                            <Select
-                              options={filteredExercises(exercise)}
-                              value={workoutOptions.find(
-                                (option) => option.value === exercise.exerciseId
-                              )}
-                              onChange={(selectedOption) => {
-                                if (selectedOption) {
-                                  const { workout } = selectedOption;
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    exerciseId: workout.$id,
-                                    motion: workout.motion,
-                                    fullName: workout.fullName,
-                                    targetArea: workout.targetArea,
-                                    exerciseVideo: workout.videoUrl,
-                                    repsMin: DEFAULT_WORKOUT_VALUES.repsMin,
-                                    repsMax: DEFAULT_WORKOUT_VALUES.repsMax,
-                                    setsMin: DEFAULT_WORKOUT_VALUES.setsMin,
-                                    setsMax: DEFAULT_WORKOUT_VALUES.setsMax,
-                                    tempo: DEFAULT_WORKOUT_VALUES.tempo,
-                                    TUT: DEFAULT_WORKOUT_VALUES.TUT,
-                                    restMin: DEFAULT_WORKOUT_VALUES.restMin,
-                                    restMax: DEFAULT_WORKOUT_VALUES.restMax,
-                                  });
-                                }
-                              }}
-                            />
-                          </td>
+                            setSelTargetArea(selectedOption.value);
+                          }}
+                        />
+                      </td>
+                      {/* <td className="w-2"></td> */}
+                      <td className="px-1 py-2 relative">
+                        <Select
+                          options={filteredExercises(exercise)}
+                          value={workoutOptions.find(
+                            (option) => option.value === exercise.exerciseId
+                          )}
+                          onChange={(selectedOption) => {
+                            if (selectedOption) {
+                              const { workout } = selectedOption;
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                exerciseId: workout.$id,
+                                motion: workout.motion,
+                                fullName: workout.fullName,
+                                targetArea: workout.targetArea,
+                                exerciseVideo: workout.videoUrl,
+                                repsMin: DEFAULT_WORKOUT_VALUES.repsMin,
+                                repsMax: DEFAULT_WORKOUT_VALUES.repsMax,
+                                setsMin: DEFAULT_WORKOUT_VALUES.setsMin,
+                                setsMax: DEFAULT_WORKOUT_VALUES.setsMax,
+                                tempo: DEFAULT_WORKOUT_VALUES.tempo,
+                                TUT: DEFAULT_WORKOUT_VALUES.TUT,
+                                restMin: DEFAULT_WORKOUT_VALUES.restMin,
+                                restMax: DEFAULT_WORKOUT_VALUES.restMax,
+                              });
+                            }
+                          }}
+                        />
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <input
-                              className="w-full px-0 text-center py-1 border rounded  "
-                              value={exercise.bias || ""}
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  bias: e.target.value,
-                                })
-                              }
-                            />
-                          </td>
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded  "
+                          value={exercise.bias || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              bias: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <Select
-                              options={lenShortOptions}
-                              value={lenShortOptions.find(
-                                (option) => option.value === exercise.lenShort
-                              )}
-                              onChange={(selectedOption) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  lenShort: selectedOption.value,
-                                })
-                              }
-                            />
-                          </td>
+                      <td className="px-1 py-2">
+                        <Select
+                          options={lenShortOptions}
+                          value={lenShortOptions.find(
+                            (option) => option.value === exercise.lenShort
+                          )}
+                          onChange={(selectedOption) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              lenShort: selectedOption.value,
+                            })
+                          }
+                        />
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <input
-                              className="w-full px-0 text-center py-1 border rounded "
-                              value={exercise.impliment || ""}
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  impliment: e.target.value,
-                                })
-                              }
-                            />
-                          </td>
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded "
+                          value={exercise.impliment || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              impliment: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <Select
-                              options={gripOptions}
-                              value={gripOptions.find(
-                                (option) => option.value === exercise.grip
-                              )}
-                              onChange={(selectedOption) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  grip: selectedOption.value,
-                                })
-                              }
-                            />
-                          </td>
-                          <td className="px-1 py-2">
-                            <Select
-                              options={angleOptions}
-                              value={angleOptions.find(
-                                (option) => option.value === exercise.angle
-                              )}
-                              onChange={(selectedOption) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  angle: selectedOption.value,
-                                })
-                              }
-                            />
-                          </td>
+                      <td className="px-1 py-2">
+                        <Select
+                          options={gripOptions}
+                          value={gripOptions.find(
+                            (option) => option.value === exercise.grip
+                          )}
+                          onChange={(selectedOption) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              grip: selectedOption.value,
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2">
+                        <Select
+                          options={angleOptions}
+                          value={angleOptions.find(
+                            (option) => option.value === exercise.angle
+                          )}
+                          onChange={(selectedOption) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              angle: selectedOption.value,
+                            })
+                          }
+                        />
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <input
-                              className="w-full px-0 text-center py-1 border rounded "
-                              value={exercise.support || ""}
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  support: e.target.value,
-                                })
-                              }
-                            />
-                          </td>
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded "
+                          value={exercise.support || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              support: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <div className="flex items-center text-center justify-center gap-1">
-                              <input
-                                className="w-12 px-0 py-1 text-center border rounded"
-                                type="number"
-                                value={exercise.setsMin || ""} // Ensure it's a controlled input
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue =
-                                    value === "" ? 0 : parseInt(value); // Handle empty input
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    setsMin: newValue,
-                                  });
-                                }}
-                              />
-                              <span className="text-xs"> - </span>
-                              <input
-                                className="w-12 px-0 py-1 text-center border rounded"
-                                type="number"
-                                value={exercise.setsMax || ""}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue =
-                                    value === "" ? 0 : parseInt(value); // Handle empty input
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    setsMax: newValue,
-                                  });
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td className="px-1 py-2">
-                            <div className="flex items-center text-center justify-center gap-1">
-                              <input
-                                className="w-12 px-0 py-1 text-center border rounded"
-                                type="number"
-                                value={exercise.repsMin || ""}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue =
-                                    value === "" ? 0 : parseInt(value); // Handle empty input
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    repsMin: newValue,
-                                  });
-                                }}
-                              />
-                              <span className="text-xs"> - </span>
-                              <input
-                                className="w-12 px-0 py-1 text-center border rounded"
-                                type="number"
-                                value={exercise.repsMax || ""}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue =
-                                    value === "" ? 0 : parseInt(value); // Handle empty input
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    repsMax: newValue,
-                                  });
-                                }}
-                              />
-                            </div>
-                          </td>
+                      <td className="px-1 py-2">
+                        <div className="flex items-center text-center justify-center gap-1">
+                          <input
+                            className="w-12 px-0 py-1 text-center border rounded"
+                            type="number"
+                            value={exercise.setsMin || ""} // Ensure it's a controlled input
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const newValue =
+                                value === "" ? 0 : parseInt(value); // Handle empty input
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                setsMin: newValue,
+                              });
+                            }}
+                          />
+                          <span className="text-xs"> - </span>
+                          <input
+                            className="w-12 px-0 py-1 text-center border rounded"
+                            type="number"
+                            value={exercise.setsMax || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const newValue =
+                                value === "" ? 0 : parseInt(value); // Handle empty input
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                setsMax: newValue,
+                              });
+                            }}
+                          />
+                        </div>
+                      </td>
+                      <td className="px-1 py-2">
+                        <div className="flex items-center text-center justify-center gap-1">
+                          <input
+                            className="w-12 px-0 py-1 text-center border rounded"
+                            type="number"
+                            value={exercise.repsMin || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const newValue =
+                                value === "" ? 0 : parseInt(value); // Handle empty input
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                repsMin: newValue,
+                              });
+                            }}
+                          />
+                          <span className="text-xs"> - </span>
+                          <input
+                            className="w-12 px-0 py-1 text-center border rounded"
+                            type="number"
+                            value={exercise.repsMax || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const newValue =
+                                value === "" ? 0 : parseInt(value); // Handle empty input
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                repsMax: newValue,
+                              });
+                            }}
+                          />
+                        </div>
+                      </td>
 
-                          <td className="px-1 py-2">
-                            <input
-                              className="w-full px-0 text-center py-1 border rounded"
-                              value={calculateTUT({
-                                tempo: exercise.tempo,
-                                setsMax: exercise.setsMax,
-                                repsMax: exercise.repsMax,
-                              })}
-                              disabled
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  TUT: Number(e.target.value),
-                                })
-                              }
-                            />
-                          </td>
-                          <td className="px-1 py-2">
-                            <input
-                              className="w-full px-0 text-center py-1 border rounded"
-                              value={exercise.tempo || ""}
-                              onChange={(e) =>
-                                onExerciseUpdate(phaseId, sessionId, {
-                                  ...exercise,
-                                  tempo: e.target.value,
-                                })
-                              }
-                            />
-                          </td>
-                          <td className="px-1 py-2">
-                            {/* <input
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded"
+                          value={calculateTUT({
+                            tempo: exercise.tempo,
+                            setsMax: exercise.setsMax,
+                            repsMax: exercise.repsMax,
+                          })}
+                          disabled
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              TUT: Number(e.target.value),
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2">
+                        <input
+                          className="w-full px-0 text-center py-1 border rounded"
+                          value={exercise.tempo || ""}
+                          onChange={(e) =>
+                            onExerciseUpdate(phaseId, sessionId, {
+                              ...exercise,
+                              tempo: e.target.value,
+                            })
+                          }
+                        />
+                      </td>
+                      <td className="px-1 py-2">
+                        {/* <input
                                                     className="w-full px-0 text-center py-1 border rounded"
                                                     value={`${exercise.restMin}-${exercise.restMax}`}
                                                     onChange={(e) => {
@@ -439,160 +420,155 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                         );
                                                     }}
                                                 /> */}
-                            <div className="flex items-center text-center justify-center gap-1">
-                              <input
-                                className="w-12 px-0 py-1 text-center border rounded"
-                                type="number"
-                                value={exercise.restMin || ""}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue =
-                                    value === "" ? 0 : parseInt(value); // Handle empty input
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    restMin: newValue,
-                                  });
-                                }}
-                              />
-                              <span className="text-xs"> - </span>
-                              <input
-                                className="w-12 px-0 py-1 text-center border rounded"
-                                type="number"
-                                value={exercise.restMax || ""}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  const newValue =
-                                    value === "" ? 0 : parseInt(value); // Handle empty input
-                                  onExerciseUpdate(phaseId, sessionId, {
-                                    ...exercise,
-                                    restMax: newValue,
-                                  });
-                                }}
-                              />
-                            </div>
-                          </td>
-                          <td className="sticky right-0 bg-white z-10 px-2 py-2 h-14 flex items-center justify-center border-l-[1px] border-gray-500">
-                            {savingState ? (
-                              <div className="text-black">
-                                <LoadingSpinner className="w-4 h-4" />
-                              </div>
-                            ) : (
-                              <button
-                                onClick={() => {
-                                  // DONE: Saving to DB
-                                  onEditExercise(null);
-                                  handleExerciseSave();
-                                }}
-                                className="text-black hover:text-black"
-                              >
-                                <FaSave className="text-lg" />
-                              </button>
-                            )}
-                          </td>
-                        </>
-                      ) : (
-                        <tr>
-                          <td></td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">
-                            {exercise.setOrderMarker}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.motion}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.targetArea}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.fullName}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.bias}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.lenShort === "none"
-                              ? ""
-                              : exercise.lenShort}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.impliment}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.grip === "none" ? "" : exercise.grip}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.angle === "none" ? "" : exercise.angle}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                            {exercise.support}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.setsMin}-${exercise.setsMax}`}</td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.repsMin}-${exercise.repsMax}`}</td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">
-                            {calculateTUT({
-                              tempo: exercise.tempo,
-                              setsMax: exercise.setsMax,
-                              repsMax: exercise.repsMax,
-                            })}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">
-                            {exercise.tempo}
-                          </td>
-                          <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">{`${exercise.restMin}-${exercise.restMax}`}</td>
-                          <td className="sticky right-0 bg-white z-10 px-2 py-2 h-10 flex items-center justify-center border-l-[1px] border-gray-500">
-                            {savingState ? (
-                              <div className="text-black">
-                                <LoadingSpinner className="w-4 h-4" />
-                              </div>
-                            ) : (
-                              <>
-                                <button
-                                  onClick={() => onEditExercise(exercise.id)}
-                                  className="text-black hover:text-black mr-2"
-                                >
-                                  <FaEdit />
-                                </button>
-                                <button
-                                  // onClick={() =>
-                                  //     onExerciseDelete(
-                                  //         phaseId,
-                                  //         sessionId,
-                                  //         exercise.id
-                                  //     )
-                                  // }
-                                  onClick={
-                                    () => handleDeleteExercise(exercise.id) // Pass the exercise ID here
-                                  }
-                                  className="text-red-500 hover:text-red-700 mr-2"
-                                >
-                                  <FaTrash />
-                                </button>
-                              </>
-                            )}
-                          </td>
-                        </tr>
-                      )}
-                    </DraggableRow>
-                  ))}
-              </SortableContext>
-              {exercises
-                .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
-                .map((exercise) => (
-                  <tr key={exercise.id} className="border-b">
-                    {/* <td className="px-1 py-2">
+                        <div className="flex items-center text-center justify-center gap-1">
+                          <input
+                            className="w-12 px-0 py-1 text-center border rounded"
+                            type="number"
+                            value={exercise.restMin || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const newValue =
+                                value === "" ? 0 : parseInt(value); // Handle empty input
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                restMin: newValue,
+                              });
+                            }}
+                          />
+                          <span className="text-xs"> - </span>
+                          <input
+                            className="w-12 px-0 py-1 text-center border rounded"
+                            type="number"
+                            value={exercise.restMax || ""}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              const newValue =
+                                value === "" ? 0 : parseInt(value); // Handle empty input
+                              onExerciseUpdate(phaseId, sessionId, {
+                                ...exercise,
+                                restMax: newValue,
+                              });
+                            }}
+                          />
+                        </div>
+                      </td>
+                      <td className="sticky right-0 bg-white z-10 px-2 py-2 h-14 flex items-center justify-center border-l-[1px] border-gray-500">
+                        {savingState ? (
+                          <div className="text-black">
+                            <LoadingSpinner className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              // DONE: Saving to DB
+                              onEditExercise(null);
+                              handleExerciseSave();
+                            }}
+                            className="text-black hover:text-black"
+                          >
+                            <FaSave className="text-lg" />
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ) : (
+                    <tr>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">
+                        {exercise.setOrderMarker}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.motion}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.targetArea}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.fullName}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.bias}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.lenShort === "none" ? "" : exercise.lenShort}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.impliment}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.grip === "none" ? "" : exercise.grip}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.angle === "none" ? "" : exercise.angle}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
+                        {exercise.support}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.setsMin}-${exercise.setsMax}`}</td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.repsMin}-${exercise.repsMax}`}</td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">
+                        {calculateTUT({
+                          tempo: exercise.tempo,
+                          setsMax: exercise.setsMax,
+                          repsMax: exercise.repsMax,
+                        })}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">
+                        {exercise.tempo}
+                      </td>
+                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">{`${exercise.restMin}-${exercise.restMax}`}</td>
+                      <td className="sticky right-0 bg-white z-10 px-2 py-2 h-10 flex items-center justify-center border-l-[1px] border-gray-500">
+                        {savingState ? (
+                          <div className="text-black">
+                            <LoadingSpinner className="w-4 h-4" />
+                          </div>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => onEditExercise(exercise.id)}
+                              className="text-black hover:text-black mr-2"
+                            >
+                              <FaEdit />
+                            </button>
+                            <button
+                              // onClick={() =>
+                              //     onExerciseDelete(
+                              //         phaseId,
+                              //         sessionId,
+                              //         exercise.id
+                              //     )
+                              // }
+                              onClick={
+                                () => handleDeleteExercise(exercise.id) // Pass the exercise ID here
+                              }
+                              className="text-red-500 hover:text-red-700 mr-2"
+                            >
+                              <FaTrash />
+                            </button>
+                          </>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </>
+              ))}
+            {exercises
+              .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
+              .map((exercise) => (
+                <tr key={exercise.id} className="border-b">
+                  {/* <td className="px-1 py-2">
                                         {exercise.exerciseOrder}
                                     </td> */}
-                    {exerciseToDelete === exercise.id && ( // Show confirmation only for the selected exercise
-                      <DeleteConfirmationDialog
-                        title={`Exercise: ${exercise.fullName}`}
-                        confirmDelete={confirmExerciseDelete}
-                        cancelDelete={cancelExerciseDelete}
-                      />
-                    )}
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </DndContext>
+                  {exerciseToDelete === exercise.id && ( // Show confirmation only for the selected exercise
+                    <DeleteConfirmationDialog
+                      title={`Exercise: ${exercise.fullName}`}
+                      confirmDelete={confirmExerciseDelete}
+                      cancelDelete={cancelExerciseDelete}
+                    />
+                  )}
+                </tr>
+              ))}
+          </tbody>
+        </table>
       )}
     </div>
   );

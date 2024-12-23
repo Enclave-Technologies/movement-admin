@@ -25,69 +25,64 @@ const WorkoutRecordBody = ({
     }
     return value;
   };
+
+  // !TODO (Optional): Autosave workout every 45 seconds
+
   return (
     <div className="">
       {workoutRecords.map((exercise) => (
         <div
           key={exercise.id}
-          className="flex flex-row items-center justify-center text-white uppercase mt-1  border-b border-gray-400 my-2"
+          className="flex flex-row items-center justify-center text-white border-b border-gray-400 my-1"
         >
-          <div className="max-w-[920px] w-full pb-4">
+          <div className="max-w-[920px] w-full py-4 flex flex-col gap-8">
             <div
-              className="cursor-pointer text-white flex justify-between 
-                items-start p-2 rounded-lg text-lg 
-                "
+              className="cursor-pointer text-white flex flex-col items-start justify-start 
+                rounded-lg text-lg uppercase"
               onClick={() => toggleAccordion(exercise.id)}
             >
-              <div className="flex flex-col items-start justify-start">
-                <span>
+              <div className="w-full flex flex-row items-center justify-between">
+                <h2 className="text-base">
                   {exercise.marker}. {exercise.shortName}
+                </h2>
+                <span
+                  className={`transition-transform text-white ${
+                    openExercises.includes(exercise.id) ? "" : "rotate-180"
+                  }`}
+                >
+                  <FaChevronUp className="text-lg" />
                 </span>
-                <div className="text-gray-400">{exercise.setRep}</div>
-                <div className="text-gray-400">
-                  {exercise.bias} {exercise.lenShort} {exercise.impliment}{" "}
-                  {exercise.grip} {exercise.angle} {exercise.support}{" "}
-                  {exercise.tempo}
-                </div>
               </div>
-              <span
-                className={`transition-transform text-white my-2 ${
-                  openExercises.includes(exercise.id) ? "" : "rotate-180"
-                }`}
-              >
-                <FaChevronUp className="text-lg" />
-              </span>
+              <p className="text-sm text-gray-400">{exercise.setRep}</p>
             </div>
-
             {openExercises.includes(exercise.id) && (
               <div
-                className={`transition-all duration-300 py-8 ${
+                className={`transition-all duration-300 pb-4 ${
                   openExercises.includes(exercise.id)
                     ? "max-h-screen"
                     : "max-h-0"
                 }`}
               >
-                <div className="bg-green-800 rounded-lg">
+                <div className="bg-green-800 rounded-lg flex flex-row items-stretch">
                   {/* <pre>{JSON.stringify(exercise, null, 2)}</pre> */}
                   <div className="flex w-full flex-row flex-wrap items-start justify-between">
                     <div className="w-2/3 pr-4">
                       <table className="font-sans text-white table-auto w-full border-[1px] border-gray-400">
                         <thead>
                           <tr className="border-[1px] border-gray-400">
-                            <th className="p-2 border-[1px] border-gray-400">
+                            <th className="p-2 border-[1px] border-gray-400 text-sm">
                               SET
                             </th>
-                            <th className="p-2 border-[1px] border-gray-400">
+                            <th className="p-2 border-[1px] border-gray-400 text-sm">
                               REPS
                             </th>
-                            <th className="p-2 border-[1px] border-gray-400">
+                            <th className="p-2 border-[1px] border-gray-400 text-sm">
                               WEIGHT (KG)
                             </th>
                           </tr>
                         </thead>
                         <tbody>
                           {exercise.sets.map((set, setIdx) => {
-                            console.log(set);
                             return (
                               <tr
                                 key={set.id}
@@ -113,7 +108,7 @@ const WorkoutRecordBody = ({
                                         );
                                       } catch (e) {}
                                     }}
-                                    className="w-full text-center bg-transparent uppercase rounded-3xl p-2 focus:outline-none"
+                                    className="w-full text-center bg-transparent rounded-3xl p-2 focus:outline-none"
                                   />
                                 </td>
                                 <td className="p-2 text-center border-[1px] border-gray-400">
@@ -129,11 +124,11 @@ const WorkoutRecordBody = ({
                                         e.target.value
                                       )
                                     }
-                                    className="w-full text-center uppercase bg-transparent  rounded-3xl p-2  focus:outline-none"
+                                    className="w-full text-center bg-transparent  rounded-3xl p-2  focus:outline-none"
                                   />
                                 </td>
                                 <td
-                                  className="p-2 text-center border-[1px] border-gray-400 bg-red-700 text-white cursor-pointer"
+                                  className="p-2 text-center border-[1px] border-gray-400 bg-red-500 hover:bg-red-700 text-white cursor-pointer"
                                   onClick={() => {
                                     handleRemoveSet(exercise.id, setIdx);
                                   }}
@@ -153,8 +148,8 @@ const WorkoutRecordBody = ({
                                 onClick={() => handleAddSet(exercise.id)}
                               >
                                 <div
-                                  className="w-full px-16 py-2 text-white
-                            hover:bg-green-300 hover:text-black font-semibold"
+                                  className="w-full px-16 py-2 text-white bg-green-500
+                            hover:bg-green-900 hover:text-white font-semibold"
                                 >
                                   Add Set
                                 </div>
@@ -164,7 +159,18 @@ const WorkoutRecordBody = ({
                         </tbody>
                       </table>
                     </div>
-                    <div className="h-full flex-1">
+                    <div className="h-full flex-1 flex flex-col justify-between gap-4">
+                      <div className="flex flex-col">
+                        <p className="text-sm text-gray-100">
+                          {exercise.setsMax}
+                        </p>
+                        <p className="text-sm text-gray-100">
+                          Tempo: {exercise.tempo}
+                        </p>
+                        <p className="text-sm text-gray-100">
+                          Rest time: {exercise.rest} seconds
+                        </p>
+                      </div>
                       <textarea
                         placeholder="Notes"
                         value={exercise.notes}
