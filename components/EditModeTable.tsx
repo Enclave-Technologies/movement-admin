@@ -140,6 +140,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                     <>
                       <td className="px-1 py-2">
                         <input
+                          autoFocus
                           className="w-full text-center px-0 py-1 border rounded"
                           value={exercise.setOrderMarker || ""}
                           onChange={(e) =>
@@ -153,7 +154,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                       <td className="px-1 py-2">
                         <input
                           className="w-full px-0 text-center py-1 border rounded cursor-not-allowed bg-gray-100"
-                          readOnly
+                          disabled
                           value={exercise.motion}
                           onChange={(e) =>
                             onExerciseUpdate(phaseId, sessionId, {
