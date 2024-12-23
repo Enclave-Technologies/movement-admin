@@ -12,7 +12,7 @@ const SignupButton = ({ label }) => {
             type="submit"
             className="w-full flex justify-center py-2 px-4 
     border-white border-2 rounded-md shadow-sm text-sm font-semibold
-    text-white bg-gold-500 hover:bg-green-500 focus:outline-none 
+    text-white bg-green-500 hover:bg-green-900 focus:outline-none 
     focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors 
     duration-300 ease-in-out tracking-wider"
             disabled={pending}

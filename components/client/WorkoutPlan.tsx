@@ -491,12 +491,10 @@ const WorkoutPlan = ({
                     </div>
                 </div>
             )}
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
                 {phaseAddingState ? (
                     <div className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-gray-300 text-black cursor-not-allowed">
-                        <div className="h-4 w-4">
-                            <LoadingSpinner className="text-black" />{" "}
-                        </div>{" "}
+                        <LoadingSpinner className="text-black h-4 w-4" />{" "}
                         <span>Adding Phase</span>
                     </div>
                 ) : (
