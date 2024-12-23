@@ -67,6 +67,14 @@ const EditModeTable: FC<EditableTableProps> = ({
     return results;
   };
 
+  const calculateTUT = ({ tempo, setsMax, repsMax }) => {
+    var tempoSum = 0;
+    for (const i in tempo.split(" ")) {
+      tempoSum += Number(tempo.split(" ")[i]);
+    }
+    return tempoSum * setsMax * repsMax;
+  };
+
   return (
     <div className="overflow-y-hidden pb-72">
       {exercises.length === 0 ? (
@@ -355,7 +363,12 @@ const EditModeTable: FC<EditableTableProps> = ({
                       <td className="px-1 py-2">
                         <input
                           className="w-full px-0 text-center py-1 border rounded"
-                          value={exercise.TUT || ""}
+                          value={calculateTUT({
+                            tempo: exercise.tempo,
+                            setsMax: exercise.setsMax,
+                            repsMax: exercise.repsMax,
+                          })}
+                          disabled
                           onChange={(e) =>
                             onExerciseUpdate(phaseId, sessionId, {
                               ...exercise,
@@ -482,7 +495,11 @@ const EditModeTable: FC<EditableTableProps> = ({
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.setsMin}-${exercise.setsMax}`}</td>
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.repsMin}-${exercise.repsMax}`}</td>
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">
-                        {exercise.TUT}
+                        {calculateTUT({
+                          tempo: exercise.tempo,
+                          setsMax: exercise.setsMax,
+                          repsMax: exercise.repsMax,
+                        })}
                       </td>
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">
                         {exercise.tempo}
