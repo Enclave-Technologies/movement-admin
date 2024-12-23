@@ -65,19 +65,6 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
   //     workout: workout,
   // }));
 
-  // function handleDragEnd(event) {
-  //     const { active, over } = event;
-
-  //     if (active.id !== over.id) {
-  //         const originalPos = exercises.findIndex((e) => e.id === active.id);
-  //         const newPos = exercises.findIndex((e) => e.id === over.id);
-  //         const newExercises = [...exercises];
-  //         newExercises.splice(originalPos, 1);
-  //         newExercises.splice(newPos, 0, exercises[originalPos]);
-  //         onExerciseOrderChange(phaseId, sessionId, newExercises);
-  //         console.log("drag end");
-  //     }
-  // }
   return (
     <div className="mt-4 overflow-x-auto touch-action-none">
       {/* {mode === "edit" ? ( */}
