@@ -65,25 +65,26 @@ const SearchParamsLoader = ({
         setPageLoading,
     ]);
 
-    useEffect(() => {
-        if (
-            !dataLoaded &&
-            exerciseData &&
-            sessionInformation &&
-            workoutTrackId &&
-            !pageLoading
-        ) {
-            onSave();
-            setDataLoaded(true);
-        }
-    }, [
-        exerciseData,
-        sessionInformation,
-        workoutTrackId,
-        pageLoading,
-        dataLoaded,
-        onSave,
-    ]);
+    // useEffect(() => {
+    //     if (
+    //         !dataLoaded &&
+    //         exerciseData &&
+    //         sessionInformation &&
+    //         workoutTrackId &&
+    //         !pageLoading
+    //     ) {
+    //         alert(`Saving data: ${JSON.stringify(exerciseData, null, 2)}`);
+    //         onSave();
+    //         setDataLoaded(true);
+    //     }
+    // }, [
+    //     exerciseData,
+    //     sessionInformation,
+    //     workoutTrackId,
+    //     pageLoading,
+    //     dataLoaded,
+    //     onSave,
+    // ]);
 
     return null;
 };
