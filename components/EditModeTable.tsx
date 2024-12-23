@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, use, useCallback, useState } from "react";
 import { FaEdit, FaPlus, FaSave, FaTrash } from "react-icons/fa";
 import { TiCancel } from "react-icons/ti";
 import { InputActionMeta } from "react-select";
@@ -22,7 +22,6 @@ const EditModeTable: FC<EditableTableProps> = ({
   onExerciseDelete,
   savingState,
 }) => {
-  console.log(targetAreas);
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
 
   const lenShortOptions = [
@@ -61,8 +60,15 @@ const EditModeTable: FC<EditableTableProps> = ({
     setExerciseToDelete(null); // Close dialog
   };
 
+  const filteredExercises = (exercise) => {
+    let results = workoutOptions.filter((option) => {
+      return option.workout.targetArea == exercise.targetArea;
+    });
+    return results;
+  };
+
   return (
-    <div>
+    <div className="overflow-y-hidden pb-72">
       {exercises.length === 0 ? (
         <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
           <p className="text-gray-500 text-sm font-medium uppercase">
@@ -165,9 +171,10 @@ const EditModeTable: FC<EditableTableProps> = ({
                           }}
                         />
                       </td>
+                      {/* <td className="w-2"></td> */}
                       <td className="px-1 py-2 relative">
                         <Select
-                          options={workoutOptions}
+                          options={filteredExercises(exercise)}
                           value={workoutOptions.find(
                             (option) => option.value === exercise.exerciseId
                           )}

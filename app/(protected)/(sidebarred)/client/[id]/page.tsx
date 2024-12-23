@@ -60,7 +60,7 @@ const Page = ({ params }: { params: { id: string } }) => {
   }, [params.id]);
 
   return (
-    <div className="flex flex-col min-h-screen items-center justify-between bg-gray-100 text-black w-full">
+    <div className="flex flex-col items-center justify-between bg-gray-100 text-black w-full">
       <div className="text-center flex flex-col gap-8 w-full">
         {userLoading ? (
           <div className="flex flex-col gap-4 p-4">

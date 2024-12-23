@@ -23,7 +23,6 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
   const [selTargetArea, setSelTargetArea] = useState("");
 
   const targetAreas = workouts.reduce((acc, workout) => {
-    console.log({ workout });
     const { targetArea } = workout;
     if (targetArea === undefined) return acc;
     const capitalizedLabel =
@@ -42,22 +41,22 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
     label: string;
     workout: WorkoutData;
   }[] = (selectedTargetArea) => {
-    return workouts
-      .map((workout) => ({
-        value: workout.$id,
-        label: workout.fullName,
-        workout: workout,
-      }))
-      .filter((option) => {
-        if (!selectedTargetArea) {
-          return true; // Return all options if no target area is selected
-        }
-        return option.workout.targetArea === selectedTargetArea;
-      });
+    return workouts.map((workout) => ({
+      value: workout.$id,
+      label: workout.fullName,
+      workout: workout,
+    }));
+    // .filter((option) => {
+    //   if (!selectedTargetArea) {
+    //     return true; // Return all options if no target area is selected
+    //   }
+    //   return option.workout.targetArea === selectedTargetArea;
+    // });
   };
 
   const workoutOptions = useMemo(() => {
-    return getWorkoutOptions(selTargetArea);
+    let options = getWorkoutOptions(selTargetArea);
+    return options;
   }, [selTargetArea]);
 
   // const workoutOptions = workouts.map((workout) => ({
@@ -100,7 +99,7 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
       {/* ) : (
          <DragModeTable exercises={exercises} handleDragEnd={handleDragEnd} />
    )} */}
-      <div className="sticky bottom-0 left-0 bg-white shadow-md py-4">
+      {/* <div className="sticky bottom-0 left-0 bg-white shadow-md py-4">
         {savingState ? (
           <div className="w-full secondary-btn flex mt-4 px-4 py-2 items-center justify-center h-12 ">
             <LoadingSpinner className="w-4 h-4" />
@@ -115,7 +114,7 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
             <FaPlus className="mr-2" /> Add Exercise
           </button>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
