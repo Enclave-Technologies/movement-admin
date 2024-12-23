@@ -1,7 +1,7 @@
 import React, { FC, useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import EditModeTable from "./EditModeTable";
-import DragModeTable from "./DragModeTable";
+// import DragModeTable from "./DragModeTable";
 import LoadingSpinner from "./LoadingSpinner";
 
 const SessionExerciseComponent: FC<SessionExerciseProps> = ({
