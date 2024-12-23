@@ -183,7 +183,7 @@ const AddExerciseForm = ({ fetchData, team }) => {
                         htmlFor="fullName"
                         className="block text-sm font-medium text-gray-700"
                     >
-                        Full Name
+                        Full Exercise Title
                     </label>
                     <input
                         type="text"
