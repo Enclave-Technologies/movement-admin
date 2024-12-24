@@ -105,6 +105,7 @@ const WorkoutPlan = ({
                     grip: exercise.grip,
                     angle: exercise.angle,
                     support: exercise.support,
+                    xtraInstructions: exercise.xtraInstructions,
                 })),
                 sessionTime: session.sessionTime,
                 sessionOrder: session.sessionOrder,
@@ -193,6 +194,7 @@ const WorkoutPlan = ({
             phases: updatedPhases,
         };
         try {
+            console.log("Updating phase name...");
             await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/phases`,
                 {
@@ -272,10 +274,9 @@ const WorkoutPlan = ({
         );
         setClientPhases(updatedPhases);
         setSavingState(false);
-        return;
     };
 
-    const handleDeleteSession = async (sessionId: string) => {
+    const handleSessionDelete = async (sessionId: string) => {
         // Remove the session from the original data
         const updatedPhases = clientPhases.map((phase) => ({
             ...phase,
@@ -332,6 +333,7 @@ const WorkoutPlan = ({
                                             grip: "",
                                             angle: "",
                                             support: "",
+                                            xtraInstructions: "",
                                         },
                                     ],
                                 }
@@ -503,9 +505,7 @@ const WorkoutPlan = ({
             <div className="flex justify-between">
                 {phaseAddingState ? (
                     <div className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-gray-300 text-black cursor-not-allowed">
-                        <div className="h-4 w-4">
-                            <LoadingSpinner className="text-black" />{" "}
-                        </div>{" "}
+                        <LoadingSpinner className="text-black w-4 h-4" />{" "}
                         <span>Adding Phase</span>
                     </div>
                 ) : (
@@ -545,7 +545,7 @@ const WorkoutPlan = ({
                                     clientPhases.find((p) => p.isActive)
                                         ?.phaseId || null
                                 }
-                                onSessionDelete={handleDeleteSession}
+                                onSessionDelete={handleSessionDelete}
                                 onSessionNameChange={handleSessionNameChange}
                                 editingExerciseId={editingExerciseId}
                                 handleAddExercise={handleExerciseAdd}

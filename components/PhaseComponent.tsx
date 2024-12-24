@@ -1,6 +1,15 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import SessionComponent from "./SessionComponent";
-import { FaChevronUp, FaPlus, FaChevronRight } from "react-icons/fa";
+import {
+    FaEdit,
+    FaCopy,
+    FaChevronDown,
+    FaChevronUp,
+    FaPlus,
+    FaTrash,
+    FaChevronRight,
+    FaSave,
+} from "react-icons/fa";
 import { ID } from "appwrite";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import PhaseActions from "./phase/PhaseActions";
@@ -101,6 +110,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                 grip: exercise.grip,
                 angle: exercise.angle,
                 support: exercise.support,
+                xtraInstructions: exercise.xtraInstructions,
             })),
             sessionOrder: phase.sessions.length + 1,
             sessionTime: "0",
@@ -124,8 +134,8 @@ const PhaseComponent: FC<PhaseProps> = ({
     return (
         <div className="bg-white rounded-lg shadow-sm border w-full border-gray-200 ">
             <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                <div className="flex items-center justify-start w-1/2 gap-4">
-                    <div className="px-1 py-1 flex justify-start">
+                <div className="flex items-center w-1/2 gap-4">
+                    <div className="px-1 py-1 flex justify-end">
                         <button
                             className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
                             onClick={() => setIsCollapsed(!isCollapsed)}
@@ -257,12 +267,12 @@ const PhaseComponent: FC<PhaseProps> = ({
                             />
                         ))
                 )}
-                <button
+                {/* <button
                     className="flex items-center justify-center w-full mt-4 px-4 py-2 h-12 secondary-btn uppercase gap-5"
                     onClick={handleAddSession}
                 >
                     <FaPlus className="text-lg" /> Add Session
-                </button>
+                </button> */}
             </div>
         </div>
     );
