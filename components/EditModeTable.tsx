@@ -1,17 +1,9 @@
-import React, { FC, use, useCallback, useState } from "react";
-import { FaEdit, FaPlus, FaSave, FaTrash } from "react-icons/fa";
-import { TiCancel } from "react-icons/ti";
-import { InputActionMeta } from "react-select";
+import React, { FC, useState } from "react";
+import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
 import Select from "react-select";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import LoadingSpinner from "./LoadingSpinner";
 import { DEFAULT_WORKOUT_VALUES } from "@/configs/constants";
-import { closestCenter, DndContext } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import DraggableRow from "./DraggableRow";
 
 const EditModeTable: FC<EditableTableProps> = ({
   phaseId,
@@ -22,7 +14,6 @@ const EditModeTable: FC<EditableTableProps> = ({
   setSelTargetArea,
   editingExerciseId,
   handleExerciseSave,
-  onCancelEdit,
   onEditExercise,
   onExerciseUpdate,
   onExerciseDelete,
@@ -30,27 +21,27 @@ const EditModeTable: FC<EditableTableProps> = ({
 }) => {
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
 
-  const lenShortOptions = [
-    { value: "lengthened", label: "Lengthened" },
-    { value: "shortened", label: "Shortened" },
-    { value: "variable", label: "Variable" },
-    { value: "midrange", label: "Midrange" },
-    { value: "none", label: "" },
-  ];
+  // const lenShortOptions = [
+  //   { value: "lengthened", label: "Lengthened" },
+  //   { value: "shortened", label: "Shortened" },
+  //   { value: "variable", label: "Variable" },
+  //   { value: "midrange", label: "Midrange" },
+  //   { value: "none", label: "" },
+  // ];
 
-  const gripOptions = [
-    { value: "neutral", label: "Neutral" },
-    { value: "underhand", label: "Underhand" },
-    { value: "overhand", label: "Overhand" },
-    { value: "none", label: "" },
-  ];
+  // const gripOptions = [
+  //   { value: "neutral", label: "Neutral" },
+  //   { value: "underhand", label: "Underhand" },
+  //   { value: "overhand", label: "Overhand" },
+  //   { value: "none", label: "" },
+  // ];
 
-  const angleOptions = [
-    { value: "flat", label: "Flat" },
-    { value: "incline", label: "Incline" },
-    { value: "decline", label: "Decline" },
-    { value: "none", label: "" },
-  ];
+  // const angleOptions = [
+  //   { value: "flat", label: "Flat" },
+  //   { value: "incline", label: "Incline" },
+  //   { value: "decline", label: "Decline" },
+  //   { value: "none", label: "" },
+  // ];
 
   const handleDeleteExercise = async (exerciseId: string) => {
     setExerciseToDelete(exerciseId); // Set the ID of the exercise to delete
@@ -118,19 +109,6 @@ const EditModeTable: FC<EditableTableProps> = ({
               <th className="px-2 py-2 text-xs text-center min-w-64">
                 Description
               </th>
-              {/*
-              <th className="px-2 py-2 text-xs text-center min-w-48">Bias</th>
-              <th className="px-2 py-2 text-xs text-center min-w-48">
-                Lengthened / Shortened
-              </th>
-              <th className="px-2 py-2 text-xs text-center min-w-48">
-                Impliment
-              </th>
-              <th className="px-2 py-2 text-xs text-center min-w-48">Grip</th>
-              <th className="px-2 py-2 text-xs text-center min-w-48">Angle</th>
-              <th className="px-2 py-2 text-xs text-center min-w-48">
-                Support
-              </th> */}
               <th className="px-2 py-2 text-xs text-center min-w-48">Sets</th>
               <th className="px-2 py-2 text-xs text-center min-w-48">Reps</th>
               <th className="px-2 py-2 text-xs text-center min-w-48">TUT</th>
@@ -221,136 +199,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                           }}
                         />
                       </td>
-
-                      {/* <td className="px-1 py-2">
-                                                <input
-                                                    className="w-full px-0 text-center py-1 border rounded  "
-                                                    value={exercise.bias || ""}
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                bias: e.target
-                                                                    .value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-
-                                            <td className="px-1 py-2">
-                                                <Select
-                                                    options={lenShortOptions}
-                                                    value={lenShortOptions.find(
-                                                        (option) =>
-                                                            option.value ===
-                                                            exercise.lenShort
-                                                    )}
-                                                    onChange={(
-                                                        selectedOption
-                                                    ) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                lenShort:
-                                                                    selectedOption.value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-
-                                            <td className="px-1 py-2">
-                                                <input
-                                                    className="w-full px-0 text-center py-1 border rounded "
-                                                    value={
-                                                        exercise.impliment || ""
-                                                    }
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                impliment:
-                                                                    e.target
-                                                                        .value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-
-                                            <td className="px-1 py-2">
-                                                <Select
-                                                    options={gripOptions}
-                                                    value={gripOptions.find(
-                                                        (option) =>
-                                                            option.value ===
-                                                            exercise.grip
-                                                    )}
-                                                    onChange={(
-                                                        selectedOption
-                                                    ) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                grip: selectedOption.value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-                                            <td className="px-1 py-2">
-                                                <Select
-                                                    options={angleOptions}
-                                                    value={angleOptions.find(
-                                                        (option) =>
-                                                            option.value ===
-                                                            exercise.angle
-                                                    )}
-                                                    onChange={(
-                                                        selectedOption
-                                                    ) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                angle: selectedOption.value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td>
-
-                                            <td className="px-1 py-2">
-                                                <input
-                                                    className="w-full px-0 text-center py-1 border rounded "
-                                                    value={
-                                                        exercise.support || ""
-                                                    }
-                                                    onChange={(e) =>
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                support:
-                                                                    e.target
-                                                                        .value,
-                                                            }
-                                                        )
-                                                    }
-                                                />
-                                            </td> */}
-
                       <td className="px-1 py-2">
                         <div className="flex items-center text-center justify-center gap-1">
                           <input
@@ -448,25 +296,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                         />
                       </td>
                       <td className="px-1 py-2">
-                        {/* <input
-                                                    className="w-full px-0 text-center py-1 border rounded"
-                                                    value={`${exercise.restMin}-${exercise.restMax}`}
-                                                    onChange={(e) => {
-                                                        const [min, max] =
-                                                            e.target.value
-                                                                .split("-")
-                                                                .map(Number);
-                                                        onExerciseUpdate(
-                                                            phaseId,
-                                                            sessionId,
-                                                            {
-                                                                ...exercise,
-                                                                restMin: min,
-                                                                restMax: max,
-                                                            }
-                                                        );
-                                                    }}
-                                                /> */}
                         <div className="flex items-center text-center justify-center gap-1">
                           <input
                             className="w-12 px-0 py-1 text-center border rounded"
@@ -532,24 +361,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
                         {exercise.fullName}
                       </td>
-                      {/* <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                        {exercise.bias}
-                      </td>
-                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                        {exercise.lenShort === "none" ? "" : exercise.lenShort}
-                      </td>
-                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                        {exercise.impliment}
-                      </td>
-                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                        {exercise.grip === "none" ? "" : exercise.grip}
-                      </td>
-                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                        {exercise.angle === "none" ? "" : exercise.angle}
-                      </td>
-                      <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-64 h-10 capitalize">
-                        {exercise.support}
-                      </td> */}
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.setsMin}-${exercise.setsMax}`}</td>
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">{`${exercise.repsMin}-${exercise.repsMax}`}</td>
                       <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap min-w-32 h-10 capitalize">

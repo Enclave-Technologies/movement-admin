@@ -187,17 +187,23 @@ const WorkoutPlan = ({
     const data: DataResponse = {
       phases: updatedPhases,
     };
-    await axios.post(
-      `${API_BASE_URL}/mvmt/v1/client/phases`,
-      {
-        client_id: client_id,
-        data,
-      },
-      { withCredentials: true }
-    );
-    setClientPhases(updatedPhases);
+    try {
+      await axios.post(
+        `${API_BASE_URL}/mvmt/v1/client/phases`,
+        {
+          client_id: client_id,
+          data,
+        },
+        { withCredentials: true }
+      );
+      setClientPhases(updatedPhases);
+    } catch (e) {
+      console.error("Failed to update phase name:", e);
+      return false;
+    }
     // setPhaseButtonsState(phaseButtonsState.filter((id) => id !== phaseId));
     setSavingState(false);
+    return true;
   };
 
   const onAddSession = async (phaseId: string, newSession: MovementSession) => {
@@ -256,9 +262,10 @@ const WorkoutPlan = ({
     );
     setClientPhases(updatedPhases);
     setSavingState(false);
+    return;
   };
 
-  const handleSessionDelete = async (sessionId: string) => {
+  const handleDeleteSession = async (sessionId: string) => {
     // Remove the session from the original data
     const updatedPhases = clientPhases.map((phase) => ({
       ...phase,
@@ -520,10 +527,10 @@ const WorkoutPlan = ({
                 activePhaseId={
                   clientPhases.find((p) => p.isActive)?.phaseId || null
                 }
-                onSessionDelete={handleSessionDelete}
+                onSessionDelete={handleDeleteSession}
                 onSessionNameChange={handleSessionNameChange}
                 editingExerciseId={editingExerciseId}
-                onExerciseAdd={handleExerciseAdd}
+                handleAddExercise={handleExerciseAdd}
                 onExerciseUpdate={handleExerciseUpdate}
                 onExerciseDelete={handleExerciseDelete}
                 handleExerciseSave={handleExerciseSave}
