@@ -13,16 +13,18 @@ import { logout } from "@/server_functions/auth";
 import TrainerInfo from "./TrainerInfo";
 import { useTrainer } from "@/context/TrainerContext";
 import Image from "next/image";
+import { FaUsers, FaUsersLine } from "react-icons/fa6";
+import { HiOutlineDocumentSearch } from "react-icons/hi";
 
 const sidebarItems = [
     {
         label: "My Clients",
-        icon: RiAdminFill,
+        icon: FaUsersLine,
         href: "/my-clients",
     },
     {
         label: "Users",
-        icon: RiAdminFill,
+        icon: FaUsers,
         href: "/users",
     },
     {
@@ -33,7 +35,7 @@ const sidebarItems = [
 
     {
         label: "Exercise Library",
-        icon: PiUsersFour,
+        icon: HiOutlineDocumentSearch,
         href: "/exercise-library",
     },
     {
@@ -105,44 +107,13 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                                 ? "bg-white text-primary font-bold"
                                 : "text-slate-500 hover:text-primary hover:bg-slate-100 transition-colors";
 
-                            // Check if the user is an admin and the item is for the admin panel
-                            // if (
-                            //     trainerData?.team.name === "Admins" &&
-                            //     item.href.includes("admin")
-                            // ) {
-                            //     return (
-                            //         <Link href={item.href} key={item.label}>
-                            //             <div
-                            //                 className={`flex items-center ${
-                            //                     isCollapsed
-                            //                         ? "justify-center h-12 w-12"
-                            //                         : "justify-start p-3"
-                            //                 } rounded-md cursor-pointer ${className}`}
-                            //             >
-                            //                 {loading ? (
-                            //                     <div className="animate-pulse">
-                            //                         <div className="bg-gray-300 rounded-full w-6 h-6"></div>
-                            //                     </div>
-                            //                 ) : (
-                            //                     <item.icon className="w-6 h-6" />
-                            //                 )}
-                            //                 {!isCollapsed && (
-                            //                     <span className="ml-2">
-                            //                         {loading ? "" : item.label}
-                            //                     </span>
-                            //                 )}
-                            //             </div>
-                            //         </Link>
-                            //     );
-                            // }
-
                             // Render other sidebar items regardless of the team
                             return (
                                 <Link href={item.href} key={item.label}>
                                     <div
-                                        className={`flex items-center ${
+                                        className={`flex items-center whitespace-nowrap ${
                                             isCollapsed
-                                                ? "justify-center h-12 w-12"
+                                                ? "justify-center p-2"
                                                 : "justify-start p-2"
                                         } rounded-md cursor-pointer ${className}`}
                                     >
@@ -151,7 +122,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                                                 <div className="bg-gray-300 rounded-full w-6 h-6"></div>
                                             </div>
                                         ) : (
-                                            <item.icon className="w-4 h-4" />
+                                            <item.icon className="w-[20px] h-[20px]" />
                                         )}
                                         {!isCollapsed && (
                                             <span className="ml-2">
