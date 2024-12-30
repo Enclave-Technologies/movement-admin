@@ -27,9 +27,10 @@ const WorkoutRecordBody = ({
   };
 
   const supersets = useMemo(() => {
+    // if exercise.marker is the same, it is a superset
     let sets = [
       {
-        id: workoutRecords[0].marker[0],
+        id: workoutRecords[0].marker[0] ?? 0,
         superset: workoutRecords[0].marker[0],
         exercises: [workoutRecords[0]],
       },
@@ -40,8 +41,16 @@ const WorkoutRecordBody = ({
         sets
           .find((set) => set.superset === superset)
           .exercises.push(workoutRecords[i]);
+      } else {
+        sets.push({
+          id: workoutRecords[i].marker[0] ?? sets.length,
+          superset: workoutRecords[i].marker[0],
+          exercises: [workoutRecords[i]],
+        });
       }
+      superset = workoutRecords[i].marker[0];
     }
+    console.log(sets);
     return sets;
   }, [workoutRecords]);
 
@@ -49,7 +58,7 @@ const WorkoutRecordBody = ({
     return (
       <div
         key={superset.id}
-        className="flex flex-row justify-center text-white border-b border-gray-400 my-1 cursor-pointer py-4"
+        className="flex flex-row justify-center text-white border-b border-gray-400 cursor-pointer py-4"
       >
         <div className="max-w-[920px] w-full flex flex-row items-start justify-center">
           <div className="w-full flex flex-col items-center justify-center">
