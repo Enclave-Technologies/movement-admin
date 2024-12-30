@@ -105,6 +105,7 @@ const WorkoutPlan = ({
                     grip: exercise.grip,
                     angle: exercise.angle,
                     support: exercise.support,
+                    xtraInstructions: exercise.xtraInstructions,
                 })),
                 sessionTime: session.sessionTime,
                 sessionOrder: session.sessionOrder,
@@ -332,6 +333,7 @@ const WorkoutPlan = ({
                                             grip: "",
                                             angle: "",
                                             support: "",
+                                            xtraInstructions: "",
                                         },
                                     ],
                                 }
