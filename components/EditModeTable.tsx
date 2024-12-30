@@ -136,6 +136,9 @@ const EditModeTable: FC<EditableTableProps> = ({
                             <th className="px-2 py-2 text-xs text-center min-w-48">
                                 Rest
                             </th>
+                            <th className="px-2 py-2 text-xs text-center min-w-48">
+                                Additional Information
+                            </th>
 
                             <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500 flex justify-center">
                                 Actions
@@ -497,6 +500,27 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     />
                                                 </div>
                                             </td>
+                                            <td className="px-1 py-2">
+                                                <input
+                                                    className="w-full text-center px-0 py-1 border rounded"
+                                                    value={
+                                                        exercise.xtraInstructions ||
+                                                        ""
+                                                    }
+                                                    onChange={(e) =>
+                                                        onExerciseUpdate(
+                                                            phaseId,
+                                                            sessionId,
+                                                            {
+                                                                ...exercise,
+                                                                xtraInstructions:
+                                                                    e.target
+                                                                        .value,
+                                                            }
+                                                        )
+                                                    }
+                                                />
+                                            </td>
                                             <td className="sticky right-0 bg-white z-10 px-2 py-2 h-14 flex items-center justify-center border-l-[1px] border-gray-500">
                                                 {savingState ? (
                                                     <div className="text-black">
@@ -545,6 +569,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                 {exercise.tempo}
                                             </td>
                                             <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">{`${exercise.restMin}-${exercise.restMax}`}</td>
+                                            <td className="px-2 py-2 overflow-hidden text-ellipsis whitespace-nowrap h-10 capitalize">{`${exercise.xtraInstructions}`}</td>
                                             <td className="sticky right-0 bg-white z-10 px-2 py-2 h-10 flex items-center justify-center border-l-[1px] border-gray-500">
                                                 {savingState ? (
                                                     <div className="text-black">

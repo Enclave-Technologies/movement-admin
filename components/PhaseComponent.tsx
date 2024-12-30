@@ -110,6 +110,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                 grip: exercise.grip,
                 angle: exercise.angle,
                 support: exercise.support,
+                xtraInstructions: exercise.xtraInstructions,
             })),
             sessionOrder: phase.sessions.length + 1,
             sessionTime: "0",
