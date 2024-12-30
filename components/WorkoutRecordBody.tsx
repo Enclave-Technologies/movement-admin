@@ -72,7 +72,10 @@ const WorkoutRecordBody = ({
                       onClick={() => toggleAccordion(superset.id)}
                     >
                       <h2 className="text-base">
-                        {exercise.marker}. {exercise.shortName}
+                        {exercise.marker !== ""
+                          ? `${exercise.marker}.`
+                          : `${index + 1}.`}{" "}
+                        {exercise.shortName}
                       </h2>
                       <span
                         className={`py-2 transition-transform text-white ${
@@ -87,7 +90,10 @@ const WorkoutRecordBody = ({
                   ) : (
                     <div className="w-full flex flex-row items-center justify-between">
                       <h2 className="text-base">
-                        {exercise.marker}. {exercise.shortName}
+                        {exercise.marker !== ""
+                          ? `${exercise.marker}.`
+                          : `${index + 1}.`}{" "}
+                        {exercise.shortName}
                       </h2>
                     </div>
                   )}
