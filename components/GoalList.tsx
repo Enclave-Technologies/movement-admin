@@ -8,10 +8,12 @@ import { GoalListSkeleton } from "./GoalListSkeleton";
 import EditGoalModal from "./EditGoalModal";
 import { API_BASE_URL } from "@/configs/constants";
 import { FaEdit, FaPlus } from "react-icons/fa";
+import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingGoal, setEditingGoal] = useState(null);
+    const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
     const {
         trainerData,
         trainerLoading: loading,
@@ -66,6 +68,38 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 console.error("Failed to delete goal:", error);
             }
         }
+    };
+
+    const handleDeleteGoal = async (goalId) => {
+        setGoalToDelete(goalId);
+    };
+
+    const confirmDeleteGoal = async () => {
+        if (goalToDelete) {
+            try {
+                const updatedGoals = goals.map((category) => ({
+                    ...category,
+                    goals: category.goals.filter(
+                        (goal) => goal.id !== goalToDelete
+                    ),
+                }));
+                console.log(updatedGoals);
+                setGoals(updatedGoals);
+                setGoalToDelete(null);
+                await axios.delete(
+                    `${API_BASE_URL}/mvmt/v1/client/goals/${goalToDelete}`,
+                    {
+                        withCredentials: true,
+                    }
+                );
+            } catch (error) {
+                console.error("Failed to delete goal:", error);
+            }
+        }
+    };
+
+    const cancelDeleteGoal = () => {
+        setGoalToDelete(null);
     };
 
     const addGoal = (goalType, newGoal) => {
@@ -282,9 +316,9 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 goal={editingGoal}
             />
             <div className="flex flex-col w-full gap-8">
-                {goals?.map((goal) => (
+                {goals?.map((goal, idx) => (
                     <div
-                        key={goal.id}
+                        key={idx}
                         className="flex flex-col w-full items-start gap-4"
                     >
                         <h1 className="uppercase text-xl font-bold">
@@ -293,18 +327,31 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                         <div className="flex flex-col gap-1 w-full">
                             {goal.goals.length > 0 ? (
                                 goal.goals.map((goalItem) => (
-                                    <GoalTile
-                                        key={goalItem.id}
-                                        goal={goalItem}
-                                        onUpdateGoal={updateGoalInBackend}
-                                        isEditMode={isEditMode}
-                                        onEdit={() =>
-                                            editGoal(goalItem, goal.type)
-                                        }
-                                        onDelete={() =>
-                                            deleteGoal(goalItem.id, goal.type)
-                                        }
-                                    />
+                                    <React.Fragment key={goalItem.id}>
+                                        {goalToDelete === goalItem.id && ( // Show confirmation only for the selected exercise
+                                            <DeleteConfirmationDialog
+                                                title={`Goal: ${goalItem.description}`}
+                                                confirmDelete={
+                                                    confirmDeleteGoal
+                                                }
+                                                cancelDelete={cancelDeleteGoal}
+                                            />
+                                        )}
+                                        <GoalTile
+                                            goal={goalItem}
+                                            onUpdateGoal={updateGoalInBackend}
+                                            isEditMode={isEditMode}
+                                            onEdit={() =>
+                                                editGoal(goalItem, goal.type)
+                                            }
+                                            // onDelete={() =>
+                                            //     deleteGoal(goalItem.id, goal.type)
+                                            // }
+                                            onDelete={() =>
+                                                handleDeleteGoal(goalItem.id)
+                                            }
+                                        />
+                                    </React.Fragment>
                                 ))
                             ) : (
                                 <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
