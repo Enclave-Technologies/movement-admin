@@ -193,6 +193,7 @@ const WorkoutPlan = ({
             phases: updatedPhases,
         };
         try {
+            console.log("Updating phase name...");
             await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/phases`,
                 {
@@ -542,7 +543,7 @@ const WorkoutPlan = ({
                                     clientPhases.find((p) => p.isActive)
                                         ?.phaseId || null
                                 }
-                                onSessionDelete={handleDeleteSession}
+                                onSessionDelete={handleSessionDelete}
                                 onSessionNameChange={handleSessionNameChange}
                                 editingExerciseId={editingExerciseId}
                                 handleAddExercise={handleExerciseAdd}

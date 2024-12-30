@@ -61,6 +61,7 @@ const PhaseComponent: FC<PhaseProps> = ({
     };
 
     const handlePhaseNameSubmit = () => {
+        setIsEditing(true);
         onPhaseNameChange(phase.phaseId, phaseName).then((res) => {
             setIsEditing(false);
         });

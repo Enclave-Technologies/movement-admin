@@ -146,7 +146,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                         {exercises
                             .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
                             .map((exercise) => (
-                                <>
+                                <React.Fragment key={exercise.id}>
                                     {editingExerciseId === exercise.id ? (
                                         <tr>
                                             <td className="px-1 py-2">
@@ -585,7 +585,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                             </td>
                                         </tr>
                                     )}
-                                </>
+                                </React.Fragment>
                             ))}
                         {exercises
                             .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
