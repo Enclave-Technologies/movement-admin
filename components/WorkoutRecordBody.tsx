@@ -108,6 +108,9 @@ const WorkoutRecordBody = ({
                                                 : "max-h-0"
                                         }`}
                                     >
+                                        <p className="text-sm text-gray-400">
+                                            {exercise.xtraInstructions}
+                                        </p>
                                         <div className="bg-green-800 rounded-lg flex flex-row items-stretch">
                                             {/* <pre>{JSON.stringify(exercise, null, 2)}</pre> */}
                                             <div className="flex w-full flex-row flex-wrap items-start justify-between">
@@ -211,7 +214,11 @@ const WorkoutRecordBody = ({
                                                                                     );
                                                                                 }}
                                                                             >
-                                                                                <button>
+                                                                                <button
+                                                                                    tabIndex={
+                                                                                        -1
+                                                                                    } // Set tabIndex to -1 to remove from tabbing order
+                                                                                >
                                                                                     <BiTrash
                                                                                         size={
                                                                                             20

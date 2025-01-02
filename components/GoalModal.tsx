@@ -16,7 +16,7 @@ const AddGoalModal = ({ isOpen, onClose, onAddGoal, goalTypes }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full">
                 <h1 className="text-lg font-bold mb-4">Add Goal</h1>
                 <select
