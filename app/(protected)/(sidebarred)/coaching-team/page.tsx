@@ -24,6 +24,14 @@ const CoachingTeam = () => {
     const { countDoc, trainers, reloadData } = useGlobalContext();
 
     useEffect(() => {
+        const fetchTrainerDetails = async () => {
+            const details = await fetchUserDetails();
+            setTrainerDetails(details);
+        };
+        fetchTrainerDetails();
+    }, []);
+
+    useEffect(() => {
         if (trainers) {
             const filteredTrainers = trainers.filter(
                 (trainer) =>

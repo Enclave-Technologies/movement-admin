@@ -146,6 +146,7 @@ interface Exercise {
     grip?: string | null;
     angle?: string | null;
     support?: string | null;
+    xtraInstructions?: string | null;
 }
 
 interface MovementSession {
@@ -166,7 +167,10 @@ interface Phase {
 interface PhaseProps {
     phase: Phase;
     workouts: WorkoutData[];
-    onPhaseNameChange: (phaseId: string, newPhaseName: string) => void;
+    onPhaseNameChange: (
+        phaseId: string,
+        newPhaseName: string
+    ) => Promise<boolean>;
     handleCopyPhase: (phaseId: string) => void;
     onPhaseDelete: (phaseId: string) => void;
     onActivatePhase: (phaseId: string, phaseState: boolean) => void;
@@ -176,7 +180,7 @@ interface PhaseProps {
     onSessionDelete;
     onSessionNameChange;
     editingExerciseId;
-    onExerciseAdd;
+    handleAddExercise;
     onExerciseUpdate;
     onExerciseDelete;
     onExerciseOrderChange;
@@ -196,11 +200,11 @@ interface SessionProps {
     phaseId: string;
     session: MovementSession;
     workouts: WorkoutData[];
-    onSessionNameChange: (sessionId: string, sessionName: str) => void;
+    onSessionNameChange: (sessionId: string, sessionName: str) => any;
     onSessionDelete: (sessionId: string) => void;
     handleExerciseSave: () => void;
     editingExerciseId;
-    onExerciseAdd;
+    handleAddExercise;
     onExerciseUpdate;
     onExerciseDelete;
     onExerciseOrderChange;
@@ -222,7 +226,7 @@ interface SessionExerciseProps {
     sessionId: string;
     exercises: Exercise[];
     workouts: WorkoutData[];
-    onExerciseAdd: (phaseId: string, sessionId: string) => void;
+    handleAddExercise: (phaseId: string, sessionId: string) => void;
     onExerciseUpdate: (
         phaseId: string,
         sessionId: string,
