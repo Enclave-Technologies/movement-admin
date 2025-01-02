@@ -22,11 +22,18 @@ const ExerciseLibrary = () => {
     const [showRightModal, setShowRightModal] = useState(false);
     const { countDoc, exercises, reloadData } = useGlobalContext();
 
+    // Separate useEffect hook for fetching user details
+    useEffect(() => {
+        const fetchTrainerDetails = async () => {
+            const details = await fetchUserDetails();
+            setTrainerDetails(details);
+        };
+        fetchTrainerDetails();
+    }, []);
+
     useEffect(() => {
         const fetchData = async () => {
             setPageLoading(true);
-            const details = await fetchUserDetails();
-            setTrainerDetails(details);
             if (exercises) {
                 const filteredExercises = exercises.filter(
                     (exercise) =>
