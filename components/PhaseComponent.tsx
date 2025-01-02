@@ -79,26 +79,6 @@ const PhaseComponent: FC<PhaseProps> = ({
             sessionOrder: phase.sessions.length + 1,
             sessionTime: "0",
         };
-
-        // const handlePhaseNameSubmit = () => {
-        //     setIsEditing(true);
-        //     onPhaseNameChange(phase.phaseId, phaseName).then((res) => {
-        //         setIsEditing(false);
-        //     });
-        // };
-
-        // const handleActivatePhase = () => {
-        //     onActivatePhase(phase.phaseId, !phase.isActive);
-        // };
-
-        // const handleAddSession = () => {
-        //     const newSession: MovementSession = {
-        //         sessionId: ID.unique(),
-        //         sessionName: "Untitled Session",
-        //         exercises: [],
-        //         sessionOrder: phase.sessions.length + 1,
-        //         sessionTime: "0",
-        //     };
         onAddSession(phase.phaseId, newSession);
         setIsCollapsed(false);
     };
