@@ -18,21 +18,25 @@ const TitleEditBox = ({
           className="w-60 px-3 py-2 text-gray-700 rounded-md border focus:outline-none "
           value={value}
           onChange={handleValueChange}
-          onBlur={() => {
-            setIsEditingTitle(false);
-          }}
           ref={inputRef}
         />
       </div>
       <div className="flex flex-row gap-[12px] w-full justify-end">
         <button
           onClick={() => {
+            console.log("clicked");
             setIsEditingTitle(false);
           }}
         >
           Cancel
         </button>
-        <button className="primary" onClick={handleValueSubmit}>
+        <button
+          className="primary"
+          onClick={() => {
+            console.log("submitting");
+            handleValueSubmit();
+          }}
+        >
           {savingState ? <LoadingSpinner className="w-5 h-5" /> : `Save`}
         </button>
       </div>
