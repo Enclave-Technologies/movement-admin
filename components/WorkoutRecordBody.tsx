@@ -12,20 +12,6 @@ const WorkoutRecordBody = ({
   handleAddSet,
   handleRemoveSet,
 }) => {
-  const removeTrailingZeros = (value) => {
-    if (value === 0) {
-      return 0;
-    }
-    for (let i = value.length - 1; i >= 0; i--) {
-      if (value[i] === "0") {
-        value = value.slice(i + 1, value.length);
-      } else {
-        break;
-      }
-    }
-    return value;
-  };
-
   const supersets = useMemo(() => {
     // if exercise.marker is the same, it is a superset
     let sets = [
