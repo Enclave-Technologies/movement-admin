@@ -7,7 +7,7 @@ import { Tab } from "./Tab";
 
 export const Tabs = ({ selectedTab, setSelectedTab }) => {
   return (
-    <div className="flex flex-row items-stretch justify-between bg-white rounded-lg w-full border-b-[1px] border-gray-200">
+    <div className="flex flex-row items-stretch justify-between bg-white rounded-lg w-full border-b-[1px] border-gray-200 rounded-t-xl">
       <Tab
         isSelected={selectedTab === "workout-history"}
         label={"Workout History"}

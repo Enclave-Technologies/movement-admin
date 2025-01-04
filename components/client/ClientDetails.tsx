@@ -86,9 +86,9 @@ const ClientDetails = ({ client_id }) => {
 
   return (
     <TrainerProvider>
-      <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
+      <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-visible shadow-md border border-gray-200">
         <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-        <div className="p-8 bg-white w-full">
+        <div className="p-8 bg-white w-full rounded-b-xl">
           {selectedTab == "workout-history" && (
             <WorkoutHistoryTable
               dataLoading={fetchingWorkouts}
