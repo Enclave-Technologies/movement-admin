@@ -8,7 +8,7 @@ const SearchResults = ({ results, setSearch }) => {
   const router = useRouter();
   const handleClick = (client) => {
     setSearch("");
-    router.push(`/client/${client.uid}`);
+    window.open(`/client/${client.uid}`);
   };
   console.log(results);
   return (
