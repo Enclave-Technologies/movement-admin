@@ -19,7 +19,7 @@ const TableBody = ({ rowVirtualizer, rows }) => {
                         key={row.id}
                         className={`${
                             virtualRow.index % 2 ? "bg-white" : "bg-gray-100"
-                        } h-12 items-center touch-action-none cursor-pointer hover:bg-gray-200`}
+                        } h-12 items-center cursor-pointer hover:bg-gray-200`}
                         style={{
                             display: "flex",
                             position: "absolute",

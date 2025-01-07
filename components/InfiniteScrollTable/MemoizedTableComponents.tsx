@@ -16,9 +16,9 @@ interface MemoizedCellProps {
 const MemoizedHeader = memo(({ header, isSorted }: MemoizedHeaderProps) => (
     <div
         {...{
-            className: header.column.getCanSort()
-                ? "cursor-pointer select-none"
-                : "",
+            className: `flex items-center gap-2 ${
+                header.column.getCanSort() ? "cursor-pointer select-none" : ""
+            }`,
             onClick: header.column.getToggleSortingHandler(),
         }}
     >
@@ -42,7 +42,7 @@ const MemoizedCell = memo(({ cell }: MemoizedCellProps) => (
             display: "flex",
             width: cell.column.getSize(),
         }}
-        className="pl-5 whitespace-nowrap text-sm"
+        className="pl-5 whitespace-normal text-sm"
     >
         {flexRender(cell.column.columnDef.cell, cell.getContext())}
     </td>

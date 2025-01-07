@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
     getCoreRowModel,
     getSortedRowModel,
@@ -39,7 +39,7 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
         });
 
     //flatten the array of arrays from the useInfiniteQuery hook
-    const flatData = React.useMemo(
+    const flatData = useMemo(
         () => data?.pages?.flatMap((page) => page.data) ?? [],
         [data]
     );
@@ -106,7 +106,7 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
     }
 
     return (
-        <div className="app">
+        <div>
             <span className="text-sm text-gray-500">
                 ({flatData.length} of {totalDBRowCount} rows fetched)
             </span>
@@ -115,13 +115,15 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
                 ref={tableContainerRef}
             >
-                <table className="w-full bg-white overflow-x-scroll">
+                <table className="w-full bg-white overflow-x-scroll touch-action-auto">
                     <TableHeader table={table} />
                     <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
                 </table>
             </div>
             {isFetching && (
-                <div className="text-sm text-gray-500">Fetching More...</div>
+                <div className="text-sm text-gray-500 animate-pulse flex justify-center items-center w-full">
+                    Fetching More...
+                </div>
             )}
         </div>
     );
