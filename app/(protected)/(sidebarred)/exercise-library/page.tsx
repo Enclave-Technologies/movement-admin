@@ -80,7 +80,7 @@ const ExerciseLibrary = () => {
         );
     };
 
-    if (exercises.length === 0)
+    if (exercises.length === 0 || !trainerDetails)
         return (
             <UserSkeleton
                 button_text="Add Exercise"
