@@ -15,6 +15,7 @@ import { useTrainer } from "@/context/TrainerContext";
 import Image from "next/image";
 import { FaUsers, FaUsersLine } from "react-icons/fa6";
 import { HiOutlineDocumentSearch } from "react-icons/hi";
+import { LiaDumbbellSolid } from "react-icons/lia";
 
 const sidebarItems = [
     {
@@ -37,6 +38,11 @@ const sidebarItems = [
         label: "Exercise Library",
         icon: HiOutlineDocumentSearch,
         href: "/exercise-library",
+    },
+    {
+        label: "Exercise Library 2",
+        icon: LiaDumbbellSolid,
+        href: "/new-exercise",
     },
     {
         label: "Settings",

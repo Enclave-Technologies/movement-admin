@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "@/configs/constants";
+import { API_BASE_URL, LIMIT } from "@/configs/constants";
 
 // Create the User Context
 const StoreContext = createContext();
@@ -14,7 +14,7 @@ export const StoreProvider = ({ children }) => {
     const [countDoc, setCountDoc] = useState(null);
     const fetchUsers = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=1000`,
+            `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${LIMIT}`,
             {
                 withCredentials: true, // Include cookies in the request
             }
@@ -24,7 +24,7 @@ export const StoreProvider = ({ children }) => {
 
     const fetchExercises = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=1000`,
+            `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${LIMIT}`,
             {
                 withCredentials: true,
             }
@@ -34,7 +34,7 @@ export const StoreProvider = ({ children }) => {
 
     const fetchTrainers = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=1000`,
+            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=${LIMIT}`,
             {
                 withCredentials: true, // Include cookies in the request
             }
@@ -53,10 +53,10 @@ export const StoreProvider = ({ children }) => {
 
     // Add a function to update the state
     const reloadData = () => {
+        fetchCounts();
         fetchUsers();
         fetchExercises();
         fetchTrainers();
-        fetchCounts();
     };
 
     useEffect(() => {
@@ -67,7 +67,16 @@ export const StoreProvider = ({ children }) => {
 
     return (
         <StoreContext.Provider
-            value={{ countDoc, users, exercises, trainers, reloadData }}
+            value={{
+                countDoc,
+                users,
+                exercises,
+                trainers,
+                setUsers,
+                setExercises,
+                setTrainers,
+                reloadData,
+            }}
         >
             {children}
         </StoreContext.Provider>
