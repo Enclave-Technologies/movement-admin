@@ -2,34 +2,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
 import { fetchUserDetails } from "@/server_functions/auth";
-import {
-    ColumnDef,
-    flexRender,
-    getCoreRowModel,
-    getSortedRowModel,
-    OnChangeFn,
-    Row,
-    ColumnSort,
-    SortingState,
-    useReactTable,
-} from "@tanstack/react-table";
-import {
-    useInfiniteQuery,
-    QueryClient,
-    QueryClientProvider,
-    keepPreviousData,
-} from "@tanstack/react-query";
-import { makeData, Person } from "@/app/api/MockApi";
+import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
+import axios from "axios";
+import RightModal from "@/components/pure-components/RightModal";
+import AddExerciseForm from "@/components/forms/add-exercise-form";
+import { API_BASE_URL } from "@/configs/constants";
+import { ExerciseTemplate } from "@/types";
 
 const ExercisePage = () => {
     const { countDoc, exercises, setExercises, reloadData } =
         useGlobalContext();
-    const [lastId, setLastId] = useState(null);
+    // const [lastId, setLastId] = useState(null);
     const [trainerDetails, setTrainerDetails] = useState(null);
+    const [showRightModal, setShowRightModal] = useState(false);
 
     const queryClient = new QueryClient();
-    const data = makeData(1000);
+    // const data = makeData(1000);
 
     // const columns = useMemo<ColumnDef<any>[]>(
     //     () => [
@@ -66,36 +56,52 @@ const ExercisePage = () => {
     //     []
     // );
 
-    const columns = React.useMemo<ColumnDef<Person>[]>(
+    const columns = useMemo<ColumnDef<ExerciseTemplate>[]>(
         () => [
             {
-                accessorKey: "firstName",
+                accessorKey: "motion",
                 cell: (info) => info.getValue(),
+                header: () => "Motion",
+                size: 200,
             },
             {
-                accessorFn: (row) => row.lastName,
-                id: "lastName",
+                accessorFn: (row) => row.targetArea,
+                id: "targetArea",
                 cell: (info) => info.getValue(),
-                header: () => <span>Last Name</span>,
+                header: () => "Target Area",
+                size: 250,
             },
             {
-                accessorKey: "age",
-                header: () => "Age",
-                size: 50,
+                accessorKey: "fullName",
+                header: () => "Exercise Name",
+                size: 300,
+                cell: (info) => (
+                    <div
+                        className={`px-4 py-2 font-semibold underline cursor-pointer"
+                        }`}
+                        onClick={() => {
+                            alert(
+                                `clicked ${JSON.stringify(info.row.original)}`
+                            );
+                            // handleApprovalClick(info.row.original)
+                        }}
+                    >
+                        {info.getValue() as string}
+                    </div>
+                ),
             },
             {
-                accessorKey: "visits",
-                header: () => <span>Visits</span>,
-                size: 50,
+                accessorKey: "shortName",
+                header: () => "Shortened Name",
+                size: 250,
             },
             {
-                accessorKey: "status",
-                header: "Status",
-            },
-            {
-                accessorKey: "progress",
-                header: "Profile Progress",
-                size: 80,
+                accessorKey: "approved",
+                header: "Approval Status",
+                size: 180,
+                cell: (info) => (
+                    <div>{info.getValue() ? "Approved" : "Unapproved"}</div>
+                ),
             },
         ],
         []
@@ -106,34 +112,38 @@ const ExercisePage = () => {
         size: number,
         sorting: SortingState
     ) {
-        // const response = await fetch(
-        //     `/api/exercises?start=${start}&limit=${limit}`
-        // );
-        // const data = await response.json();
-        // return data;
-
-        console.log(start, size, sorting, start / size + 1);
-        console.log(data.length);
-
-        const dbData = [...data];
+        let response: any;
+        const pageNo = start / size + 1;
         if (sorting.length) {
             const sort = sorting[0] as ColumnSort;
-            const { id, desc } = sort as { id: keyof Person; desc: boolean };
-            dbData.sort((a, b) => {
-                if (desc) {
-                    return a[id] < b[id] ? 1 : -1;
+            const { id, desc } = sort as {
+                id: keyof ExerciseTemplate;
+                desc: boolean;
+            };
+            const order = desc ? "desc" : "asc";
+            response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${size}&pageNo=${pageNo}&sort_by=${id}&sort_order=${order}`,
+                {
+                    withCredentials: true,
                 }
-                return a[id] > b[id] ? 1 : -1;
-            });
+            );
+        } else {
+            response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${size}&pageNo=${pageNo}`,
+                {
+                    withCredentials: true,
+                }
+            );
         }
 
-        //simulate a backend api
-        await new Promise((resolve) => setTimeout(resolve, 200));
+        const { data, total } = response.data;
 
+        console.log(data.length);
+        console.log(total);
         return {
-            data: dbData.slice(start, start + size),
+            data: data,
             meta: {
-                totalRowCount: dbData.length,
+                totalRowCount: total,
             },
         };
     }
@@ -147,21 +157,56 @@ const ExercisePage = () => {
         fetchTrainerDetails();
     }, []);
 
+    const rightModal = () => {
+        return (
+            <RightModal
+                formTitle="Add Exercise"
+                isVisible={showRightModal}
+                hideModal={() => {
+                    setShowRightModal(false);
+                }}
+            >
+                <AddExerciseForm
+                    fetchData={reloadData}
+                    team={trainerDetails?.team.name}
+                />
+            </RightModal>
+        );
+    };
+
     if (!countDoc || !trainerDetails) {
         return null;
     }
 
     return (
-        <div>
-            <QueryClientProvider client={queryClient}>
-                <ScrollTable
-                    queryKey="exercises"
-                    datacount={countDoc?.exercises_count}
-                    columns={columns}
-                    fetchData={fetchData}
-                />
-            </QueryClientProvider>
-        </div>
+        <main className="flex flex-col bg-gray-100 text-black">
+            <div className="w-full flex flex-col gap-4">
+                <div className="w-full flex flex-row items-center justify-between">
+                    <span className="text-lg font-bold ml-4">
+                        Exercise List
+                    </span>
+                    <button
+                        onClick={() => {
+                            setShowRightModal(true);
+                        }}
+                        className="bg-primary text-white py-2 px-4 rounded-md"
+                    >
+                        + Add Exercise
+                    </button>
+                </div>
+                <div>
+                    <QueryClientProvider client={queryClient}>
+                        <ScrollTable
+                            queryKey="exercises"
+                            datacount={countDoc?.exercises_count}
+                            columns={columns}
+                            fetchData={fetchData}
+                        />
+                    </QueryClientProvider>
+                </div>
+                {rightModal()}
+            </div>
+        </main>
     );
 };
 
