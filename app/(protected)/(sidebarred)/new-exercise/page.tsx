@@ -112,7 +112,7 @@ const ExercisePage = () => {
         // const data = await response.json();
         // return data;
 
-        console.log(start, size, sorting);
+        console.log(start, size, sorting, start / size + 1);
         console.log(data.length);
 
         const dbData = [...data];

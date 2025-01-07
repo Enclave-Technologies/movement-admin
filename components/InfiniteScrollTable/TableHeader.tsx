@@ -2,17 +2,25 @@ import { MemoizedHeader } from "./MemoizedTableComponents";
 
 const TableHeader = ({ table }) => {
     return (
-        <thead className="sticky top-0 z-10 bg-gray-200 shadow-sm">
+        <thead className="sticky top-0 z-10">
             {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id} className="flex w-full">
+                <tr
+                    key={headerGroup.id}
+                    className="bg-gray-200 text-black"
+                    style={{ display: "flex", width: "100%" }}
+                >
                     {headerGroup.headers.map((header) => (
                         <th
                             key={header.id}
-                            className={`flex w-[${header.getSize()}] p-3 font-medium text-gray-700 ${
+                            className={`text-xs uppercase font-bold pl-5 pr-4 h-8 items-center whitespace-nowrap ${
                                 header.column.getCanSort()
-                                    ? "cursor-pointer select-none hover:bg-gray-300"
+                                    ? "cursor-pointer select-none"
                                     : ""
                             }`}
+                            style={{
+                                display: "flex",
+                                width: header.getSize(),
+                            }}
                             onClick={header.column.getToggleSortingHandler()}
                         >
                             <MemoizedHeader

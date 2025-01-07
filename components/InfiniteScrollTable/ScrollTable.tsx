@@ -96,7 +96,7 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
 
     const rowVirtualizer = useVirtualizer({
         count: rows.length,
-        estimateSize: () => 33, //estimate row height for accurate scrollbar dragging
+        estimateSize: () => 52, //estimate row height for accurate scrollbar dragging
         getScrollElement: () => tableContainerRef.current,
         overscan: 5,
     });
@@ -115,7 +115,7 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
                 ref={tableContainerRef}
             >
-                <table className="w-full bg-white">
+                <table className="w-full bg-white overflow-x-scroll">
                     <TableHeader table={table} />
                     <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
                 </table>
