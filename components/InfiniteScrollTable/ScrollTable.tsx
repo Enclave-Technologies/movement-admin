@@ -1,22 +1,35 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
     getCoreRowModel,
     getSortedRowModel,
+    getFilteredRowModel,
     useReactTable,
+    FilterFn,
 } from "@tanstack/react-table";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
-
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { ApiResponse } from "@/types";
 import { LIMIT } from "@/configs/constants";
-import { useFetchMoreOnBottomReached } from "@/utils/scrollUtils";
+import {
+    useFetchMoreOnBottomReached,
+    globalFilterFunction,
+} from "@/utils/scrollUtils";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import useTableState from "@/hooks/useTableState";
+import ScrollTableSkeleton from "../pageSkeletons/scrollTableSkeleton";
 
-const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
-    // const tableContainerRef = useRef(null);
+const ScrollTable = ({
+    queryKey,
+    columns,
+    fetchData,
+    dataAdded,
+    dataModified,
+    globalFilter,
+    setGlobalFilter,
+}) => {
+    const [totalDBRowCount, setTotalDBRowCount] = useState(0);
 
     const { sorting, handleSortingChange } = useTableState();
 
@@ -26,10 +39,14 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
             queryKey: [
                 queryKey,
                 sorting, //refetch when sorting changes
+                dataAdded, //refetch when new data is added
+                dataModified, //refetch when data is modified
             ],
             queryFn: async ({ pageParam = 0 }) => {
+                console.log(JSON.stringify(sorting), dataAdded, dataModified);
+
                 const start = (pageParam as number) * LIMIT;
-                const fetchedData = await fetchData(start, LIMIT, sorting); //pretend api call
+                const fetchedData = await fetchData(start, LIMIT, sorting); // api call
                 return fetchedData;
             },
             initialPageParam: 0,
@@ -43,7 +60,14 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
         () => data?.pages?.flatMap((page) => page.data) ?? [],
         [data]
     );
-    const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
+
+    useEffect(() => {
+        if (data?.pages?.[0]?.meta?.totalRowCount) {
+            setTotalDBRowCount(data?.pages?.[0]?.meta?.totalRowCount);
+        }
+    }, [data]);
+
+    // const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
     const totalFetched = flatData.length;
 
     //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
@@ -71,20 +95,18 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
         columns,
         state: {
             sorting,
+            globalFilter,
         },
+        globalFilterFn: globalFilterFunction, // Use the filter function here
+        onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(), //client side filtering
         manualSorting: true,
         debugTable: true,
     });
 
     //scroll to top of table when sorting changes
-    // const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
-    //     setSorting(updater);
-    //     if (!!table.getRowModel().rows.length) {
-    //         rowVirtualizer.scrollToIndex?.(0);
-    //     }
-    // };
 
     //since this table option is derived from table row model state, we're using the table.setOptions utility
     table.setOptions((prev) => ({
@@ -102,7 +124,12 @@ const ScrollTable = ({ queryKey, datacount, columns, fetchData }) => {
     });
 
     if (isLoading) {
-        return <>Loading...</>;
+        return (
+            <ScrollTableSkeleton
+                columnCount={columns.length}
+                rowCount={LIMIT}
+            />
+        );
     }
 
     return (

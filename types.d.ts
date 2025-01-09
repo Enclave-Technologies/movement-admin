@@ -348,6 +348,11 @@ interface CountsDocument {
     users_count: number;
 }
 
+interface ScrollTableSkeletonProps {
+    columnCount: number;
+    rowCount: number;
+}
+
 interface CountsDocument {
     $collectionId: string;
     $createdAt: string;

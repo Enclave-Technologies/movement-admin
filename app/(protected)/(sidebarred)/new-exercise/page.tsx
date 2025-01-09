@@ -1,152 +1,26 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
-import { useGlobalContext } from "@/context/GlobalContextProvider";
-import { fetchUserDetails } from "@/server_functions/auth";
-import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
-import axios from "axios";
-import RightModal from "@/components/pure-components/RightModal";
-import AddExerciseForm from "@/components/forms/add-exercise-form";
 import { API_BASE_URL } from "@/configs/constants";
-import { ExerciseTemplate } from "@/types";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import ExercisesTable from "@/components/ExercisesTable";
+import Searchbar from "@/components/pure-components/Searchbar";
+import { useGlobalContext } from "@/context/GlobalContextProvider";
+import { LIMIT } from "@/configs/constants";
+import RightModal from "@/components/pure-components/RightModal";
+import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
+import Pagination from "@/components/pure-components/Pagination";
+import { fetchUserDetails } from "@/server_functions/auth";
+import AddExerciseForm from "@/components/forms/add-exercise-form";
 
-const ExercisePage = () => {
-    const { countDoc, exercises, setExercises, reloadData } =
-        useGlobalContext();
-    // const [lastId, setLastId] = useState(null);
+const ExerciseLibrary = () => {
+    const [allExercises, setAllExercises] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [pageLoading, setPageLoading] = useState(true);
+    const [search, setSearch] = useState("");
+    const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
     const [trainerDetails, setTrainerDetails] = useState(null);
     const [showRightModal, setShowRightModal] = useState(false);
-
-    const queryClient = new QueryClient();
-    // const data = makeData(1000);
-
-    // const columns = useMemo<ColumnDef<any>[]>(
-    //     () => [
-    //         {
-    //             accessorKey: "$id",
-    //             header: "ID",
-    //             size: 60,
-    //         },
-    //         {
-    //             accessorKey: "targetArea",
-    //             cell: (info) => info.getValue(),
-    //         },
-    //         {
-    //             accessorFn: (row) => row.fullName,
-    //             id: "fullName",
-    //             cell: (info) => info.getValue(),
-    //             header: () => <span>Exercise</span>,
-    //         },
-    //         {
-    //             accessorKey: "shortName",
-    //             header: () => "Shortened Name",
-    //             size: 50,
-    //         },
-    //         {
-    //             accessorKey: "motion",
-    //             header: () => <span>Motion</span>,
-    //             size: 50,
-    //         },
-    //         {
-    //             accessorKey: "approved",
-    //             header: "Status",
-    //         },
-    //     ],
-    //     []
-    // );
-
-    const columns = useMemo<ColumnDef<ExerciseTemplate>[]>(
-        () => [
-            {
-                accessorKey: "motion",
-                cell: (info) => info.getValue(),
-                header: () => "Motion",
-                size: 200,
-            },
-            {
-                accessorFn: (row) => row.targetArea,
-                id: "targetArea",
-                cell: (info) => info.getValue(),
-                header: () => "Target Area",
-                size: 250,
-            },
-            {
-                accessorKey: "fullName",
-                header: () => "Exercise Name",
-                size: 300,
-                cell: (info) => (
-                    <div
-                        className={`px-4 py-2 font-semibold underline cursor-pointer"
-                        }`}
-                        onClick={() => {
-                            alert(
-                                `clicked ${JSON.stringify(info.row.original)}`
-                            );
-                            // handleApprovalClick(info.row.original)
-                        }}
-                    >
-                        {info.getValue() as string}
-                    </div>
-                ),
-            },
-            {
-                accessorKey: "shortName",
-                header: () => "Shortened Name",
-                size: 250,
-            },
-            {
-                accessorKey: "approved",
-                header: "Approval Status",
-                size: 180,
-                cell: (info) => (
-                    <div>{info.getValue() ? "Approved" : "Unapproved"}</div>
-                ),
-            },
-        ],
-        []
-    );
-
-    async function fetchData(
-        start: number,
-        size: number,
-        sorting: SortingState
-    ) {
-        let response: any;
-        const pageNo = start / size + 1;
-        if (sorting.length) {
-            const sort = sorting[0] as ColumnSort;
-            const { id, desc } = sort as {
-                id: keyof ExerciseTemplate;
-                desc: boolean;
-            };
-            const order = desc ? "desc" : "asc";
-            response = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${size}&pageNo=${pageNo}&sort_by=${id}&sort_order=${order}`,
-                {
-                    withCredentials: true,
-                }
-            );
-        } else {
-            response = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${size}&pageNo=${pageNo}`,
-                {
-                    withCredentials: true,
-                }
-            );
-        }
-
-        const { data, total } = response.data;
-
-        console.log(data.length);
-        console.log(total);
-        return {
-            data: data,
-            meta: {
-                totalRowCount: total,
-            },
-        };
-    }
+    const { countDoc, exercises, reloadData } = useGlobalContext();
 
     // Separate useEffect hook for fetching user details
     useEffect(() => {
@@ -156,6 +30,39 @@ const ExercisePage = () => {
         };
         fetchTrainerDetails();
     }, []);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setPageLoading(true);
+            console.log(exercises.length);
+            if (exercises) {
+                const filteredExercises = exercises.filter(
+                    (exercise) =>
+                        exercise.fullName
+                            .toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        exercise.shortName
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        exercise.motion
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase()) ||
+                        exercise.targetArea
+                            ?.toLowerCase()
+                            .includes(search.toLowerCase())
+                );
+                console.log(exercises.length);
+                console.log(Math.ceil(filteredExercises.length / LIMIT));
+
+                setTotalPages(Math.ceil(filteredExercises.length / LIMIT));
+                const startIndex = (currentPage - 1) * LIMIT;
+                const endIndex = startIndex + LIMIT;
+                setAllExercises(filteredExercises.slice(startIndex, endIndex));
+                setPageLoading(false);
+            }
+        };
+        fetchData();
+    }, [exercises, currentPage, search]);
 
     const rightModal = () => {
         return (
@@ -174,13 +81,32 @@ const ExercisePage = () => {
         );
     };
 
-    if (!countDoc || !trainerDetails) {
-        return null;
-    }
+    if (exercises.length === 0 || !trainerDetails)
+        return (
+            <UserSkeleton
+                button_text="Add Exercise"
+                pageTitle="Exercise List"
+                buttons={totalPages}
+                active_page={currentPage}
+                tableHeaders={[
+                    "Motion",
+                    "Target Area",
+                    "Exercise",
+                    "Shortend Name",
+                    "Approved",
+                ]}
+                searchLoadingText="Search by motion, target area or name"
+            />
+        );
 
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
+                {/* <Searchbar
+                    search={search}
+                    setSearch={setSearch}
+                    placeholder="Search by motion, target area or name"
+                /> */}
                 <div className="w-full flex flex-row items-center justify-between">
                     <span className="text-lg font-bold ml-4">
                         Exercise List
@@ -194,20 +120,26 @@ const ExercisePage = () => {
                         + Add Exercise
                     </button>
                 </div>
-                <div>
-                    <QueryClientProvider client={queryClient}>
-                        <ScrollTable
-                            queryKey="exercises"
-                            datacount={countDoc?.exercises_count}
-                            columns={columns}
-                            fetchData={fetchData}
-                        />
-                    </QueryClientProvider>
+                <div className="w-full overflow-x-auto">
+                    <ExercisesTable
+                        search={search}
+                        exercises={allExercises}
+                        trainerDetails={trainerDetails}
+                        setAllExercises={setAllExercises}
+                    />
                 </div>
+
+                <Pagination
+                    totalPages={totalPages}
+                    pageNo={currentPage}
+                    handlePageChange={(page: number) => {
+                        setCurrentPage(page);
+                    }}
+                />
                 {rightModal()}
             </div>
         </main>
     );
 };
 
-export default ExercisePage;
+export default ExerciseLibrary;

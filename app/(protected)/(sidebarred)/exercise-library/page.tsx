@@ -1,26 +1,23 @@
 "use client";
-import { API_BASE_URL } from "@/configs/constants";
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import ExercisesTable from "@/components/ExercisesTable";
-import Searchbar from "@/components/pure-components/Searchbar";
-import { useGlobalContext } from "@/context/GlobalContextProvider";
-import { LIMIT } from "@/configs/constants";
-import RightModal from "@/components/pure-components/RightModal";
-import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
-import Pagination from "@/components/pure-components/Pagination";
+import React, { useEffect, useMemo, useState } from "react";
 import { fetchUserDetails } from "@/server_functions/auth";
+import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
+import axios from "axios";
+import RightModal from "@/components/pure-components/RightModal";
 import AddExerciseForm from "@/components/forms/add-exercise-form";
+import { API_BASE_URL } from "@/configs/constants";
+import { ExerciseTemplate } from "@/types";
+import Searchbar from "@/components/pure-components/Searchbar";
 
-const ExerciseLibrary = () => {
-    const [allExercises, setAllExercises] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [pageLoading, setPageLoading] = useState(true);
-    const [search, setSearch] = useState("");
-    const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
+const ExercisePage = () => {
+    const [modified, setModified] = useState(true);
+    const [added, setAdded] = useState(true);
     const [trainerDetails, setTrainerDetails] = useState(null);
     const [showRightModal, setShowRightModal] = useState(false);
-    const { countDoc, exercises, reloadData } = useGlobalContext();
+    const [updatingExercise, setUpdatingExercise] = useState([]);
+    const [globalFilter, setGlobalFilter] = useState("");
 
     // Separate useEffect hook for fetching user details
     useEffect(() => {
@@ -31,37 +28,162 @@ const ExerciseLibrary = () => {
         fetchTrainerDetails();
     }, []);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setPageLoading(true);
-            if (exercises) {
-                const filteredExercises = exercises.filter(
-                    (exercise) =>
-                        exercise.fullName
-                            .toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        exercise.shortName
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        exercise.motion
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        exercise.targetArea
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase())
-                );
-                console.log(exercises.length);
-                console.log(Math.ceil(filteredExercises.length / LIMIT));
+    const queryClient = new QueryClient();
 
-                setTotalPages(Math.ceil(filteredExercises.length / LIMIT));
-                const startIndex = (currentPage - 1) * LIMIT;
-                const endIndex = startIndex + LIMIT;
-                setAllExercises(filteredExercises.slice(startIndex, endIndex));
-                setPageLoading(false);
-            }
+    const handleApprovalStatusChange = async (
+        rowData: ExerciseTemplate,
+        newApprovalStatus: boolean
+    ) => {
+        setUpdatingExercise([...updatingExercise, rowData.id]);
+        // Implement your logic here, e.g., update the approval status in the database
+        console.log(
+            "Approval status changed for row:",
+            rowData,
+            newApprovalStatus
+        );
+
+        try {
+            console.log("SENDING INFO TO BACKEND", rowData.id);
+            const response = await axios.put(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises/${rowData.id}`,
+                {
+                    approved: newApprovalStatus,
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+
+            setModified((prevModified) => !prevModified);
+        } catch (error) {
+            console.error("Error updating exercise approval:", error);
+        } finally {
+            setUpdatingExercise(
+                updatingExercise.filter((id) => id !== rowData.id)
+            );
+        }
+    };
+
+    const columns = useMemo<ColumnDef<ExerciseTemplate>[]>(
+        () => [
+            {
+                accessorKey: "motion",
+                cell: (info) => info.getValue(),
+                header: () => "Motion",
+                size: 200,
+                filterFn: "includesString",
+            },
+            {
+                accessorFn: (row) => row.targetArea,
+                id: "targetArea",
+                cell: (info) => info.getValue(),
+                header: () => "Target Area",
+                size: 250,
+            },
+            {
+                accessorKey: "fullName",
+                header: () => "Exercise Name",
+                size: 300,
+                cell: (info) => (
+                    <div
+                        className={`px-4 py-2 font-semibold underline cursor-pointer"
+                        }`}
+                        onClick={() => {
+                            alert(
+                                `clicked ${JSON.stringify(info.row.original)}`
+                            );
+                            // handleApprovalClick(info.row.original)
+                        }}
+                    >
+                        {info.getValue() as string}
+                    </div>
+                ),
+            },
+            {
+                accessorKey: "shortName",
+                header: () => "Shortened Name",
+                size: 250,
+            },
+            // {
+            //     accessorKey: "approved",
+            //     header: "Approval Status",
+            //     size: 180,
+            //     cell: (info) => (
+            //         <div>{info.getValue() ? "Approved" : "Unapproved"}</div>
+            //     ),
+            // },
+            {
+                accessorKey: "approved",
+                header: "Approval Status",
+                size: 180,
+                cell: (info) => (
+                    <div className="flex items-center">
+                        {trainerDetails?.team.name === "Admins" ? (
+                            <select
+                                value={info.getValue() ? "true" : "false"}
+                                onChange={(e) =>
+                                    handleApprovalStatusChange(
+                                        info.row.original,
+                                        e.target.value === "true"
+                                    )
+                                }
+                                className="px-4 py-2 rounded-md bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            >
+                                <option value="true">Approved</option>
+                                <option value="false">Unapproved</option>
+                            </select>
+                        ) : info.getValue() ? (
+                            "Approved"
+                        ) : (
+                            "Not Approved"
+                        )}
+                    </div>
+                ),
+            },
+        ],
+        [trainerDetails]
+    );
+
+    async function fetchData(
+        start: number,
+        size: number,
+        sorting: SortingState
+    ) {
+        let response: any;
+        const pageNo = start / size + 1;
+        if (sorting.length) {
+            const sort = sorting[0] as ColumnSort;
+            const { id, desc } = sort as {
+                id: keyof ExerciseTemplate;
+                desc: boolean;
+            };
+            const order = desc ? "desc" : "asc";
+            response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${size}&pageNo=${pageNo}&sort_by=${id}&sort_order=${order}`,
+                {
+                    withCredentials: true,
+                }
+            );
+        } else {
+            response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${size}&pageNo=${pageNo}`,
+                {
+                    withCredentials: true,
+                }
+            );
+        }
+
+        const { data, total } = response.data;
+
+        console.log(data.length);
+        console.log(total);
+        return {
+            data: data,
+            meta: {
+                totalRowCount: total,
+            },
         };
-        fetchData();
-    }, [exercises, currentPage, search]);
+    }
 
     const rightModal = () => {
         return (
@@ -73,43 +195,27 @@ const ExerciseLibrary = () => {
                 }}
             >
                 <AddExerciseForm
-                    fetchData={reloadData}
+                    fetchData={() => {
+                        setAdded((prevAdded) => !prevAdded);
+                    }}
                     team={trainerDetails?.team.name}
                 />
             </RightModal>
         );
     };
 
-    if (exercises.length === 0 || !trainerDetails)
-        return (
-            <UserSkeleton
-                button_text="Add Exercise"
-                pageTitle="Exercise List"
-                buttons={totalPages}
-                active_page={currentPage}
-                tableHeaders={[
-                    "Motion",
-                    "Target Area",
-                    "Exercise",
-                    "Shortend Name",
-                    "Approved",
-                ]}
-                searchLoadingText="Search by motion, target area or name"
-            />
-        );
+    if (!trainerDetails) {
+        return null;
+    }
 
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                {/* <Searchbar
-                    search={search}
-                    setSearch={setSearch}
-                    placeholder="Search by motion, target area or name"
-                /> */}
                 <div className="w-full flex flex-row items-center justify-between">
                     <span className="text-lg font-bold ml-4">
                         Exercise List
                     </span>
+
                     <button
                         onClick={() => {
                             setShowRightModal(true);
@@ -119,26 +225,28 @@ const ExerciseLibrary = () => {
                         + Add Exercise
                     </button>
                 </div>
-                <div className="w-full overflow-x-auto">
-                    <ExercisesTable
-                        search={search}
-                        exercises={allExercises}
-                        trainerDetails={trainerDetails}
-                        setAllExercises={setAllExercises}
-                    />
-                </div>
-
-                <Pagination
-                    totalPages={totalPages}
-                    pageNo={currentPage}
-                    handlePageChange={(page: number) => {
-                        setCurrentPage(page);
-                    }}
+                <Searchbar
+                    search={globalFilter}
+                    setSearch={setGlobalFilter}
+                    placeholder="Search"
                 />
+                <div>
+                    <QueryClientProvider client={queryClient}>
+                        <ScrollTable
+                            queryKey="exercises"
+                            columns={columns}
+                            fetchData={fetchData}
+                            dataAdded={added}
+                            dataModified={modified}
+                            globalFilter={globalFilter}
+                            setGlobalFilter={setGlobalFilter}
+                        />
+                    </QueryClientProvider>
+                </div>
                 {rightModal()}
             </div>
         </main>
     );
 };
 
-export default ExerciseLibrary;
+export default ExercisePage;

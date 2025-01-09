@@ -24,12 +24,12 @@ export const StoreProvider = ({ children }) => {
 
     const fetchExercises = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=${LIMIT}`,
+            `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=1000`,
             {
                 withCredentials: true,
             }
         );
-        setExercises(response.data);
+        setExercises(response.data.data);
     };
 
     const fetchTrainers = async () => {

@@ -36,12 +36,12 @@ const sidebarItems = [
 
     {
         label: "Exercise Library",
-        icon: HiOutlineDocumentSearch,
+        icon: LiaDumbbellSolid,
         href: "/exercise-library",
     },
     {
-        label: "Exercise Library 2",
-        icon: LiaDumbbellSolid,
+        label: "Exercise Library (old)",
+        icon: HiOutlineDocumentSearch,
         href: "/new-exercise",
     },
     {

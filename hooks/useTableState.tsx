@@ -7,6 +7,12 @@ const useTableState = () => {
 
     const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
         setSorting(updater);
+        // const handleSortingChange: OnChangeFn<SortingState> = (updater) => {
+        //     setSorting(updater);
+        // if (!!table.getRowModel().rows.length) {
+        //     rowVirtualizer.scrollToIndex?.(0);
+        // }
+        // };
     };
 
     return { sorting, handleSortingChange };
