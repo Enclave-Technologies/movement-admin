@@ -8,7 +8,6 @@ import {
 } from "@tanstack/react-table";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { ApiResponse } from "@/types";
 import { LIMIT } from "@/configs/constants";
 import {
     useFetchMoreOnBottomReached,
@@ -19,6 +18,13 @@ import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import useTableState from "@/hooks/useTableState";
 import ScrollTableSkeleton from "../pageSkeletons/scrollTableSkeleton";
+
+type ApiResponse = {
+    data: any[];
+    meta: {
+        totalRowCount: number;
+    };
+};
 
 const ScrollTable = ({
     queryKey,

@@ -1,4 +1,3 @@
-import { ScrollTableSkeletonProps } from "@/types";
 import React from "react";
 
 const ScrollTableSkeleton: React.FC<ScrollTableSkeletonProps> = ({

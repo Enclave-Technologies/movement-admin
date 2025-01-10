@@ -364,20 +364,3 @@ interface CountsDocument {
     trainers_count: number;
     users_count: number;
 }
-
-export type ApiResponse = {
-    data: any[];
-    meta: {
-        totalRowCount: number;
-    };
-};
-
-export type ExerciseTemplate = {
-    id: string;
-    targetArea: string;
-    fullName: string;
-    shortName: string;
-    videoUrl: string;
-    approved: boolean;
-    motion: string;
-};

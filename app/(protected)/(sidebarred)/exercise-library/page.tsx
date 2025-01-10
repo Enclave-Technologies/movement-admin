@@ -8,8 +8,17 @@ import axios from "axios";
 import RightModal from "@/components/pure-components/RightModal";
 import AddExerciseForm from "@/components/forms/add-exercise-form";
 import { API_BASE_URL } from "@/configs/constants";
-import { ExerciseTemplate } from "@/types";
 import Searchbar from "@/components/pure-components/Searchbar";
+
+type ExerciseTemplate = {
+    id: string;
+    targetArea: string;
+    fullName: string;
+    shortName: string;
+    videoUrl: string;
+    approved: boolean;
+    motion: string;
+};
 
 const ExercisePage = () => {
     const [modified, setModified] = useState(true);
