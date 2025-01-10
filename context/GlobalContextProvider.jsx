@@ -19,7 +19,7 @@ export const StoreProvider = ({ children }) => {
                 withCredentials: true, // Include cookies in the request
             }
         );
-        setUsers(response.data);
+        setUsers(response.data.data);
     };
 
     const fetchExercises = async () => {

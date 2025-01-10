@@ -364,3 +364,13 @@ interface CountsDocument {
     trainers_count: number;
     users_count: number;
 }
+
+type UserTemplate = {
+    uid: string;
+    name: string;
+    email: string;
+    phone?: string;
+    trainer_id?: string;
+    trainer_name?: string;
+    imageUrl?: string;
+};
