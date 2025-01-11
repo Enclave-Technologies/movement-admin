@@ -1,114 +1,18 @@
 "use client";
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
-import UsersTable from "@/components/UsersTable";
-import Searchbar from "@/components/pure-components/Searchbar";
 import AddUserForm from "@/components/forms/add-user-form";
 import RightModal from "@/components/pure-components/RightModal";
 import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
 import { defaultProfileURL, LIMIT } from "@/configs/constants";
-import Pagination from "@/components/pure-components/Pagination";
-import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { API_BASE_URL } from "@/configs/constants";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { TbArrowsSort, TbFilter, TbSearch } from "react-icons/tb";
 import { TiSortAlphabetically } from "react-icons/ti";
 import { MdOutlineMail, MdOutlinePerson, MdOutlinePhone } from "react-icons/md";
-
-// export default function AllClients() {
-//     const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
-//     const [lastId, setLastId] = useState<number>(1); // State to hold the last ID of the fetched clients
-//     const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
-
-//     const [search, setSearch] = useState("");
-//     const [pageLoading, setPageLoading] = useState(true);
-//     const [showRightModal, setShowRightModal] = useState(false);
-//     const { countDoc, reloadData, users } = useGlobalContext();
-
-//     useEffect(() => {
-//         const fetchData = async () => {
-//             if (users) {
-//                 const myClients = users.filter(
-//                     (user) =>
-//                         user.name
-//                             .toLowerCase()
-//                             .includes(search.toLowerCase()) ||
-//                         user.email
-//                             ?.toLowerCase()
-//                             .includes(search.toLowerCase()) ||
-//                         user.phone?.toLowerCase().includes(search.toLowerCase())
-//                 );
-
-//                 setTotalPages(Math.ceil(myClients.length / LIMIT));
-//                 const startIndex = (lastId - 1) * LIMIT;
-//                 const endIndex = startIndex + LIMIT;
-
-//                 setClients(myClients.slice(startIndex, endIndex));
-//             }
-//         };
-//         fetchData();
-//     }, [users, lastId, search]);
-
-//     const rightModal = () => {
-//         return (
-//             <RightModal
-//                 formTitle="Add User"
-//                 isVisible={showRightModal}
-//                 hideModal={() => {
-//                     setShowRightModal(false);
-//                 }}
-//             >
-//                 <AddUserForm fetchData={reloadData} />
-//             </RightModal>
-//         );
-//     };
-
-//     if (users.length === 0)
-//         return (
-//             <UserSkeleton
-//                 button_text="Add User"
-//                 pageTitle="All Users"
-//                 buttons={totalPages}
-//                 active_page={lastId}
-//             />
-//         );
-
-//     return (
-//         <main className="flex flex-col bg-gray-100 text-black">
-//             <div className="w-full flex flex-col gap-4">
-//                 <div className="w-full flex flex-row items-center justify-between">
-//                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">
-//                         All Users
-//                     </h1>
-//                     <button
-//                         onClick={() => {
-//                             setShowRightModal(true);
-//                         }}
-//                         className="bg-primary text-white py-2 px-4 rounded-md"
-//                     >
-//                         + Add User
-//                     </button>
-//                 </div>
-
-//                 <div className="w-full overflow-x-auto">
-//                     <UsersTable clients={clients} search={search} />
-//                 </div>
-
-//                 <Pagination
-//                     totalPages={totalPages}
-//                     pageNo={lastId}
-//                     handlePageChange={(page: number) => {
-//                         setLastId(page);
-//                     }}
-//                 />
-//                 {rightModal()}
-//             </div>
-//         </main>
-//     );
-// }
+import TableActions from "@/components/InfiniteScrollTable/TableActions";
 
 export default function AllClients() {
   const [modified, setModified] = useState(true);
@@ -257,10 +161,12 @@ export default function AllClients() {
   return (
     <main className="flex flex-col bg-transparent text-black">
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex flex-row items-center justify-between">
+        <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
           <span className="text-xl font-bold">All Users</span>
           <TableActions
-            setShowRightModal={setShowRightModal}
+            onClickNewButton={() => {
+              setShowRightModal(true);
+            }}
             tableSearchQuery={tableSearchQuery}
             setTableSearchQuery={setTableSearchQuery}
           />
@@ -283,50 +189,3 @@ export default function AllClients() {
     </main>
   );
 }
-
-const TableActions = ({
-  setShowRightModal,
-  tableSearchQuery,
-  setTableSearchQuery,
-}) => {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  return (
-    <div className="flex flex-row gap-[4px] items-center">
-      <div className="flex flex-row items-center">
-        <button className="hover:bg-gray-300 h-8 w-8 rounded-md flex items-center justify-center text-gray-600">
-          <TbArrowsSort />
-        </button>
-        <button className="hover:bg-gray-300 h-8 w-8 rounded-md flex items-center justify-center text-gray-600">
-          <TbFilter />
-        </button>
-        <div className="flex flex-row items-center">
-          <button
-            className="hover:bg-gray-300 h-8 w-8 rounded-md flex items-center justify-center text-gray-600"
-            onClick={() => setIsSearchExpanded((prev) => !prev)}
-          >
-            <TbSearch />
-          </button>
-          <input
-            value={tableSearchQuery}
-            onChange={(e) => {
-              setTableSearchQuery(e.target.value);
-            }}
-            placeholder="Type to search..."
-            className={`${
-              isSearchExpanded ? "w-52" : "w-0"
-            } bg-transparent focus:outline-none transition-all duration-300 ease-in-out`}
-            autoFocus={isSearchExpanded}
-          />
-        </div>
-      </div>
-      <button
-        onClick={() => {
-          setShowRightModal(true);
-        }}
-        className="bg-primary hover:bg-green-900 text-white px-4 h-8 rounded-md"
-      >
-        New
-      </button>
-    </div>
-  );
-};

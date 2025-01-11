@@ -12,7 +12,7 @@ const SearchResults = ({ results, setSearch }) => {
   };
   console.log(results);
   return (
-    <div className="absolute w-full top-[60px] z-50 px-6">
+    <div className="absolute w-full top-[40px] z-50 px-6">
       <div className="bg-white shadow-md p-2 rounded-lg border border-gray-200">
         {results.map((user, index) => {
           return (

@@ -11,12 +11,14 @@ import Pagination from "@/components/pure-components/Pagination";
 import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { getCurrentUser } from "@/server_functions/auth";
 import { API_BASE_URL } from "@/configs/constants";
+import TableActions from "@/components/InfiniteScrollTable/TableActions";
 
 export default function AllClients() {
   const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
   const [lastId, setLastId] = useState<number>(1); // State to hold the last ID of the fetched clients
   const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
   const [isFetching, setIsFetching] = useState(false); // State to track if a fetch is in progress
+  const [tableSearchQuery, setTableSearchQuery] = useState(""); // State to hold the table search query
 
   const [search, setSearch] = useState("");
   const [pageLoading, setPageLoading] = useState(true);
@@ -71,18 +73,17 @@ export default function AllClients() {
   return (
     <main className="flex flex-col bg-transparent text-black">
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex flex-row items-center justify-between">
-          <h1 className="text-xl font-bold text-black ml-2 leading-tight">
+        <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
+          <h1 className="text-xl font-bold text-black leading-tight">
             My Clients
           </h1>
-          <button
-            onClick={() => {
+          <TableActions
+            onClickNewButton={() => {
               setShowRightModal(true);
             }}
-            className="bg-primary text-white py-2 px-4 rounded-md"
-          >
-            + Add User
-          </button>
+            setTableSearchQuery={setTableSearchQuery}
+            tableSearchQuery={tableSearchQuery}
+          />
         </div>
 
         <div className="w-full overflow-x-auto">

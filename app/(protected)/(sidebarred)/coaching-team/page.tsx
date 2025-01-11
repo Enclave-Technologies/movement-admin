@@ -12,6 +12,7 @@ import React, { useEffect, useState } from "react";
 import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { fetchUserDetails } from "@/server_functions/auth";
 import RegisterTrainerForm from "@/components/forms/RegisterTrainerForm";
+import TableActions from "@/components/InfiniteScrollTable/TableActions";
 
 const CoachingTeam = () => {
   const [allTrainers, setAllTrainers] = useState([]);
@@ -22,6 +23,7 @@ const CoachingTeam = () => {
   const [search, setSearch] = useState("");
   const [showRightModal, setShowRightModal] = useState(false);
   const { countDoc, trainers, reloadData } = useGlobalContext();
+  const [tableSearchQuery, setTableSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchTrainerDetails = async () => {
@@ -86,19 +88,18 @@ const CoachingTeam = () => {
                     placeholder="Search trainer by name, email, phone or title"
                 /> */}
 
-        <div className="w-full flex flex-row items-center justify-between">
-          <h1 className="text-xl font-bold text-black ml-2 leading-tight">
+        <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
+          <h1 className="text-xl font-bold text-black leading-tight">
             Coaching Team
           </h1>
           {trainerDetails?.team.name === "Admins" && (
-            <button
-              onClick={() => {
+            <TableActions
+              tableSearchQuery={tableSearchQuery}
+              setTableSearchQuery={setTableSearchQuery}
+              onClickNewButton={() => {
                 setShowRightModal(true);
               }}
-              className="bg-primary text-white py-2 px-4 rounded-md"
-            >
-              + Add Trainer
-            </button>
+            />
           )}
         </div>
         {/* <pre>{JSON.stringify(trainerDetails)}</pre> */}

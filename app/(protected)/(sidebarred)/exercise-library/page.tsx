@@ -9,6 +9,7 @@ import RightModal from "@/components/pure-components/RightModal";
 import AddExerciseForm from "@/components/forms/add-exercise-form";
 import { API_BASE_URL } from "@/configs/constants";
 import Searchbar from "@/components/pure-components/Searchbar";
+import TableActions from "@/components/InfiniteScrollTable/TableActions";
 
 type ExerciseTemplate = {
   id: string;
@@ -26,7 +27,7 @@ const ExercisePage = () => {
   const [trainerDetails, setTrainerDetails] = useState(null);
   const [showRightModal, setShowRightModal] = useState(false);
   const [updatingExercise, setUpdatingExercise] = useState([]);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [tableSearchQuery, setTableSearchQuery] = useState("");
 
   // Separate useEffect hook for fetching user details
   useEffect(() => {
@@ -208,23 +209,16 @@ const ExercisePage = () => {
   return (
     <main className="flex flex-col bg-transparent text-black">
       <div className="w-full flex flex-col gap-4">
-        <div className="w-full flex flex-row items-center justify-between">
-          <span className="text-lg font-bold ml-4">Exercise List</span>
-
-          <button
-            onClick={() => {
+        <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
+          <span className="text-lg font-bold">Exercise List</span>
+          <TableActions
+            tableSearchQuery={tableSearchQuery}
+            setTableSearchQuery={setTableSearchQuery}
+            onClickNewButton={() => {
               setShowRightModal(true);
             }}
-            className="bg-primary text-white py-2 px-4 rounded-md"
-          >
-            + Add Exercise
-          </button>
+          />
         </div>
-        <Searchbar
-          search={globalFilter}
-          setSearch={setGlobalFilter}
-          placeholder="Search"
-        />
         <div>
           <QueryClientProvider client={queryClient}>
             <ScrollTable
@@ -233,8 +227,8 @@ const ExercisePage = () => {
               fetchData={fetchData}
               dataAdded={added}
               dataModified={modified}
-              globalFilter={globalFilter}
-              setGlobalFilter={setGlobalFilter}
+              globalFilter={tableSearchQuery}
+              setGlobalFilter={setTableSearchQuery}
             />
           </QueryClientProvider>
         </div>

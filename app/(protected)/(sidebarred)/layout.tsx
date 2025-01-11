@@ -29,10 +29,10 @@ export default function RootLayout({
           <div
             className={`flex-1 flex flex-col ${
               isCollapsed ? "ml-16" : "ml-64"
-            } overflow-y-auto transition-all duration-300  `}
+            } overflow-y-auto transition-all duration-300 px-6 py-4 gap-4`}
           >
             <Navbar />
-            <div className={`p-6`}>{children}</div>
+            <div className={`px-2`}>{children}</div>
           </div>
         </div>
       </TrainerProvider>

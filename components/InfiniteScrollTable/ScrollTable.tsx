@@ -137,9 +137,10 @@ const ScrollTable = ({
 
   return (
     <div>
-      <span className="text-sm text-gray-500">
+      {/* TODO: To be commented */}
+      {/* <span className="text-sm text-gray-500">
         ({flatData.length} of {totalDBRowCount} rows fetched)
-      </span>
+      </span> */}
       <div
         className="container h-[600px] overflow-auto relative rounded-lg"
         onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
