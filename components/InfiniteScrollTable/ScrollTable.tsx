@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
-    getCoreRowModel,
-    getSortedRowModel,
-    getFilteredRowModel,
-    useReactTable,
-    FilterFn,
+  getCoreRowModel,
+  getSortedRowModel,
+  getFilteredRowModel,
+  useReactTable,
+  FilterFn,
 } from "@tanstack/react-table";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { LIMIT } from "@/configs/constants";
 import {
-    useFetchMoreOnBottomReached,
-    globalFilterFunction,
+  useFetchMoreOnBottomReached,
+  globalFilterFunction,
 } from "@/utils/scrollUtils";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import TableHeader from "./TableHeader";
@@ -20,146 +20,143 @@ import useTableState from "@/hooks/useTableState";
 import ScrollTableSkeleton from "../pageSkeletons/scrollTableSkeleton";
 
 type ApiResponse = {
-    data: any[];
-    meta: {
-        totalRowCount: number;
-    };
+  data: any[];
+  meta: {
+    totalRowCount: number;
+  };
 };
 
 const ScrollTable = ({
-    queryKey,
-    columns,
-    fetchData,
-    dataAdded,
-    dataModified,
-    globalFilter,
-    setGlobalFilter,
+  queryKey,
+  columns,
+  fetchData,
+  dataAdded,
+  dataModified,
+  globalFilter,
+  setGlobalFilter,
 }) => {
-    const [totalDBRowCount, setTotalDBRowCount] = useState(0);
+  const [totalDBRowCount, setTotalDBRowCount] = useState(0);
 
-    const { sorting, handleSortingChange } = useTableState();
+  const { sorting, handleSortingChange } = useTableState();
 
-    //react-query has a useInfiniteQuery hook that is perfect for this use case
-    const { data, fetchNextPage, isFetching, isLoading } =
-        useInfiniteQuery<ApiResponse>({
-            queryKey: [
-                queryKey,
-                sorting, //refetch when sorting changes
-                dataAdded, //refetch when new data is added
-                dataModified, //refetch when data is modified
-            ],
-            queryFn: async ({ pageParam = 0 }) => {
-                console.log(JSON.stringify(sorting), dataAdded, dataModified);
+  //react-query has a useInfiniteQuery hook that is perfect for this use case
+  const { data, fetchNextPage, isFetching, isLoading } =
+    useInfiniteQuery<ApiResponse>({
+      queryKey: [
+        queryKey,
+        sorting, //refetch when sorting changes
+        dataAdded, //refetch when new data is added
+        dataModified, //refetch when data is modified
+      ],
+      queryFn: async ({ pageParam = 0 }) => {
+        console.log(JSON.stringify(sorting), dataAdded, dataModified);
 
-                const start = (pageParam as number) * LIMIT;
-                const fetchedData = await fetchData(start, LIMIT, sorting); // api call
-                return fetchedData;
-            },
-            initialPageParam: 0,
-            getNextPageParam: (_lastGroup, groups) => groups.length,
-            refetchOnWindowFocus: false,
-            placeholderData: keepPreviousData,
-        });
-
-    //flatten the array of arrays from the useInfiniteQuery hook
-    const flatData = useMemo(
-        () => data?.pages?.flatMap((page) => page.data) ?? [],
-        [data]
-    );
-
-    useEffect(() => {
-        if (data?.pages?.[0]?.meta?.totalRowCount) {
-            setTotalDBRowCount(data?.pages?.[0]?.meta?.totalRowCount);
-        }
-    }, [data]);
-
-    // const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
-    const totalFetched = flatData.length;
-
-    //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
-    const fetchMoreOnBottomReached = useFetchMoreOnBottomReached(
-        fetchNextPage,
-        isFetching,
-        totalFetched,
-        totalDBRowCount
-    );
-
-    const tableContainerRef = useInfiniteScroll(
-        fetchNextPage,
-        isFetching,
-        totalFetched,
-        totalDBRowCount
-    );
-
-    //a check on mount and after a fetch to see if the table is already scrolled to the bottom and immediately needs to fetch more data
-    useEffect(() => {
-        fetchMoreOnBottomReached(tableContainerRef.current);
-    }, [fetchMoreOnBottomReached]);
-
-    const table = useReactTable({
-        data: flatData,
-        columns,
-        state: {
-            sorting,
-            globalFilter,
-        },
-        globalFilterFn: globalFilterFunction, // Use the filter function here
-        onGlobalFilterChange: setGlobalFilter,
-        getCoreRowModel: getCoreRowModel(),
-        getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(), //client side filtering
-        manualSorting: true,
-        debugTable: true,
+        const start = (pageParam as number) * LIMIT;
+        const fetchedData = await fetchData(start, LIMIT, sorting); // api call
+        return fetchedData;
+      },
+      initialPageParam: 0,
+      getNextPageParam: (_lastGroup, groups) => groups.length,
+      refetchOnWindowFocus: false,
+      placeholderData: keepPreviousData,
     });
 
-    //scroll to top of table when sorting changes
+  //flatten the array of arrays from the useInfiniteQuery hook
+  const flatData = useMemo(
+    () => data?.pages?.flatMap((page) => page.data) ?? [],
+    [data]
+  );
 
-    //since this table option is derived from table row model state, we're using the table.setOptions utility
-    table.setOptions((prev) => ({
-        ...prev,
-        onSortingChange: handleSortingChange,
-    }));
-
-    const { rows } = table.getRowModel();
-
-    const rowVirtualizer = useVirtualizer({
-        count: rows.length,
-        estimateSize: () => 52, //estimate row height for accurate scrollbar dragging
-        getScrollElement: () => tableContainerRef.current,
-        overscan: 5,
-    });
-
-    if (isLoading) {
-        return (
-            <ScrollTableSkeleton
-                columnCount={columns.length}
-                rowCount={LIMIT}
-            />
-        );
+  useEffect(() => {
+    if (data?.pages?.[0]?.meta?.totalRowCount) {
+      setTotalDBRowCount(data?.pages?.[0]?.meta?.totalRowCount);
     }
+  }, [data]);
 
+  // const totalDBRowCount = data?.pages?.[0]?.meta?.totalRowCount ?? 0;
+  const totalFetched = flatData.length;
+
+  //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
+  const fetchMoreOnBottomReached = useFetchMoreOnBottomReached(
+    fetchNextPage,
+    isFetching,
+    totalFetched,
+    totalDBRowCount
+  );
+
+  const tableContainerRef = useInfiniteScroll(
+    fetchNextPage,
+    isFetching,
+    totalFetched,
+    totalDBRowCount
+  );
+
+  //a check on mount and after a fetch to see if the table is already scrolled to the bottom and immediately needs to fetch more data
+  useEffect(() => {
+    fetchMoreOnBottomReached(tableContainerRef.current);
+  }, [fetchMoreOnBottomReached]);
+
+  const table = useReactTable({
+    data: flatData,
+    columns,
+    state: {
+      sorting,
+      globalFilter,
+    },
+    globalFilterFn: globalFilterFunction, // Use the filter function here
+    onGlobalFilterChange: setGlobalFilter,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(), //client side filtering
+    manualSorting: true,
+    debugTable: true,
+  });
+
+  //scroll to top of table when sorting changes
+
+  //since this table option is derived from table row model state, we're using the table.setOptions utility
+  table.setOptions((prev) => ({
+    ...prev,
+    onSortingChange: handleSortingChange,
+  }));
+
+  const { rows } = table.getRowModel();
+
+  const rowVirtualizer = useVirtualizer({
+    count: rows.length,
+    estimateSize: () => 52, //estimate row height for accurate scrollbar dragging
+    getScrollElement: () => tableContainerRef.current,
+    overscan: 5,
+  });
+
+  if (isLoading) {
     return (
-        <div>
-            <span className="text-sm text-gray-500">
-                ({flatData.length} of {totalDBRowCount} rows fetched)
-            </span>
-            <div
-                className="container h-[600px] overflow-auto relative shadow-lg rounded-lg"
-                onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
-                ref={tableContainerRef}
-            >
-                <table className="w-full bg-white overflow-x-scroll touch-action-auto">
-                    <TableHeader table={table} />
-                    <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
-                </table>
-            </div>
-            {isFetching && (
-                <div className="text-sm text-gray-500 animate-pulse flex justify-center items-center w-full">
-                    Fetching More...
-                </div>
-            )}
-        </div>
+      <ScrollTableSkeleton columnCount={columns.length} rowCount={LIMIT} />
     );
+  }
+
+  return (
+    <div>
+      <span className="text-sm text-gray-500">
+        ({flatData.length} of {totalDBRowCount} rows fetched)
+      </span>
+      <div
+        className="container h-[600px] overflow-auto relative rounded-lg"
+        onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
+        ref={tableContainerRef}
+      >
+        <table className="w-full bg-white overflow-x-visible touch-action-auto">
+          <TableHeader table={table} />
+          <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
+        </table>
+      </div>
+      {isFetching && (
+        <div className="text-sm text-gray-500 animate-pulse flex justify-center items-center w-full">
+          Fetching More...
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default ScrollTable;
