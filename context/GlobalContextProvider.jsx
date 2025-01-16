@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL } from "@/configs/constants";
+import { API_BASE_URL, LIMIT } from "@/configs/constants";
 
 // Create the User Context
 const StoreContext = createContext();
@@ -14,12 +14,12 @@ export const StoreProvider = ({ children }) => {
     const [countDoc, setCountDoc] = useState(null);
     const fetchUsers = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=1000`,
+            `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${LIMIT}`,
             {
                 withCredentials: true, // Include cookies in the request
             }
         );
-        setUsers(response.data);
+        setUsers(response.data.data);
     };
 
     const fetchExercises = async () => {
@@ -29,17 +29,17 @@ export const StoreProvider = ({ children }) => {
                 withCredentials: true,
             }
         );
-        setExercises(response.data);
+        setExercises(response.data.data);
     };
 
     const fetchTrainers = async () => {
         const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=1000`,
+            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=${LIMIT}`,
             {
                 withCredentials: true, // Include cookies in the request
             }
         );
-        setTrainers(response.data);
+        setTrainers(response.data.data);
     };
     const fetchCounts = async () => {
         const response = await axios.get(
@@ -53,10 +53,10 @@ export const StoreProvider = ({ children }) => {
 
     // Add a function to update the state
     const reloadData = () => {
+        fetchCounts();
         fetchUsers();
         fetchExercises();
         fetchTrainers();
-        fetchCounts();
     };
 
     useEffect(() => {
@@ -67,7 +67,16 @@ export const StoreProvider = ({ children }) => {
 
     return (
         <StoreContext.Provider
-            value={{ countDoc, users, exercises, trainers, reloadData }}
+            value={{
+                countDoc,
+                users,
+                exercises,
+                trainers,
+                setUsers,
+                setExercises,
+                setTrainers,
+                reloadData,
+            }}
         >
             {children}
         </StoreContext.Provider>

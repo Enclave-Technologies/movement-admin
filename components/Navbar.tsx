@@ -79,7 +79,7 @@ const Navbar = () => {
       <div className="flex-1 flex flex-row justify-between items-center relative">
         <div
           ref={searchBarRef}
-          className="relative flex flex-col items-center px-6 py-3 flex-1"
+          className="relative flex flex-col items-center flex-1"
         >
           <Searchbar search={search} setSearch={setSearch} />
           {search.length > 0 && showResults && (

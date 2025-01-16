@@ -6,11 +6,11 @@ import { useState } from "react";
 import Navbar from "@/components/Navbar";
 
 export default function RootLayout({
-    children,
+  children,
 }: Readonly<{
-    children: React.ReactNode;
+  children: React.ReactNode;
 }>) {
-    const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <StoreProvider>
       <TrainerProvider>
-        <div className="flex flex-col h-screen bg-gray-100">
+        <div className="flex flex-col h-screen bg-white">
           <div
             className={`fixed bg-white ${
               isCollapsed ? "w-16" : "w-64"
@@ -29,10 +29,10 @@ export default function RootLayout({
           <div
             className={`flex-1 flex flex-col ${
               isCollapsed ? "ml-16" : "ml-64"
-            } overflow-y-auto transition-all duration-300  `}
+            } overflow-y-auto transition-all duration-300 px-6 py-4 gap-4`}
           >
             <Navbar />
-            <div className={`p-6`}>{children}</div>
+            <div className={`px-2`}>{children}</div>
           </div>
         </div>
       </TrainerProvider>
