@@ -373,4 +373,48 @@ type UserTemplate = {
     trainer_id?: string;
     trainer_name?: string;
     imageUrl?: string;
+    gender?: string;
 };
+
+type ExerciseTemplate = {
+    id: string;
+    targetArea: string;
+    fullName: string;
+    shortName: string;
+    videoUrl: string;
+    approved: boolean;
+    motion: string;
+};
+
+type Person = {
+    id: number;
+    firstName: string;
+    lastName: string;
+    age: number;
+    visits: number;
+    progress: number;
+    status: "relationship" | "complicated" | "single";
+    createdAt: Date;
+};
+
+type ApiResponse = {
+    data: any[];
+    meta: {
+        totalRowCount: number;
+    };
+};
+
+interface CoachTemplate {
+    // Unique user ID (uid)
+    uid: string;
+    // User's full name
+    name: string;
+    // User's email address
+    email: string;
+    // Optional phone number for the user
+    phone?: string;
+    // Optional URL for the user's profile image
+    imageUrl?: string;
+    jobTitle?: string;
+    gender?: string;
+}

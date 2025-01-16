@@ -19,12 +19,7 @@ import TableBody from "./TableBody";
 import useTableState from "@/hooks/useTableState";
 import ScrollTableSkeleton from "../pageSkeletons/scrollTableSkeleton";
 
-type ApiResponse = {
-    data: any[];
-    meta: {
-        totalRowCount: number;
-    };
-};
+
 
 const ScrollTable = ({
     queryKey,
@@ -47,6 +42,7 @@ const ScrollTable = ({
                 sorting, //refetch when sorting changes
                 dataAdded, //refetch when new data is added
                 dataModified, //refetch when data is modified
+                globalFilter, //refetch when global filter changes
             ],
             queryFn: async ({ pageParam = 0 }) => {
                 console.log(JSON.stringify(sorting), dataAdded, dataModified);
@@ -68,7 +64,7 @@ const ScrollTable = ({
     );
 
     useEffect(() => {
-        if (data?.pages?.[0]?.meta?.totalRowCount) {
+        if (data?.pages?.[0]?.meta?.totalRowCount >= 0) {
             setTotalDBRowCount(data?.pages?.[0]?.meta?.totalRowCount);
         }
     }, [data]);
@@ -107,8 +103,9 @@ const ScrollTable = ({
         onGlobalFilterChange: setGlobalFilter,
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
-        getFilteredRowModel: getFilteredRowModel(), //client side filtering
+        // getFilteredRowModel: getFilteredRowModel(), //client side filtering
         manualSorting: true,
+        manualFiltering: true,
         debugTable: true,
     });
 

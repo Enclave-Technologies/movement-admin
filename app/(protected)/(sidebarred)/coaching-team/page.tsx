@@ -2,55 +2,129 @@
 
 import Searchbar from "@/components/pure-components/Searchbar";
 import TrainerTable from "@/components/TrainerTable";
-import { API_BASE_URL } from "@/configs/constants";
+import { API_BASE_URL, defaultProfileURL } from "@/configs/constants";
 import RightModal from "@/components/pure-components/RightModal";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
 import { LIMIT } from "@/configs/constants";
 import Pagination from "@/components/pure-components/Pagination";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
 import { fetchUserDetails } from "@/server_functions/auth";
 import RegisterTrainerForm from "@/components/forms/RegisterTrainerForm";
+import { useRouter } from "next/navigation";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Image from "next/image";
+import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
+import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
 
 const CoachingTeam = () => {
-    const [allTrainers, setAllTrainers] = useState([]);
-    const [pageNo, setPageNo] = useState<number>(1); // State to hold the last ID of the fetched clients
-    const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
-    const [pageLoading, setPageLoading] = useState(true);
-    const [trainerDetails, setTrainerDetails] = useState(null);
-    const [search, setSearch] = useState("");
+    const { myDetails: trainerDetails } = useGlobalContext();
+    const [modified, setModified] = useState(true);
+    const [added, setAdded] = useState(true);
     const [showRightModal, setShowRightModal] = useState(false);
-    const { countDoc, trainers, reloadData } = useGlobalContext();
+    const [globalFilter, setGlobalFilter] = useState("");
 
-    useEffect(() => {
-        const fetchTrainerDetails = async () => {
-            const details = await fetchUserDetails();
-            setTrainerDetails(details);
-        };
-        fetchTrainerDetails();
-    }, []);
+    // const router = useRouter();
 
-    useEffect(() => {
-        if (trainers) {
-            const filteredTrainers = trainers.filter(
-                (trainer) =>
-                    trainer.name.toLowerCase().includes(search.toLowerCase()) ||
-                    trainer.jobTitle
-                        .toLowerCase()
-                        .includes(search.toLowerCase()) ||
-                    trainer.email
-                        ?.toLowerCase()
-                        .includes(search.toLowerCase()) ||
-                    trainer.phone?.toLowerCase().includes(search.toLowerCase())
-            );
+    const queryClient = new QueryClient();
 
-            setTotalPages(Math.ceil(filteredTrainers.length / LIMIT));
-            const startIndex = (pageNo - 1) * LIMIT;
-            const endIndex = startIndex + LIMIT;
-            setAllTrainers(filteredTrainers.slice(startIndex, endIndex));
+    const columns = useMemo<ColumnDef<CoachTemplate>[]>(
+        () => [
+            {
+                accessorKey: "imageUrl",
+                header: "",
+                cell: (info) => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <Image
+                            src={
+                                info.getValue() &&
+                                String(info.getValue()).trim() !== ""
+                                    ? String(info.getValue())
+                                    : defaultProfileURL
+                            } // Provide a default placeholder
+                            width={32}
+                            height={32}
+                            alt={`Image of ${info.row.original.name}`}
+                            className="rounded-full"
+                        />
+                    </div>
+                ),
+                size: 50,
+                enableSorting: false,
+            },
+            {
+                header: "Name",
+                accessorKey: "name",
+                cell: (info) => (
+                    <div className="whitespace-nowrap cursor-pointer text-sm font-semibold underline">
+                        {info.getValue() as String}
+                    </div>
+                ),
+                size: 200,
+            },
+            {
+                header: "Title",
+                accessorKey: "jobTitle",
+                size: 250,
+                // enableSorting: false,
+            },
+            {
+                header: "Email",
+                accessorKey: "email",
+                size: 250,
+            },
+            {
+                header: "Phone",
+                accessorKey: "phone",
+                size: 150,
+            },
+            // {
+            //     header: "Status",
+            //     accessorKey: "status",
+            // },
+        ],
+        []
+    );
+
+    async function fetchTrainers(
+        start: number,
+        size: number,
+        sorting: SortingState
+    ) {
+        // let response: any;
+        const pageNo = start / size + 1;
+
+        const url = new URL(`${API_BASE_URL}/mvmt/v1/admin/trainers`);
+        url.searchParams.set("limit", size.toString());
+        url.searchParams.set("pageNo", pageNo.toString());
+
+        if (sorting.length) {
+            const sort = sorting[0] as ColumnSort;
+            const { id, desc } = sort;
+            url.searchParams.set("sort_by", id);
+            url.searchParams.set("sort_order", desc ? "desc" : "asc");
         }
-    }, [trainers, pageNo, search]);
+
+        if (globalFilter) {
+            url.searchParams.set("search_query", globalFilter);
+        }
+
+        const response = await axios.get(url.toString(), {
+            withCredentials: true,
+        });
+
+        const { data, total } = response.data;
+
+        console.log(data.length);
+        console.log(total);
+        return {
+            data: data,
+            meta: {
+                totalRowCount: total,
+            },
+        };
+    }
 
     const rightModal = () => {
         return (
@@ -62,34 +136,23 @@ const CoachingTeam = () => {
                 }}
             >
                 <div className="w-full">
-                    <RegisterTrainerForm fetchData={reloadData} />
+                    <RegisterTrainerForm
+                        fetchData={() => {
+                            setAdded((prev) => !prev);
+                        }}
+                    />
                 </div>
             </RightModal>
         );
     };
 
-    if (trainers.length === 0) {
-        return (
-            <UserSkeleton
-                button_text="Add Trainer"
-                pageTitle="Coaching Team"
-                buttons={totalPages}
-                active_page={pageNo}
-                searchLoadingText="Search trainer by name, email, phone or title"
-                tableHeaders={["", "Name", "Title", "Email", "Phone"]}
-            />
-        );
+    if (!trainerDetails) {
+        return null;
     }
 
     return (
         <main className="flex flex-col bg-gray-100 text-black">
             <div className="w-full flex flex-col gap-4">
-                {/* <Searchbar
-                    search={search}
-                    setSearch={setSearch}
-                    placeholder="Search trainer by name, email, phone or title"
-                /> */}
-
                 <div className="w-full flex flex-row items-center justify-between">
                     <h1 className="text-xl font-bold text-black ml-2 leading-tight">
                         Coaching Team
@@ -105,18 +168,24 @@ const CoachingTeam = () => {
                         </button>
                     )}
                 </div>
-                {/* <pre>{JSON.stringify(trainerDetails)}</pre> */}
-                <div className="w-full overflow-x-auto">
-                    <TrainerTable search={search} trainers={allTrainers} />
-                </div>
-
-                <Pagination
-                    totalPages={totalPages}
-                    pageNo={pageNo}
-                    handlePageChange={(page: number) => {
-                        setPageNo(page);
-                    }}
+                <Searchbar
+                    search={globalFilter}
+                    setSearch={setGlobalFilter}
+                    placeholder="Search"
                 />
+                <div>
+                    <QueryClientProvider client={queryClient}>
+                        <ScrollTable
+                            queryKey="allUsers"
+                            columns={columns}
+                            fetchData={fetchTrainers}
+                            dataAdded={added}
+                            dataModified={modified}
+                            globalFilter={globalFilter}
+                            setGlobalFilter={setGlobalFilter}
+                        />
+                    </QueryClientProvider>
+                </div>
                 {rightModal()}
             </div>
         </main>

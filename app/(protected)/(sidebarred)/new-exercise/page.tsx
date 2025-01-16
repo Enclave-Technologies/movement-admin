@@ -20,7 +20,7 @@ const ExerciseLibrary = () => {
     const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
     const [trainerDetails, setTrainerDetails] = useState(null);
     const [showRightModal, setShowRightModal] = useState(false);
-    const { countDoc, exercises, reloadData } = useGlobalContext();
+    // const { countDoc, exercises, reloadData } = useGlobalContext();
 
     // Separate useEffect hook for fetching user details
     useEffect(() => {
@@ -31,57 +31,57 @@ const ExerciseLibrary = () => {
         fetchTrainerDetails();
     }, []);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setPageLoading(true);
-            console.log(exercises.length);
-            if (exercises) {
-                const filteredExercises = exercises.filter(
-                    (exercise) =>
-                        exercise.fullName
-                            .toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        exercise.shortName
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        exercise.motion
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        exercise.targetArea
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase())
-                );
-                console.log(exercises.length);
-                console.log(Math.ceil(filteredExercises.length / LIMIT));
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         setPageLoading(true);
+    //         console.log(exercises.length);
+    //         if (exercises) {
+    //             const filteredExercises = exercises.filter(
+    //                 (exercise) =>
+    //                     exercise.fullName
+    //                         .toLowerCase()
+    //                         .includes(search.toLowerCase()) ||
+    //                     exercise.shortName
+    //                         ?.toLowerCase()
+    //                         .includes(search.toLowerCase()) ||
+    //                     exercise.motion
+    //                         ?.toLowerCase()
+    //                         .includes(search.toLowerCase()) ||
+    //                     exercise.targetArea
+    //                         ?.toLowerCase()
+    //                         .includes(search.toLowerCase())
+    //             );
+    //             console.log(exercises.length);
+    //             console.log(Math.ceil(filteredExercises.length / LIMIT));
 
-                setTotalPages(Math.ceil(filteredExercises.length / LIMIT));
-                const startIndex = (currentPage - 1) * LIMIT;
-                const endIndex = startIndex + LIMIT;
-                setAllExercises(filteredExercises.slice(startIndex, endIndex));
-                setPageLoading(false);
-            }
-        };
-        fetchData();
-    }, [exercises, currentPage, search]);
+    //             setTotalPages(Math.ceil(filteredExercises.length / LIMIT));
+    //             const startIndex = (currentPage - 1) * LIMIT;
+    //             const endIndex = startIndex + LIMIT;
+    //             setAllExercises(filteredExercises.slice(startIndex, endIndex));
+    //             setPageLoading(false);
+    //         }
+    //     };
+    //     fetchData();
+    // }, [exercises, currentPage, search]);
 
-    const rightModal = () => {
-        return (
-            <RightModal
-                formTitle="Add Exercise"
-                isVisible={showRightModal}
-                hideModal={() => {
-                    setShowRightModal(false);
-                }}
-            >
-                <AddExerciseForm
-                    fetchData={reloadData}
-                    team={trainerDetails?.team.name}
-                />
-            </RightModal>
-        );
-    };
+    // const rightModal = () => {
+    //     return (
+    //         <RightModal
+    //             formTitle="Add Exercise"
+    //             isVisible={showRightModal}
+    //             hideModal={() => {
+    //                 setShowRightModal(false);
+    //             }}
+    //         >
+    //             <AddExerciseForm
+    //                 fetchData={reloadData}
+    //                 team={trainerDetails?.team.name}
+    //             />
+    //         </RightModal>
+    //     );
+    // };
 
-    if (exercises.length === 0 || !trainerDetails)
+    if (!trainerDetails)
         return (
             <UserSkeleton
                 button_text="Add Exercise"
@@ -136,7 +136,7 @@ const ExerciseLibrary = () => {
                         setCurrentPage(page);
                     }}
                 />
-                {rightModal()}
+                {/* {rightModal()} */}
             </div>
         </main>
     );

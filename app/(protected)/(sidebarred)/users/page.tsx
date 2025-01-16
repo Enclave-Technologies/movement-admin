@@ -193,29 +193,48 @@ export default function AllClients() {
         size: number,
         sorting: SortingState
     ) {
-        let response: any;
+        // let response: any;
         const pageNo = start / size + 1;
+        // if (sorting.length) {
+        //     const sort = sorting[0] as ColumnSort;
+        //     const { id, desc } = sort as {
+        //         id: keyof UserTemplate;
+        //         desc: boolean;
+        //     };
+        //     const order = desc ? "desc" : "asc";
+        //     response = await axios.get(
+        //         `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${size}&pageNo=${pageNo}&sort_by=${id}&sort_order=${order}`,
+        //         {
+        //             withCredentials: true,
+        //         }
+        //     );
+        // } else {
+        //     response = await axios.get(
+        //         `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${size}&pageNo=${pageNo}`,
+        //         {
+        //             withCredentials: true,
+        //         }
+        //     );
+        // }
+
+        const url = new URL(`${API_BASE_URL}/mvmt/v1/trainer/clients`);
+        url.searchParams.set("limit", size.toString());
+        url.searchParams.set("pageNo", pageNo.toString());
+
         if (sorting.length) {
             const sort = sorting[0] as ColumnSort;
-            const { id, desc } = sort as {
-                id: keyof UserTemplate;
-                desc: boolean;
-            };
-            const order = desc ? "desc" : "asc";
-            response = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${size}&pageNo=${pageNo}&sort_by=${id}&sort_order=${order}`,
-                {
-                    withCredentials: true,
-                }
-            );
-        } else {
-            response = await axios.get(
-                `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${size}&pageNo=${pageNo}`,
-                {
-                    withCredentials: true,
-                }
-            );
+            const { id, desc } = sort;
+            url.searchParams.set("sort_by", id);
+            url.searchParams.set("sort_order", desc ? "desc" : "asc");
         }
+
+        if (globalFilter) {
+            url.searchParams.set("search_query", globalFilter);
+        }
+
+        const response = await axios.get(url.toString(), {
+            withCredentials: true,
+        });
 
         const { data, total } = response.data;
 
