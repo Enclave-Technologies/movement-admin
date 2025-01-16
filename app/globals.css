@@ -259,3 +259,19 @@
     @apply bg-background text-foreground;
   }
 }
+
+#csv-dropzone {
+  @apply text-primary border-primary;
+  width: 100%;
+  border: 2px dashed;
+  border-radius: 10px;
+  background: #fff;
+  padding: 30px;
+  text-align: center;
+  font-size: 1.2em;
+  transition: background-color 0.3s;
+}
+
+#csv-dropzone.dragover {
+  background-color: #e0f7ff;
+}
