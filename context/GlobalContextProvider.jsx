@@ -39,7 +39,7 @@ export const StoreProvider = ({ children }) => {
                 withCredentials: true, // Include cookies in the request
             }
         );
-        setTrainers(response.data);
+        setTrainers(response.data.data);
     };
     const fetchCounts = async () => {
         const response = await axios.get(
