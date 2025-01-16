@@ -37,7 +37,13 @@ const Option = (props: OptionProps<any, false>) => {
     );
 };
 
-const AddUserForm = ({ fetchData }) => {
+const AddUserForm = ({
+    fetchData,
+    trainerId,
+}: {
+    fetchData: () => void;
+    trainerId?: string;
+}) => {
     const { trainers } = useGlobalContext();
     const [clientState, clientAction] = useFormState(registerClient, undefined);
     const ref = useRef<HTMLFormElement>(null);
@@ -62,7 +68,6 @@ const AddUserForm = ({ fetchData }) => {
             setShowToast(true);
         }
     }, [clientState, fetchData]);
-
 
     const handleToastClose = () => {
         setShowToast(false);
@@ -185,6 +190,13 @@ const AddUserForm = ({ fetchData }) => {
                             components={{ Option }}
                             className="mt-1 block w-full"
                             classNamePrefix="react-select"
+                            defaultValue={
+                                trainerId
+                                    ? trainers.find(
+                                          (trainer) => trainer.id === trainerId
+                                      )
+                                    : null
+                            }
                         />
                     </div>
                 </div>
