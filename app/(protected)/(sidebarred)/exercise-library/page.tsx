@@ -287,7 +287,7 @@ const ExercisePage = () => {
             }}
           />
         </div>
-        <div className="bg-red-100">
+        <div className="">
           <QueryClientProvider client={queryClient}>
             <ScrollTable
               queryKey="exercises"

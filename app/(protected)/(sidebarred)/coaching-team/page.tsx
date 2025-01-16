@@ -18,6 +18,7 @@ import Image from "next/image";
 import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
 import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
 import TableActions from "@/components/InfiniteScrollTable/TableActions";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const CoachingTeam = () => {
   const { myDetails: trainerDetails, reloadData } = useGlobalContext();
@@ -25,6 +26,7 @@ const CoachingTeam = () => {
   const [added, setAdded] = useState(true);
   const [showRightModal, setShowRightModal] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
+  const [isFetching, setIsFetching] = useState(false);
 
   // const router = useRouter();
 
@@ -155,9 +157,10 @@ const CoachingTeam = () => {
     <main className="flex flex-col bg-transparent text-black">
       <div className="w-full flex flex-col gap-4">
         <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
-          <h1 className="text-xl font-bold text-black leading-tight">
-            Coaching Team
-          </h1>
+          <div className="flex flex-row gap-2 items-center">
+            <span className="text-lg font-bold">Coaching Team</span>
+            {isFetching && <LoadingSpinner className="h-4 w-4" />}
+          </div>
           {trainerDetails?.team.name === "Admins" && (
             <TableActions
               tableSearchQuery={globalFilter}
@@ -168,11 +171,6 @@ const CoachingTeam = () => {
             />
           )}
         </div>
-        {/* <Searchbar
-                    search={globalFilter}
-                    setSearch={setGlobalFilter}
-                    placeholder="Search"
-                /> */}
         <div>
           <QueryClientProvider client={queryClient}>
             <ScrollTable
@@ -183,6 +181,7 @@ const CoachingTeam = () => {
               dataModified={modified}
               globalFilter={globalFilter}
               setGlobalFilter={setGlobalFilter}
+              setIsFetching={setIsFetching}
             />
           </QueryClientProvider>
         </div>
