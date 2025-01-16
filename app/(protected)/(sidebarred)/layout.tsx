@@ -32,7 +32,7 @@ export default function RootLayout({
             } overflow-y-auto transition-all duration-300 px-6 py-4 gap-4`}
           >
             <Navbar />
-            <div className={`px-2`}>{children}</div>
+            <div className={`px-2 flex-1`}>{children}</div>
           </div>
         </div>
       </TrainerProvider>
