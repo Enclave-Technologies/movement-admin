@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { IoSearch } from "react-icons/io5";
 
 const Searchbar = ({
@@ -6,7 +6,7 @@ const Searchbar = ({
     setSearch,
     placeholder = "Search clients by name, email, or phone",
 }) => {
-    const [value, setValue] = React.useState(search);
+    const [value, setValue] = useState(search);
 
     useEffect(() => {
         setValue(search);
