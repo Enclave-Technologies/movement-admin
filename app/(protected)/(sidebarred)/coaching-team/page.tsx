@@ -20,7 +20,7 @@ import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
 import TableActions from "@/components/InfiniteScrollTable/TableActions";
 
 const CoachingTeam = () => {
-    const { myDetails: trainerDetails } = useGlobalContext();
+    const { myDetails: trainerDetails, reloadData } = useGlobalContext();
     const [modified, setModified] = useState(true);
     const [added, setAdded] = useState(true);
     const [showRightModal, setShowRightModal] = useState(false);
@@ -140,6 +140,7 @@ const CoachingTeam = () => {
                     <RegisterTrainerForm
                         fetchData={() => {
                             setAdded((prev) => !prev);
+                            reloadData();
                         }}
                     />
                 </div>

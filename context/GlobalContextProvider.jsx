@@ -12,7 +12,7 @@ const StoreContext = createContext();
 export const StoreProvider = ({ children }) => {
     // const [users, setUsers] = useState([]); // State to hold user data
     // const [exercises, setExercises] = useState([]);
-    // const [trainers, setTrainers] = useState([]);
+    const [trainers, setTrainers] = useState([]);
     // const [countDoc, setCountDoc] = useState(null);
     const [myDetails, setMyDetails] = useState(null);
     // const fetchUsers = async () => {
@@ -35,15 +35,15 @@ export const StoreProvider = ({ children }) => {
     //     setExercises(response.data.data);
     // };
 
-    // const fetchTrainers = async () => {
-    //     const response = await axios.get(
-    //         `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=${LIMIT}`,
-    //         {
-    //             withCredentials: true, // Include cookies in the request
-    //         }
-    //     );
-    //     setTrainers(response.data.data);
-    // };
+    const fetchTrainers = async () => {
+        const response = await axios.get(
+            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=5000`,
+            {
+                withCredentials: true, // Include cookies in the request
+            }
+        );
+        setTrainers(response.data.data);
+    };
 
     // const fetchCounts = async () => {
     //     const response = await axios.get(
@@ -65,7 +65,7 @@ export const StoreProvider = ({ children }) => {
         // fetchCounts();
         // fetchUsers();
         // fetchExercises();
-        // fetchTrainers();
+        fetchTrainers();
         fetchMyDetails();
     };
 
@@ -81,7 +81,7 @@ export const StoreProvider = ({ children }) => {
                 // countDoc,
                 // users,
                 // exercises,
-                // trainers,
+                trainers,
                 myDetails,
                 // setUsers,
                 // setExercises,
