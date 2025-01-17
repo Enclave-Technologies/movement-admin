@@ -23,6 +23,15 @@ const RecordWorkout = () => {
     const [savingState, setSavingState] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
+    // Add the beforeunload event listener
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+        e.preventDefault();
+        // e.returnValue = "";
+        setShowDeleteDialog(true);
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
     const toggleAccordion = (exId: string) => {
         setOpenExercises((prevOpenExercises) => {
             if (prevOpenExercises.includes(exId)) {

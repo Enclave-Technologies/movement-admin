@@ -14,7 +14,7 @@ import { API_BASE_URL, defaultProfileURL, LIMIT } from "@/configs/constants";
 import axios from "axios";
 
 const Navbar = () => {
-    const [loadingLogout, setLoadingLogout] = useState(false);
+    const [loadingResults, setLoadingResults] = useState(false);
     const [search, setSearch] = useState("");
     const [users, setUsers] = useState([]);
     const [showResults, setShowResults] = useState(false);
@@ -36,22 +36,30 @@ const Navbar = () => {
 
     useEffect(() => {
         const fetchUsers = async () => {
+            setLoadingResults(true);
             if (search) {
-                const url = new URL(`${API_BASE_URL}/mvmt/v1/trainer/clients`);
-                url.searchParams.set("limit", LIMIT.toString());
-                url.searchParams.set("pageNo", "1");
-                url.searchParams.set("search_query", search);
-                const response = await axios.get(url.toString(), {
-                    withCredentials: true,
-                });
+                try {
+                    const url = new URL(
+                        `${API_BASE_URL}/mvmt/v1/trainer/clients`
+                    );
+                    url.searchParams.set("limit", LIMIT.toString());
+                    url.searchParams.set("pageNo", "1");
+                    url.searchParams.set("search_query", search);
+                    const response = await axios.get(url.toString(), {
+                        withCredentials: true,
+                    });
 
-                const { data, total } = response.data;
+                    const { data, total } = response.data;
 
-                console.log(total);
-                if (data) {
-                    setUsers(data);
+                    console.log(total);
+                    if (data) {
+                        setUsers(data);
+                    }
+                } catch (e) {
+                    console.log(e);
                 }
             }
+            setLoadingResults(false);
         };
         fetchUsers();
     }, [search]);
@@ -98,6 +106,7 @@ const Navbar = () => {
                         <SearchResults
                             results={results}
                             setSearch={setSearch}
+                            isLoading={loadingResults}
                         />
                     )}
                 </div>

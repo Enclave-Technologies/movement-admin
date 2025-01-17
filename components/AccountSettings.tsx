@@ -1,4 +1,5 @@
 import React from "react";
+import SubmitButton from "./ResponsiveButton";
 
 const AccountSettings = ({ formData, handleSubmit, handleInputChange }) => {
     return (
@@ -90,14 +91,15 @@ const AccountSettings = ({ formData, handleSubmit, handleInputChange }) => {
                 />
             </div>
 
-            <div className="flex justify-end">
-                <button
+            {/* <div className="flex justify-end"> */}
+            {/* <button
                     type="submit"
                     className="px-4 py-2 bg-green-500  hover:bg-green-900 text-white rounded-md"
                 >
                     Save Changes
-                </button>
-            </div>
+                </button> */}
+            <SubmitButton label="Submit" />
+            {/* </div> */}
         </form>
     );
 };
