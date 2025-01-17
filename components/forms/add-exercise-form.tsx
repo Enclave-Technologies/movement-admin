@@ -11,7 +11,7 @@ import Select, {
   StylesConfig,
 } from "react-select";
 import { useFormState } from "react-dom";
-import SignupButton from "../ResponsiveButton";
+import SubmitButton from "../ResponsiveButton";
 import Toast from "../Toast";
 import { addWorkout } from "@/server_functions/auth";
 
@@ -275,7 +275,7 @@ const AddExerciseForm = ({ fetchData, team }) => {
             className="hidden read-only"
           />
         </div>
-        <SignupButton label="Submit" />
+                <SubmitButton label="Submit" />
       </form>
 
       <div className="flex flex-row items-center justify-center space-x-4 py-8">

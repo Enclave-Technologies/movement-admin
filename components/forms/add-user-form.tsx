@@ -4,7 +4,7 @@ import { defaultProfileURL } from "@/configs/constants";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import Select, { components, OptionProps } from "react-select";
-import SignupButton from "../ResponsiveButton";
+import SubmitButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
 import { registerClient } from "@/server_functions/auth";
 import Toast from "../Toast";
@@ -200,7 +200,7 @@ const AddUserForm = ({
                         />
                     </div>
                 </div>
-                <SignupButton label="Submit" />
+                <SubmitButton label="Submit" />
             </form>
             {showToast && (
                 <Toast

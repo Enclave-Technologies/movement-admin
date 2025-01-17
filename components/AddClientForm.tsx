@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import Select, { components, OptionProps } from "react-select";
-import SignupButton from "./ResponsiveButton";
+import SubmitButton from "./ResponsiveButton";
 import Image from "next/image";
 import { defaultProfileURL } from "@/configs/constants";
 
@@ -130,11 +130,11 @@ const AddClientForm = forwardRef<HTMLFormElement, AddClientFormProps>(
           </div>
           {/* <pre>{JSON.stringify(allTrainers, null, 2)}</pre> */}
 
-          <SignupButton label="Submit" />
-        </form>
-      </div>
-    );
-  }
+                    <SubmitButton label="Submit" />
+                </form>
+            </div>
+        );
+    }
 );
 
 AddClientForm.displayName = "AddClientForm"; // Set the display name

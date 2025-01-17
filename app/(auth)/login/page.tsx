@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SignupButton from "@/components/ResponsiveButton";
+import SubmitButton from "@/components/ResponsiveButton";
 import { login } from "@/server_functions/auth";
 import { useFormState } from "react-dom";
 import Image from "next/image";
@@ -62,7 +62,7 @@ const Page = () => {
                             </p>
                         )}
                     </div>
-                    <SignupButton label="Login" />
+                    <SubmitButton label="Login" />
                 </form>
                 <div className="mt-4 flex justify-between items-center">
                     <div className="flex-1 text-sm text-gray-600">

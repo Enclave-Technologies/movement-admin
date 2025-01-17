@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SignupButton from "@/components/ResponsiveButton";
+import SubmitButton from "@/components/ResponsiveButton";
 import { resetPassword } from "@/server_functions/auth"; // Assuming you have this function
 import { useFormState } from "react-dom"; // Assuming similar state management as login
 import Image from "next/image";
@@ -46,7 +46,7 @@ const ForgotPasswordPage = () => {
                             </p>
                         )}
                     </div>
-                    <SignupButton label="Send Reset Link" />
+                    <SubmitButton label="Send Reset Link" />
                 </form>
                 <div className="mt-4 flex justify-between items-center">
                     <div className="flex-1 text-sm text-gray-600">
