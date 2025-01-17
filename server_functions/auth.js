@@ -155,6 +155,7 @@ export async function registerClient(state, formData) {
     }
 
     console.log(validatedResult.data);
+
     const { firstName, lastName, phone, email, trainerId, gender } =
         validatedResult.data;
 
