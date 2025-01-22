@@ -1,22 +1,28 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import SessionComponent from "./SessionComponent";
-import {
-  FaEdit,
-  FaCopy,
-  FaChevronDown,
-  FaChevronUp,
-  FaPlus,
-  FaTrash,
-  FaChevronRight,
-  FaSave,
-} from "react-icons/fa";
+import { FaChevronUp, FaChevronRight } from "react-icons/fa";
 import { ID } from "appwrite";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import PhaseActions from "./phase/PhaseActions";
 import TitleEditBox from "./phase/PhaseTitle";
+import {
+  closestCenter,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 
 const PhaseComponent: FC<PhaseProps> = ({
   phase,
+  setClientPhases,
   workouts,
   onPhaseNameChange,
   handleCopyPhase,
@@ -41,12 +47,17 @@ const PhaseComponent: FC<PhaseProps> = ({
   setToastMessage,
   setToastType,
   savingState,
+  handleSessionOrderChange,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [phaseName, setPhaseName] = useState(phase.phaseName);
   const [showPhaseDeleteConfirm, setShowPhaseDeleteConfirm] = useState(false);
-  const [tooltipText, setTooltipText] = useState("");
+  const [items, setItems] = useState(
+    phase.sessions
+      .sort((a, b) => a.sessionOrder - b.sessionOrder)
+      .map((session) => session.sessionId)
+  );
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -130,6 +141,47 @@ const PhaseComponent: FC<PhaseProps> = ({
   const cancelDeletePhase = () => {
     setShowPhaseDeleteConfirm(false); // Just close the dialog
   };
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  async function handleDragEnd(event) {
+    const { active, over } = event;
+    if (active.id !== over.id) {
+      const oldIndex = items.indexOf(active.id);
+      const newIndex = items.indexOf(over.id);
+      let newItems = [];
+      setItems((items) => {
+        newItems = arrayMove(items, oldIndex, newIndex);
+        return newItems;
+      });
+      newItems.forEach((sessionId, index) => {
+        handleSessionOrderChange(sessionId, index + 1);
+      });
+      let newPhase = {
+        ...phase,
+        sessions: newItems.map((sessionId, index) => {
+          let session = phase.sessions.find((s) => s.sessionId === sessionId);
+          return { ...session, sessionOrder: index + 1 };
+        }),
+      };
+      setClientPhases((phases) =>
+        phases.map((p) => (p.phaseId === phase.phaseId ? newPhase : p))
+      );
+    }
+  }
+
+  useEffect(() => {
+    setItems(
+      phase.sessions
+        .sort((a, b) => a.sessionOrder - b.sessionOrder)
+        .map((session) => session.sessionId)
+    );
+  }, [phase]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border w-full border-gray-200 overflow-visible">
@@ -228,43 +280,52 @@ const PhaseComponent: FC<PhaseProps> = ({
             </p>
           </div>
         ) : (
-          phase.sessions
-            .sort((a, b) => a.sessionOrder - b.sessionOrder)
-            .map((session, index) => (
-              <SessionComponent
-                index={index}
-                phaseId={phase.phaseId}
-                key={session.sessionId}
-                session={session}
-                workouts={workouts}
-                onSessionDelete={onSessionDelete}
-                onSessionNameChange={onSessionNameChange}
-                editingExerciseId={editingExerciseId}
-                handleAddExercise={handleAddExercise}
-                onExerciseUpdate={onExerciseUpdate}
-                handleExerciseSave={handleExerciseSave}
-                onExerciseDelete={onExerciseDelete}
-                onExerciseOrderChange={onExerciseOrderChange}
-                onEditExercise={onEditExercise}
-                onCancelEdit={onCancelEdit}
-                client_id={client_id}
-                nextSession={nextSession}
-                progressId={progressId}
-                handleCopySession={handleCopySession}
-                setShowToast={setShowToast}
-                setToastMessage={setToastMessage}
-                setToastType={setToastType}
-                savingState={savingState}
-                isPhaseActive={phase.isActive}
-              />
-            ))
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={items}
+              strategy={verticalListSortingStrategy}
+            >
+              {items.map((sessionId, index) => {
+                var session = phase.sessions.find(
+                  (s) => s.sessionId === sessionId
+                );
+                if (!session) return null;
+                return (
+                  <SessionComponent
+                    index={index}
+                    phaseId={phase.phaseId}
+                    key={session.sessionId}
+                    session={session}
+                    workouts={workouts}
+                    onSessionDelete={onSessionDelete}
+                    onSessionNameChange={onSessionNameChange}
+                    editingExerciseId={editingExerciseId}
+                    handleAddExercise={handleAddExercise}
+                    onExerciseUpdate={onExerciseUpdate}
+                    handleExerciseSave={handleExerciseSave}
+                    onExerciseDelete={onExerciseDelete}
+                    onExerciseOrderChange={onExerciseOrderChange}
+                    onEditExercise={onEditExercise}
+                    onCancelEdit={onCancelEdit}
+                    client_id={client_id}
+                    nextSession={nextSession}
+                    progressId={progressId}
+                    handleCopySession={handleCopySession}
+                    setShowToast={setShowToast}
+                    setToastMessage={setToastMessage}
+                    setToastType={setToastType}
+                    savingState={savingState}
+                    isPhaseActive={phase.isActive}
+                  />
+                );
+              })}
+            </SortableContext>
+          </DndContext>
         )}
-        {/* <button
-                    className="flex items-center justify-center w-full mt-4 px-4 py-2 h-12 secondary-btn uppercase gap-5"
-                    onClick={handleAddSession}
-                >
-                    <FaPlus className="text-lg" /> Add Session
-                </button> */}
       </div>
     </div>
   );
