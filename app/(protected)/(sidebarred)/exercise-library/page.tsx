@@ -21,6 +21,8 @@ const ExercisePage = () => {
   const [updatingExercise, setUpdatingExercise] = useState([]);
   const [globalFilter, setGlobalFilter] = useState("");
   const { myDetails: trainerDetails } = useGlobalContext();
+  const [selectedRows, setSelectedRows] = useState([]);
+  const [rows, setRows] = useState([]);
 
   const queryClient = new QueryClient();
 
@@ -82,12 +84,56 @@ const ExercisePage = () => {
   //   }
   // };
 
+  console.log(selectedRows);
+
   const columns = useMemo<ColumnDef<ExerciseTemplate>[]>(
     () => [
       {
+        accessorKey: "checkbox",
+        header: () => (
+          <input
+            type="checkbox"
+            onChange={(event) => {
+              if (event.target.checked) {
+                setSelectedRows((prevSelectedRows) => [
+                  ...prevSelectedRows,
+                  rows,
+                ]);
+              } else {
+                setSelectedRows((prevSelectedRows) => []);
+              }
+            }}
+          />
+        ),
+        cell: (info) => (
+          <div className="w-10 h-10 flex items-center justify-center">
+            <input
+              type="checkbox"
+              checked={selectedRows.find((u) => u.id === info.row.original.id)}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  setSelectedRows((prevSelectedRows) => [
+                    ...prevSelectedRows,
+                    info.row.original,
+                  ]);
+                } else {
+                  setSelectedRows((prevSelectedRows) =>
+                    prevSelectedRows.filter(
+                      (row, index) => index !== info.row.index
+                    )
+                  );
+                }
+              }}
+            />
+          </div>
+        ),
+        size: 50,
+        enableSorting: false,
+      },
+      {
         accessorKey: "motion",
         cell: (info) => info.getValue(),
-        header: () => "Motion",
+        header: "Motion",
         size: 200,
         filterFn: "includesString",
       },
@@ -95,12 +141,12 @@ const ExercisePage = () => {
         accessorFn: (row) => row.targetArea,
         id: "targetArea",
         cell: (info) => info.getValue(),
-        header: () => "Target Area",
+        header: "Target Area",
         size: 250,
       },
       {
         accessorKey: "fullName",
-        header: () => "Exercise Name",
+        header: "Exercise Name",
         size: 300,
         cell: (info) => (
           <div
@@ -117,7 +163,7 @@ const ExercisePage = () => {
       },
       {
         accessorKey: "shortName",
-        header: () => "Shortened Name",
+        header: "Shortened Name",
         size: 250,
       },
       // {
@@ -143,7 +189,9 @@ const ExercisePage = () => {
                     e.target.value === "true"
                   )
                 }
-                className="px-4 py-2 rounded-md bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className={`px-4 py-2 rounded-md bg-gray-100 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+                  info.getValue() ? "bg-green-200" : "bg-red-200"
+                }`}
               >
                 <option value="true">Approved</option>
                 <option value="false">Unapproved</option>
@@ -157,7 +205,7 @@ const ExercisePage = () => {
         ),
       },
     ],
-    [trainerDetails]
+    [trainerDetails, rows, selectedRows]
   );
 
   async function fetchData(start: number, size: number, sorting: SortingState) {
@@ -280,6 +328,8 @@ const ExercisePage = () => {
             {isFetching && <LoadingSpinner className="h-4 w-4" />}
           </div>
           <TableActions
+            columns={columns}
+            selectedRows={selectedRows}
             tableSearchQuery={globalFilter}
             setTableSearchQuery={setGlobalFilter}
             onClickNewButton={() => {
@@ -290,6 +340,7 @@ const ExercisePage = () => {
         <div className="">
           <QueryClientProvider client={queryClient}>
             <ScrollTable
+              setRows={setRows}
               queryKey="exercises"
               columns={columns}
               fetchData={fetchData}

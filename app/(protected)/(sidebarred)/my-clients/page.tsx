@@ -24,6 +24,7 @@ const Page = () => {
   const router = useRouter();
   const queryClient = new QueryClient();
   const [isFetching, setIsFetching] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   const handleRowClick = (client) => {
     // Implement the action you want to execute on double-click
@@ -35,6 +36,36 @@ const Page = () => {
 
   const columns = useMemo<ColumnDef<UserTemplate>[]>(
     () => [
+      {
+        accessorKey: "checkbox",
+        header: "",
+        cell: (info) => (
+          <div className="w-10 h-10 flex items-center justify-center">
+            <input
+              type="checkbox"
+              checked={selectedRows.find(
+                (u) => u.uid === info.row.original.uid
+              )}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  setSelectedRows((prevSelectedRows) => [
+                    ...prevSelectedRows,
+                    info.row.original,
+                  ]);
+                } else {
+                  setSelectedRows((prevSelectedRows) =>
+                    prevSelectedRows.filter(
+                      (row, index) => index !== info.row.index
+                    )
+                  );
+                }
+              }}
+            />
+          </div>
+        ),
+        size: 50,
+        enableSorting: false,
+      },
       {
         accessorKey: "imageUrl",
         header: "",
@@ -165,6 +196,8 @@ const Page = () => {
             {isFetching && <LoadingSpinner className="h-4 w-4" />}
           </div>
           <TableActions
+            columns={columns}
+            selectedRows={selectedRows}
             onClickNewButton={() => {
               setShowRightModal(true);
             }}

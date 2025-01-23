@@ -27,6 +27,7 @@ const CoachingTeam = () => {
   const [showRightModal, setShowRightModal] = useState(false);
   const [globalFilter, setGlobalFilter] = useState("");
   const [isFetching, setIsFetching] = useState(false);
+  const [selectedRows, setSelectedRows] = useState([]);
 
   // const router = useRouter();
 
@@ -34,6 +35,36 @@ const CoachingTeam = () => {
 
   const columns = useMemo<ColumnDef<CoachTemplate>[]>(
     () => [
+      {
+        accessorKey: "checkbox",
+        header: "",
+        cell: (info) => (
+          <div className="w-10 h-10 flex items-center justify-center">
+            <input
+              type="checkbox"
+              checked={selectedRows.find(
+                (u) => u.uid === info.row.original.uid
+              )}
+              onChange={(event) => {
+                if (event.target.checked) {
+                  setSelectedRows((prevSelectedRows) => [
+                    ...prevSelectedRows,
+                    info.row.original,
+                  ]);
+                } else {
+                  setSelectedRows((prevSelectedRows) =>
+                    prevSelectedRows.filter(
+                      (row, index) => index !== info.row.index
+                    )
+                  );
+                }
+              }}
+            />
+          </div>
+        ),
+        size: 50,
+        enableSorting: false,
+      },
       {
         accessorKey: "imageUrl",
         header: "",
@@ -163,6 +194,8 @@ const CoachingTeam = () => {
           </div>
           {trainerDetails?.team.name === "Admins" && (
             <TableActions
+              columns={columns}
+              selectedRows={selectedRows}
               tableSearchQuery={globalFilter}
               setTableSearchQuery={setGlobalFilter}
               onClickNewButton={() => {

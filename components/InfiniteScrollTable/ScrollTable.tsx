@@ -20,6 +20,7 @@ import useTableState from "@/hooks/useTableState";
 import ScrollTableSkeleton from "../pageSkeletons/scrollTableSkeleton";
 
 const ScrollTable = ({
+  setRows = (rows: any[]) => {},
   queryKey,
   columns,
   fetchData,
@@ -180,6 +181,11 @@ const ScrollTable = ({
     overscan: 5,
   });
 
+  useEffect(() => {
+    console.log("updating rows");
+    setRows(rows);
+  }, [setRows, rows]);
+
   if (isLoading) {
     return (
       <ScrollTableSkeleton columnCount={columns.length} rowCount={LIMIT} />
@@ -187,7 +193,6 @@ const ScrollTable = ({
   }
 
   const tableHeight = window.screen.height - 264 + "px";
-  // alert(tableHeight);
 
   return (
     <div>

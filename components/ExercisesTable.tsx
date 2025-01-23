@@ -107,7 +107,7 @@ const ExercisesTable = ({
           </td>
         ) : (
           <td className="pl-5 whitespace-nowrap text-sm">
-            {exercise.approved ? "Approved" : "Not Approved"}
+            {exercise.approved ? <span>Approved abc</span> : "Not Approved"}
           </td>
         )}
       </tr>
