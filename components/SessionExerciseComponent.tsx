@@ -36,7 +36,7 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
         workout: WorkoutData;
     }[] = (selectedTargetArea) => {
         return workouts.map((workout) => ({
-            value: workout.$id,
+            value: workout.id,
             label: workout.fullName,
             workout: workout,
         }));
