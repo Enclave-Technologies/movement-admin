@@ -426,4 +426,10 @@ interface BatchConfirmationDialogProps {
     confirmOp: () => void;
     cancelOp: () => void;
     loadingState?: boolean;
-  }
+}
+interface DeleteConfirmationDialogProps {
+    title: string;
+    confirmDelete: () => void;
+    cancelDelete: () => void;
+    isLoading?: boolean;
+}

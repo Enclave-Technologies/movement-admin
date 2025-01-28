@@ -1,6 +1,5 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
-import { fetchUserDetails } from "@/server_functions/auth";
+import React, { useMemo, useState } from "react";
 import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
@@ -8,7 +7,6 @@ import axios from "axios";
 import RightModal from "@/components/pure-components/RightModal";
 import AddExerciseForm from "@/components/forms/add-exercise-form";
 import { API_BASE_URL } from "@/configs/constants";
-import Searchbar from "@/components/pure-components/Searchbar";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
 import TableActions from "@/components/InfiniteScrollTable/TableActions";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -44,14 +42,8 @@ const ExercisePage = () => {
     ) => {
         setUpdatingExercise([...updatingExercise, rowData.id]);
         // Implement your logic here, e.g., update the approval status in the database
-        console.log(
-            "Approval status changed for row:",
-            rowData,
-            newApprovalStatus
-        );
 
         try {
-            console.log("SENDING INFO TO BACKEND", rowData.id);
             const response = await axios.put(
                 `${API_BASE_URL}/mvmt/v1/admin/exercises/${rowData.id}`,
                 {
@@ -63,6 +55,9 @@ const ExercisePage = () => {
             );
 
             setModified((prevModified) => !prevModified);
+            setToastMessage("Exercise approval status updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error("Error updating exercise approval:", error);
         } finally {
@@ -73,8 +68,8 @@ const ExercisePage = () => {
     };
 
     const handleBatchDelete = async () => {
+        setModalButtonLoadingState(true);
         try {
-            console.log("DELETING EXERCISES", selectedRows);
             const response = await axios.delete(
                 `${API_BASE_URL}/mvmt/v1/admin/exercises`,
                 {
@@ -88,6 +83,11 @@ const ExercisePage = () => {
             setDeletePressed(false);
             setSelectedRows([]);
             setModified((prevModified) => !prevModified);
+            setModalButtonLoadingState(false);
+
+            setToastMessage("Exercises deleted successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error("Error deleting exercises:", error);
         }
@@ -121,10 +121,13 @@ const ExercisePage = () => {
 
             if (allSuccessful) {
                 // All updates were successful, do something here
-                console.log("All updates successful");
+
                 setBatchApprovalPressed(false);
                 setSelectedRows([]);
                 setModified((prevModified) => !prevModified);
+                setToastMessage("Batch of exercises updated successfully");
+                setToastType("success");
+                setShowToast(true);
             } else {
                 // Some updates failed, handle the error
                 console.error("One or more updates failed");
@@ -161,23 +164,7 @@ const ExercisePage = () => {
         () => [
             {
                 accessorKey: "checkbox",
-                // header: () => (
-                //     <input
-                //         type="checkbox"
-                //         onChange={(event) => {
-                //             if (event.target.checked) {
-                //                 setSelectedRows((prevSelectedRows) => [
-                //                     ...prevSelectedRows,
-                //                     ...rows.map((row) => row.original),
-                //                 ]);
-                //                 event.target.checked = true;
-                //             } else {
-                //                 setSelectedRows((prevSelectedRows) => []);
-                //                 event.target.checked = false;
-                //             }
-                //         }}
-                //     />
-                // ),
+
                 header: "",
                 cell: (info) => (
                     <div className="w-10 h-10 flex items-center justify-center">
@@ -440,6 +427,7 @@ const ExercisePage = () => {
                         title="this batch of exercises"
                         confirmDelete={handleBatchDelete}
                         cancelDelete={handleDeleteCancel}
+                        isLoading={modalButtonLoadingState}
                     />
                 )}
                 {batchApprovalPressed && (
