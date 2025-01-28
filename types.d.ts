@@ -420,3 +420,10 @@ interface CoachTemplate {
     jobTitle?: string;
     gender?: string;
 }
+
+interface BatchConfirmationDialogProps {
+    title: string;
+    confirmOp: () => void;
+    cancelOp: () => void;
+    loadingState?: boolean;
+  }
