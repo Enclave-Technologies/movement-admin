@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
@@ -13,6 +13,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import BatchConfirmationDialog from "@/components/InfiniteScrollTable/batchConfirmationDialog";
 import Toast from "@/components/Toast";
+import EditExerciseForm from "@/components/forms/edit-exercise-form";
 
 const ExercisePage = () => {
     const [modified, setModified] = useState(true);
@@ -33,6 +34,9 @@ const ExercisePage = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+    // const [editRow, setEditRow] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const editRowRef = useRef<ExerciseTemplate | null>(null);
 
     const queryClient = new QueryClient();
 
@@ -101,39 +105,72 @@ const ExercisePage = () => {
         setDeletePressed(false);
     };
 
+    // const handleBatchApproval = async () => {
+    //     setModalButtonLoadingState(true);
+    //     const promises = selectedRows.map((row) =>
+    //         axios.put(
+    //             `${API_BASE_URL}/mvmt/v1/admin/exercises/${row.id}`,
+    //             {
+    //                 approved: approving,
+    //             },
+    //             {
+    //                 withCredentials: true,
+    //             }
+    //         )
+    //     );
+
+    //     try {
+    //         const results = await Promise.all(promises);
+    //         const allSuccessful = results.every((res) => res.status === 200);
+
+    //         if (allSuccessful) {
+    //             // All updates were successful, do something here
+
+    //             setBatchApprovalPressed(false);
+    //             setSelectedRows([]);
+    //             setModified((prevModified) => !prevModified);
+    //             setToastMessage("Batch of exercises updated successfully");
+    //             setToastType("success");
+    //             setShowToast(true);
+    //         } else {
+    //             // Some updates failed, handle the error
+    //             console.error("One or more updates failed");
+    //         }
+    //     } catch (error) {
+    //         // Handle any errors that occurred during the requests
+    //         console.error("Error updating exercises:", error);
+    //     } finally {
+    //         setModalButtonLoadingState(false);
+    //         setApproving(false);
+    //     }
+    // };
+
     const handleBatchApproval = async () => {
         setModalButtonLoadingState(true);
-        const promises = selectedRows.map((row) =>
-            axios.put(
-                `${API_BASE_URL}/mvmt/v1/admin/exercises/${row.id}`,
+
+        const exerciseUpdates = selectedRows.map((row) => ({
+            id: row.id,
+            approved: approving,
+        }));
+
+        try {
+            await axios.put(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises`,
                 {
-                    approved: approving,
+                    updates: exerciseUpdates,
                 },
                 {
                     withCredentials: true,
                 }
-            )
-        );
+            );
 
-        try {
-            const results = await Promise.all(promises);
-            const allSuccessful = results.every((res) => res.status === 200);
-
-            if (allSuccessful) {
-                // All updates were successful, do something here
-
-                setBatchApprovalPressed(false);
-                setSelectedRows([]);
-                setModified((prevModified) => !prevModified);
-                setToastMessage("Batch of exercises updated successfully");
-                setToastType("success");
-                setShowToast(true);
-            } else {
-                // Some updates failed, handle the error
-                console.error("One or more updates failed");
-            }
+            setBatchApprovalPressed(false);
+            setSelectedRows([]);
+            setModified((prevModified) => !prevModified);
+            setToastMessage("Batch of exercises updated successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
-            // Handle any errors that occurred during the requests
             console.error("Error updating exercises:", error);
         } finally {
             setModalButtonLoadingState(false);
@@ -158,6 +195,12 @@ const ExercisePage = () => {
 
     const closeBatchApproveConfirmation = () => {
         setBatchApprovalPressed(false);
+    };
+
+    const handleExerciseEditClicked = (rowData: ExerciseTemplate) => {
+        // setEditRow(rowData);
+        editRowRef.current = rowData;
+        setShowEditModal(true);
     };
 
     const columns = useMemo<ColumnDef<ExerciseTemplate>[]>(
@@ -218,9 +261,10 @@ const ExercisePage = () => {
                         className={`px-4 py-2 font-semibold underline cursor-pointer"
                         }`}
                         onClick={() => {
-                            alert(
-                                `clicked ${JSON.stringify(info.row.original)}`
-                            );
+                            // alert(
+                            //     `clicked ${JSON.stringify(info.row.original)}`
+                            // );
+                            handleExerciseEditClicked(info.row.original);
                             // handleApprovalClick(info.row.original)
                         }}
                     >
@@ -233,14 +277,6 @@ const ExercisePage = () => {
                 header: "Shortened Name",
                 size: 250,
             },
-            // {
-            //     accessorKey: "approved",
-            //     header: "Approval Status",
-            //     size: 180,
-            //     cell: (info) => (
-            //         <div>{info.getValue() ? "Approved" : "Unapproved"}</div>
-            //     ),
-            // },
             {
                 accessorKey: "approved",
                 header: "Approval Status",
@@ -335,6 +371,27 @@ const ExercisePage = () => {
         );
     };
 
+    const rightEditModal = () => {
+        return (
+            <RightModal
+                formTitle="Edit Exercise"
+                isVisible={showEditModal}
+                hideModal={() => {
+                    setShowEditModal(false);
+                }}
+            >
+                <EditExerciseForm
+                    fetchData={() => {
+                        setAdded((prevAdded) => !prevAdded);
+                    }}
+                    team={trainerDetails?.team.name}
+                    // rowData={editRow}
+                    rowData={editRowRef.current}
+                />
+            </RightModal>
+        );
+    };
+
     if (!trainerDetails) {
         return null;
     }
@@ -422,6 +479,7 @@ const ExercisePage = () => {
                     </QueryClientProvider>
                 </div>
                 {rightModal()}
+                {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
                         title="this batch of exercises"
