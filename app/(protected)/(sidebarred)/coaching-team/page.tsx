@@ -28,6 +28,7 @@ const CoachingTeam = () => {
   const [globalFilter, setGlobalFilter] = useState("");
   const [isFetching, setIsFetching] = useState(false);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [rows, setRows] = useState([]);
 
   // const router = useRouter();
 
@@ -37,7 +38,30 @@ const CoachingTeam = () => {
     () => [
       {
         accessorKey: "checkbox",
-        header: "",
+        header: () => (
+          <div className="w-10 h-10 flex items-center justify-center">
+            <input
+              className=""
+              type="checkbox"
+              onClick={() => {
+                if (selectedRows.length > 0) {
+                  setSelectedRows([]);
+                } else {
+                  setSelectedRows((prevSelectedRows) => {
+                    const newSelectedRows = Array.from(
+                      new Set([
+                        ...prevSelectedRows,
+                        ...rows.map((row) => row.original),
+                      ])
+                    );
+                    return newSelectedRows;
+                  });
+                }
+              }}
+              checked={selectedRows.length > 0 ? true : false}
+            />
+          </div>
+        ),
         cell: (info) => (
           <div className="w-10 h-10 flex items-center justify-center">
             <input
@@ -117,7 +141,7 @@ const CoachingTeam = () => {
       //     accessorKey: "status",
       // },
     ],
-    []
+    [trainerDetails, rows, selectedRows]
   );
 
   async function fetchTrainers(
@@ -207,6 +231,7 @@ const CoachingTeam = () => {
         <div>
           <QueryClientProvider client={queryClient}>
             <ScrollTable
+              setRows={setRows}
               queryKey="allUsers"
               columns={columns}
               fetchData={fetchTrainers}
