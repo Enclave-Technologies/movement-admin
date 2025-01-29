@@ -13,6 +13,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import BatchConfirmationDialog from "@/components/InfiniteScrollTable/batchConfirmationDialog";
 import Toast from "@/components/Toast";
+import { TbCheck, TbCross } from "react-icons/tb";
 import EditExerciseForm from "@/components/forms/edit-exercise-form";
 
 const ExercisePage = () => {
@@ -97,54 +98,6 @@ const ExercisePage = () => {
         }
     };
 
-    const openDeleteConfirmation = () => {
-        setDeletePressed(true);
-    };
-
-    const handleDeleteCancel = () => {
-        setDeletePressed(false);
-    };
-
-    // const handleBatchApproval = async () => {
-    //     setModalButtonLoadingState(true);
-    //     const promises = selectedRows.map((row) =>
-    //         axios.put(
-    //             `${API_BASE_URL}/mvmt/v1/admin/exercises/${row.id}`,
-    //             {
-    //                 approved: approving,
-    //             },
-    //             {
-    //                 withCredentials: true,
-    //             }
-    //         )
-    //     );
-
-    //     try {
-    //         const results = await Promise.all(promises);
-    //         const allSuccessful = results.every((res) => res.status === 200);
-
-    //         if (allSuccessful) {
-    //             // All updates were successful, do something here
-
-    //             setBatchApprovalPressed(false);
-    //             setSelectedRows([]);
-    //             setModified((prevModified) => !prevModified);
-    //             setToastMessage("Batch of exercises updated successfully");
-    //             setToastType("success");
-    //             setShowToast(true);
-    //         } else {
-    //             // Some updates failed, handle the error
-    //             console.error("One or more updates failed");
-    //         }
-    //     } catch (error) {
-    //         // Handle any errors that occurred during the requests
-    //         console.error("Error updating exercises:", error);
-    //     } finally {
-    //         setModalButtonLoadingState(false);
-    //         setApproving(false);
-    //     }
-    // };
-
     const handleBatchApproval = async () => {
         setModalButtonLoadingState(true);
 
@@ -203,12 +156,45 @@ const ExercisePage = () => {
         setShowEditModal(true);
     };
 
+    const openDeleteConfirmation = () => {
+        setDeletePressed(true);
+    };
+
+    const handleDeleteCancel = () => {
+        setDeletePressed(false);
+    };
+
     const columns = useMemo<ColumnDef<ExerciseTemplate>[]>(
         () => [
             {
                 accessorKey: "checkbox",
 
-                header: "",
+                header: () => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <input
+                            className=""
+                            type="checkbox"
+                            onClick={() => {
+                                if (selectedRows.length > 0) {
+                                    setSelectedRows([]);
+                                } else {
+                                    setSelectedRows((prevSelectedRows) => {
+                                        const newSelectedRows = Array.from(
+                                            new Set([
+                                                ...prevSelectedRows,
+                                                ...rows.map(
+                                                    (row) => row.original
+                                                ),
+                                            ])
+                                        );
+                                        return newSelectedRows;
+                                    });
+                                }
+                            }}
+                            checked={selectedRows.length > 0 ? true : false}
+                        />
+                    </div>
+                ),
                 cell: (info) => (
                     <div className="w-10 h-10 flex items-center justify-center">
                         <input
@@ -261,10 +247,9 @@ const ExercisePage = () => {
                         className={`px-4 py-2 font-semibold underline cursor-pointer"
                         }`}
                         onClick={() => {
-                            // alert(
-                            //     `clicked ${JSON.stringify(info.row.original)}`
-                            // );
-                            handleExerciseEditClicked(info.row.original);
+                            alert(
+                                `clicked ${JSON.stringify(info.row.original)}`
+                            );
                             // handleApprovalClick(info.row.original)
                         }}
                     >
@@ -277,6 +262,14 @@ const ExercisePage = () => {
                 header: "Shortened Name",
                 size: 250,
             },
+            // {
+            //     accessorKey: "approved",
+            //     header: "Approval Status",
+            //     size: 180,
+            //     cell: (info) => (
+            //         <div>{info.getValue() ? "Approved" : "Unapproved"}</div>
+            //     ),
+            // },
             {
                 accessorKey: "approved",
                 header: "Approval Status",
@@ -404,56 +397,9 @@ const ExercisePage = () => {
                         <span className="text-lg font-bold">Exercise List</span>
                         {isFetching && <LoadingSpinner className="h-4 w-4" />}
                     </div>
-                    <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                        onClick={() => {
-                            setSelectedRows((prevSelectedRows) => {
-                                const newSelectedRows = Array.from(
-                                    new Set([
-                                        ...prevSelectedRows,
-                                        ...rows.map((row) => row.original),
-                                    ])
-                                );
-                                return newSelectedRows;
-                            });
-                        }}
-                    >
-                        Select All
-                    </button>
-                    <button
-                        className="bg-blue-500 text-white px-4 py-2 rounded-md"
-                        onClick={() => {
-                            setSelectedRows([]);
-                        }}
-                    >
-                        Deselect All
-                    </button>
-                    <button
-                        className="bg-red-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-md"
-                        disabled={selectedRows.length === 0}
-                        onClick={openDeleteConfirmation}
-                    >
-                        Delete selected
-                    </button>
-                    <button
-                        className="bg-green-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-md"
-                        disabled={selectedRows.length === 0}
-                        onClick={() => {
-                            openBatchApproveConfirmation(true);
-                        }}
-                    >
-                        Approve selected
-                    </button>
-                    <button
-                        className="bg-gold-500 disabled:bg-gray-600 text-white px-4 py-2 rounded-md"
-                        disabled={selectedRows.length === 0}
-                        onClick={() => {
-                            openBatchApproveConfirmation(false);
-                        }}
-                    >
-                        Unapprove selected
-                    </button>
+
                     <TableActions
+                        openDeleteConfirmation={openDeleteConfirmation}
                         columns={columns}
                         selectedRows={selectedRows}
                         tableSearchQuery={globalFilter}
@@ -461,6 +407,28 @@ const ExercisePage = () => {
                         onClickNewButton={() => {
                             setShowRightModal(true);
                         }}
+                        additionalActions={
+                            <>
+                                <button
+                                    className="text-black disabled:text-gray-400 px-4 rounded-md h-8 hover:bg-gray-100"
+                                    disabled={selectedRows.length === 0}
+                                    onClick={() => {
+                                        openBatchApproveConfirmation(true);
+                                    }}
+                                >
+                                    Approve
+                                </button>
+                                <button
+                                    className="text-black disabled:text-gray-400 px-4 rounded-md h-8 hover:bg-gray-100"
+                                    disabled={selectedRows.length === 0}
+                                    onClick={() => {
+                                        openBatchApproveConfirmation(false);
+                                    }}
+                                >
+                                    Unapprove
+                                </button>
+                            </>
+                        }
                     />
                 </div>
                 <div className="">
