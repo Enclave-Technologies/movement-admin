@@ -17,7 +17,7 @@ export const ClientFormSchema = z.object({
     lastName: z.string().min(2, "Last Name must be at least 2 letters"),
     phone: z.string().max(20, "Phone should be less than 20 letters"),
     email: z.string().email("Invalid email address"),
-    trainerId: z.string(),
+    trainerId: z.string().min(2, "Trainer ID cannot be empty"),
     gender: z.enum(["m", "f"]),
 });
 

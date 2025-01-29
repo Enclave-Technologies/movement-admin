@@ -35,9 +35,9 @@ const ExercisePage = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
-    // const [editRow, setEditRow] = useState(null);
+    const [editRow, setEditRow] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    const editRowRef = useRef<ExerciseTemplate | null>(null);
+    // const editRowRef = useRef<ExerciseTemplate | null>(null);
 
     const queryClient = new QueryClient();
 
@@ -50,9 +50,14 @@ const ExercisePage = () => {
 
         try {
             const response = await axios.put(
-                `${API_BASE_URL}/mvmt/v1/admin/exercises/${rowData.id}`,
+                `${API_BASE_URL}/mvmt/v1/admin/exercises`,
                 {
-                    approved: newApprovalStatus,
+                    updates: [
+                        {
+                            id: rowData.id,
+                            approved: newApprovalStatus,
+                        },
+                    ],
                 },
                 {
                     withCredentials: true,
@@ -151,8 +156,8 @@ const ExercisePage = () => {
     };
 
     const handleExerciseEditClicked = (rowData: ExerciseTemplate) => {
-        // setEditRow(rowData);
-        editRowRef.current = rowData;
+        setEditRow(rowData);
+        // editRowRef.current = rowData;
         setShowEditModal(true);
     };
 
@@ -191,7 +196,9 @@ const ExercisePage = () => {
                                     });
                                 }
                             }}
-                            checked={selectedRows.length > 0 ? true : false}
+                            defaultChecked={
+                                selectedRows.length > 0 ? true : false
+                            }
                         />
                     </div>
                 ),
@@ -199,7 +206,7 @@ const ExercisePage = () => {
                     <div className="w-10 h-10 flex items-center justify-center">
                         <input
                             type="checkbox"
-                            checked={selectedRows.find(
+                            defaultChecked={selectedRows.find(
                                 (u) => u.id === info.row.original.id
                             )}
                             onChange={(event) => {
@@ -247,9 +254,10 @@ const ExercisePage = () => {
                         className={`px-4 py-2 font-semibold underline cursor-pointer"
                         }`}
                         onClick={() => {
-                            alert(
-                                `clicked ${JSON.stringify(info.row.original)}`
-                            );
+                            handleExerciseEditClicked(info.row.original);
+                            // alert(
+                            //     `clicked ${JSON.stringify(info.row.original)}`
+                            // );
                             // handleApprovalClick(info.row.original)
                         }}
                     >
@@ -371,15 +379,16 @@ const ExercisePage = () => {
                 isVisible={showEditModal}
                 hideModal={() => {
                     setShowEditModal(false);
+                    setEditRow(null);
                 }}
             >
                 <EditExerciseForm
-                    fetchData={() => {
+                    refreshTable={() => {
                         setAdded((prevAdded) => !prevAdded);
                     }}
                     team={trainerDetails?.team.name}
-                    // rowData={editRow}
-                    rowData={editRowRef.current}
+                    rowData={editRow}
+                    // rowData={editRowRef.current}
                 />
             </RightModal>
         );

@@ -112,7 +112,7 @@ export async function register(state, formData) {
                 email,
                 phone,
                 trainer_id: uid,
-                trainers: trainerId,
+                trainers: uid,
                 imageUrl: null,
                 gender: gender,
             }
