@@ -27,14 +27,6 @@ const PhaseActions = ({
       <TooltipButton
         tooltip="Delete Phase"
         className="ml-2 text-red-400 hover:text-red-600 focus:outline-none focus:ring focus:ring-red-500"
-        // onClick={() => {
-        //     const isConfirmed = window.confirm(
-        //         "Are you sure you want to delete this phase?"
-        //     );
-        //     if (isConfirmed) {
-        //         onPhaseDelete(phase.phaseId);
-        //     }
-        // }}
         onClick={handleDeletePhase}
       >
         <FaTrash />

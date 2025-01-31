@@ -1,21 +1,27 @@
 "use client";
-import { API_BASE_URL } from "@/configs/constants";
 import { defaultProfileURL } from "@/configs/constants";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import Select, { components, OptionProps } from "react-select";
-import SignupButton from "../ResponsiveButton";
+import SubmitButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
 import { registerClient } from "@/server_functions/auth";
 import Toast from "../Toast";
-import axios from "axios";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
 
 const Option = (props: OptionProps<any, false>) => {
-    const { data } = props;
+    const { data, isSelected, isFocused } = props;
     return (
         <components.Option {...props}>
-            <div className="flex items-center">
+            <div
+                className={`flex items-center px-3 py-2 ${
+                    isSelected
+                        ? "bg-green-500 text-white"
+                        : isFocused
+                        ? "bg-gray-100"
+                        : "hover:bg-gray-100"
+                }`}
+            >
                 <Image
                     src={data.imageUrl || defaultProfileURL}
                     alt={data.name}
@@ -27,7 +33,11 @@ const Option = (props: OptionProps<any, false>) => {
                 <div className="flex flex-col">
                     <span className="font-semibold">{data.name}</span>
                     {data.jobTitle && (
-                        <span className="text-gray-500 text-sm">
+                        <span
+                            className={`text-sm ${
+                                isSelected ? "text-gray-100" : "text-gray-500"
+                            }`}
+                        >
                             {data.jobTitle}
                         </span>
                     )}
@@ -37,7 +47,13 @@ const Option = (props: OptionProps<any, false>) => {
     );
 };
 
-const AddUserForm = ({ fetchData }) => {
+const AddUserForm = ({
+    fetchData,
+    trainerId,
+}: {
+    fetchData: () => void;
+    trainerId?: string;
+}) => {
     const { trainers } = useGlobalContext();
     const [clientState, clientAction] = useFormState(registerClient, undefined);
     const ref = useRef<HTMLFormElement>(null);
@@ -48,7 +64,7 @@ const AddUserForm = ({ fetchData }) => {
     useEffect(() => {
         if (clientState?.success) {
             fetchData();
-            ref.current?.reset();
+            // ref.current?.reset();
             setToastMessage(
                 clientState.message || "Trainer registered successfully!"
             );
@@ -61,8 +77,7 @@ const AddUserForm = ({ fetchData }) => {
             setToastType("error");
             setShowToast(true);
         }
-    }, [clientState, fetchData]);
-
+    }, [clientState]);
 
     const handleToastClose = () => {
         setShowToast(false);
@@ -175,20 +190,47 @@ const AddUserForm = ({ fetchData }) => {
                     >
                         Select Trainer
                     </label>
-                    <div suppressHydrationWarning>
-                        <Select
-                            id="trainerId"
-                            name="trainerId"
-                            options={trainers}
-                            getOptionLabel={(option) => option.name}
-                            getOptionValue={(option) => option.id}
-                            components={{ Option }}
-                            className="mt-1 block w-full"
-                            classNamePrefix="react-select"
-                        />
-                    </div>
+
+                    <Select
+                        id="trainerId"
+                        name="trainerId"
+                        options={trainers}
+                        getOptionLabel={(option) => option.name}
+                        getOptionValue={(option) => option.uid}
+                        components={{ Option }}
+                        className="mt-1 block w-full"
+                        classNamePrefix="react-select"
+                        defaultValue={
+                            trainerId
+                                ? trainers.find(
+                                      (trainer) => trainer.uid === trainerId
+                                  )
+                                : null
+                        }
+                        styles={{
+                            option: (provided, state) => ({
+                                ...provided,
+                                backgroundColor: state.isSelected
+                                    ? "#006747" // Selected option background color
+                                    : state.isFocused
+                                    ? "#f7f7f7" // Hovered option background color
+                                    : "white",
+                                color: state.isSelected
+                                    ? "white" // Selected option text color
+                                    : state.isFocused
+                                    ? "#006747" // Hovered option text color
+                                    : "black",
+                            }),
+                            menu: (provided) => ({
+                                ...provided,
+                                borderRadius: "0.5rem", // Change the border radius of the dropdown menu
+                                boxShadow:
+                                    "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", // Add a box shadow to the dropdown menu
+                            }),
+                        }}
+                    />
                 </div>
-                <SignupButton label="Submit" />
+                <SubmitButton label="Submit" />
             </form>
             {showToast && (
                 <Toast

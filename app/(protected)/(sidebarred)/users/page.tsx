@@ -1,49 +1,255 @@
 "use client";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useMemo } from "react";
 import axios from "axios";
-import UsersTable from "@/components/UsersTable";
-import Searchbar from "@/components/pure-components/Searchbar";
 import AddUserForm from "@/components/forms/add-user-form";
 import RightModal from "@/components/pure-components/RightModal";
-import { useGlobalContext } from "@/context/GlobalContextProvider";
-import { LIMIT } from "@/configs/constants";
-import Pagination from "@/components/pure-components/Pagination";
-import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
+import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
+import { defaultProfileURL, LIMIT } from "@/configs/constants";
 import { API_BASE_URL } from "@/configs/constants";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { TiSortAlphabetically } from "react-icons/ti";
+import { MdOutlineMail, MdOutlinePerson, MdOutlinePhone } from "react-icons/md";
+import TableActions from "@/components/InfiniteScrollTable/TableActions";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
+import Toast from "@/components/Toast";
 
 export default function AllClients() {
-    const [clients, setClients] = useState<Client[]>([]); // State to hold the clients data
-    const [lastId, setLastId] = useState<number>(1); // State to hold the last ID of the fetched clients
-    const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
-
-    const [search, setSearch] = useState("");
-    const [pageLoading, setPageLoading] = useState(true);
+    const [modified, setModified] = useState(true);
+    const [added, setAdded] = useState(true);
     const [showRightModal, setShowRightModal] = useState(false);
-    const { countDoc, reloadData, users } = useGlobalContext();
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [isFetching, setIsFetching] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [rows, setRows] = useState([]);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            if (users) {
-                const myClients = users.filter(
-                    (user) =>
-                        user.name
-                            .toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        user.email
-                            ?.toLowerCase()
-                            .includes(search.toLowerCase()) ||
-                        user.phone?.toLowerCase().includes(search.toLowerCase())
-                );
+    const [deletePressed, setDeletePressed] = useState(false);
+    const [modalButtonLoadingState, setModalButtonLoadingState] =
+        useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState("success");
 
-                setTotalPages(Math.ceil(myClients.length / LIMIT));
-                const startIndex = (lastId - 1) * LIMIT;
-                const endIndex = startIndex + LIMIT;
+    const router = useRouter();
 
-                setClients(myClients.slice(startIndex, endIndex));
-            }
+    // Separate useEffect hook for fetching user details
+
+    const queryClient = new QueryClient();
+
+    const handleRowClick = (client) => {
+        // Implement the action you want to execute on double-click
+        // console.log("Client clicked:", client);
+        // For example, you can redirect to the client details page
+        // window.location.href = `client/${client.uid}`;
+        router.push(`client/${client.uid}`);
+    };
+
+    const openDeleteConfirmation = () => {
+        setDeletePressed(true);
+    };
+
+    const handleDeleteCancel = () => {
+        setDeletePressed(false);
+    };
+
+    const handleBatchDelete = async () => {
+        setModalButtonLoadingState(true);
+        console.log(selectedRows);
+        try {
+            const response = await axios.delete(
+                `${API_BASE_URL}/mvmt/v1/trainer/clients`,
+                {
+                    data: {
+                        ids: selectedRows.map((row) => row.uid),
+                    },
+                    withCredentials: true,
+                }
+            );
+
+            setDeletePressed(false);
+            setSelectedRows([]);
+            setModified((prevModified) => !prevModified);
+            setModalButtonLoadingState(false);
+
+            setToastMessage("Users deleted successfully");
+            setToastType("success");
+            setShowToast(true);
+        } catch (error) {
+            console.error("Error deleting users:", error);
+            setDeletePressed(false);
+            setModalButtonLoadingState(false);
+            setToastMessage("Error deleting users");
+            setToastType("error");
+            setShowToast(true);
+        }
+    };
+
+    const handleToastClose = () => {
+        setShowToast(false);
+    };
+
+    const columns = useMemo<ColumnDef<UserTemplate>[]>(
+        () => [
+            {
+                accessorKey: "checkbox",
+                header: () => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <input
+                            className=""
+                            type="checkbox"
+                            onClick={() => {
+                                if (selectedRows.length > 0) {
+                                    setSelectedRows([]);
+                                } else {
+                                    setSelectedRows((prevSelectedRows) => {
+                                        const newSelectedRows = Array.from(
+                                            new Set([
+                                                ...prevSelectedRows,
+                                                ...rows.map(
+                                                    (row) => row.original
+                                                ),
+                                            ])
+                                        );
+                                        return newSelectedRows;
+                                    });
+                                }
+                            }}
+                            checked={selectedRows.length > 0 ? true : false}
+                        />
+                    </div>
+                ),
+                cell: (info) => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <input
+                            type="checkbox"
+                            checked={selectedRows.find(
+                                (u) => u.uid === info.row.original.uid
+                            )}
+                            onChange={(event) => {
+                                if (event.target.checked) {
+                                    setSelectedRows((prevSelectedRows) => [
+                                        ...prevSelectedRows,
+                                        info.row.original,
+                                    ]);
+                                } else {
+                                    setSelectedRows((prevSelectedRows) =>
+                                        prevSelectedRows.filter(
+                                            (row, index) =>
+                                                index !== info.row.index
+                                        )
+                                    );
+                                }
+                            }}
+                        />
+                    </div>
+                ),
+                size: 50,
+                enableSorting: false,
+            },
+            {
+                accessorKey: "imageUrl",
+                header: "",
+                cell: (info) => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <Image
+                            src={
+                                info?.getValue() &&
+                                String(info?.getValue()).trim() !== ""
+                                    ? String(info?.getValue())
+                                    : defaultProfileURL
+                            } // Provide a default placeholder
+                            width={24}
+                            height={24}
+                            alt={`Image of ${info?.row.original.name}`}
+                            className="rounded-full"
+                        />
+                    </div>
+                ),
+                size: 50,
+                enableSorting: false,
+            },
+            {
+                icon: <TiSortAlphabetically />,
+                header: "Name",
+                accessorKey: "name",
+                cell: (info) => (
+                    <div
+                        className="whitespace-nowrap cursor-pointer text-sm font-semibold underline"
+                        onClick={() => handleRowClick(info?.row.original)}
+                    >
+                        {info?.getValue() as String}
+                    </div>
+                ),
+                size: 200,
+            },
+            {
+                icon: <MdOutlineMail />,
+                header: "Email",
+                accessorKey: "email",
+                size: 250,
+            },
+            {
+                icon: <MdOutlinePhone />,
+                header: "Phone",
+                accessorKey: "phone",
+                size: 150,
+            },
+            {
+                icon: <MdOutlinePerson />,
+                header: "Trainer",
+                accessorKey: "trainer_name",
+                size: 250,
+                enableSorting: false,
+            },
+            // {
+            //     header: "Status",
+            //     accessorKey: "status",
+            // },
+        ],
+        [rows, selectedRows]
+    );
+
+    async function fetchUsers(
+        start: number,
+        size: number,
+        sorting: SortingState
+    ) {
+        // let response: any;
+        const pageNo = start / size + 1;
+
+        const url = new URL(`${API_BASE_URL}/mvmt/v1/trainer/clients`);
+        url.searchParams.set("limit", size.toString());
+        url.searchParams.set("pageNo", pageNo.toString());
+
+        if (sorting.length) {
+            const sort = sorting[0] as ColumnSort;
+            const { id, desc } = sort;
+            url.searchParams.set("sort_by", id);
+            url.searchParams.set("sort_order", desc ? "desc" : "asc");
+        }
+
+        if (globalFilter) {
+            url.searchParams.set("search_query", globalFilter);
+        }
+
+        const response = await axios.get(url.toString(), {
+            withCredentials: true,
+        });
+
+        const { data, total } = response.data;
+
+        console.log("Data fetched:", JSON.stringify(data));
+
+        return {
+            data: data,
+            meta: {
+                totalRowCount: total,
+            },
         };
-        fetchData();
-    }, [users, lastId, search]);
+    }
 
     const rightModal = () => {
         return (
@@ -54,50 +260,67 @@ export default function AllClients() {
                     setShowRightModal(false);
                 }}
             >
-                <AddUserForm fetchData={reloadData} />
+                <AddUserForm
+                    fetchData={() => {
+                        setAdded((prevAdded) => !prevAdded);
+                    }}
+                />
             </RightModal>
         );
     };
 
-    if (users.length === 0)
-        return (
-            <UserSkeleton
-                button_text="Add User"
-                pageTitle="All Users"
-                buttons={totalPages}
-                active_page={lastId}
-            />
-        );
-
     return (
-        <main className="flex flex-col bg-gray-100 text-black">
+        <main className="flex flex-col bg-transparent text-black">
             <div className="w-full flex flex-col gap-4">
-                <div className="w-full flex flex-row items-center justify-between">
-                    <h1 className="text-xl font-bold text-black ml-2 leading-tight">
-                        All Users
-                    </h1>
-                    <button
-                        onClick={() => {
+                <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
+                    <div className="flex flex-row gap-2 items-center">
+                        <span className="text-lg font-bold">All Users</span>
+                        {isFetching && <LoadingSpinner className="h-4 w-4" />}
+                    </div>
+                    <TableActions
+                        openDeleteConfirmation={openDeleteConfirmation}
+                        columns={columns}
+                        selectedRows={selectedRows}
+                        onClickNewButton={() => {
                             setShowRightModal(true);
                         }}
-                        className="bg-primary text-white py-2 px-4 rounded-md"
-                    >
-                        + Add User
-                    </button>
+                        tableSearchQuery={globalFilter}
+                        setTableSearchQuery={setGlobalFilter}
+                    />
                 </div>
-
-                <div className="w-full overflow-x-auto">
-                    <UsersTable clients={clients} search={search} />
+                <div>
+                    <QueryClientProvider client={queryClient}>
+                        <ScrollTable
+                            setRows={setRows}
+                            queryKey="allUsers"
+                            columns={columns}
+                            fetchData={fetchUsers}
+                            dataAdded={added}
+                            dataModified={modified}
+                            globalFilter={globalFilter}
+                            setGlobalFilter={setGlobalFilter}
+                            setIsFetching={setIsFetching}
+                        />
+                    </QueryClientProvider>
                 </div>
-
-                <Pagination
-                    totalPages={totalPages}
-                    pageNo={lastId}
-                    handlePageChange={(page: number) => {
-                        setLastId(page);
-                    }}
-                />
                 {rightModal()}
+                {deletePressed && (
+                    <DeleteConfirmationDialog
+                        title="batch of users? 
+                        This will remove them permanently. 
+                        Are you sure you want to delete them?"
+                        confirmDelete={handleBatchDelete}
+                        cancelDelete={handleDeleteCancel}
+                        isLoading={modalButtonLoadingState}
+                    />
+                )}
+                {showToast && (
+                    <Toast
+                        message={toastMessage}
+                        onClose={handleToastClose}
+                        type={toastType}
+                    />
+                )}
             </div>
         </main>
     );

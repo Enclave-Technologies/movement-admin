@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import SignupButton from "@/components/ResponsiveButton";
+import SubmitButton from "@/components/ResponsiveButton";
 import { updatePassword } from "@/server_functions/auth"; // Assuming you have this function to update the password
 import { useFormState } from "react-dom"; // Assuming similar state management as login
 import Image from "next/image";
@@ -65,7 +65,7 @@ const ConfirmPasswordPage = () => {
                             </p>
                         )}
                     </div>
-                    <SignupButton label="Update Password" />
+                    <SubmitButton label="Update Password" />
                 </form>
                 <div className="mt-4 text-center text-sm text-gray-600">
                     <Link

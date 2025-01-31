@@ -11,7 +11,7 @@ import Select, {
     StylesConfig,
 } from "react-select";
 import { useFormState } from "react-dom";
-import SignupButton from "../ResponsiveButton";
+import SubmitButton from "../ResponsiveButton";
 import Toast from "../Toast";
 import { addWorkout } from "@/server_functions/auth";
 
@@ -83,7 +83,6 @@ const AddExerciseForm = ({ fetchData, team }) => {
     }));
 
     useEffect(() => {
-        console.log(formState);
         if (formState?.success) {
             fetchData();
             ref.current?.reset();
@@ -122,6 +121,59 @@ const AddExerciseForm = ({ fetchData, team }) => {
     const handleToastClose = () => {
         setShowToast(false);
     };
+
+    useEffect(() => {
+        const csvDropzone = document.getElementById("csv-dropzone");
+        let isHandlingDrop = false;
+
+        const handleDragOver = (event) => {
+            event.preventDefault();
+            csvDropzone.classList.add("dragover");
+        };
+
+        const handleDragLeave = (event) => {
+            event.preventDefault();
+            csvDropzone.classList.remove("dragover");
+        };
+
+        const handleDrop = (event) => {
+            event.preventDefault();
+            if (isHandlingDrop) return;
+            isHandlingDrop = true;
+
+            csvDropzone.classList.remove("dragover");
+            const csvFile = event.dataTransfer.files[0];
+            if (
+                csvFile.type === "text/csv" ||
+                csvFile.type === "application/vnd.ms-excel"
+            ) {
+                alert("CSV file has been selected");
+                handleCsvFile(csvFile);
+            } else {
+                alert("Please drop a CSV file.");
+            }
+
+            setTimeout(() => {
+                isHandlingDrop = false;
+            }, 1000); // Reset the flag after 1 second
+        };
+
+        csvDropzone.addEventListener("dragover", handleDragOver);
+        csvDropzone.addEventListener("dragleave", handleDragLeave);
+        csvDropzone.addEventListener("drop", handleDrop);
+
+        return () => {
+            csvDropzone.removeEventListener("dragover", handleDragOver);
+            csvDropzone.removeEventListener("dragleave", handleDragLeave);
+            csvDropzone.removeEventListener("drop", handleDrop);
+        };
+    }, []);
+
+    function handleCsvFile(file) {
+        console.log(file.name);
+        // check file headers
+        // Implement file handling logic here
+    }
 
     return (
         <div>
@@ -227,8 +279,40 @@ const AddExerciseForm = ({ fetchData, team }) => {
                         className="hidden read-only"
                     />
                 </div>
-                <SignupButton label="Submit" />
+                <SubmitButton label="Submit" />
             </form>
+
+            <div className="flex flex-row items-center justify-center space-x-4 py-8">
+                <div className="h-[1px] w-full bg-gray-500" />
+                <p>OR</p>
+                <div className="h-[1px] w-full bg-gray-500" />
+            </div>
+
+            <div className="flex flex-col gap-2 items-end">
+                <div id="csv-dropzone">Drop CSV file here</div>
+                <div className="flex flex-row">
+                    <p className="text-gray-500">
+                        <span className="text-black">
+                            While uploading CSV please make sure that:{" "}
+                        </span>
+                        <br />
+                        targetArea field matches one of the following: chest,
+                        biceps-brachii, back-latissimus-dorsi, core, metabolic
+                        conditioning, adductors, hamstrings, rectus femoris,
+                        quadriceps, gluteal, shoulders deltoids,
+                        triceps-brachii, back-lower, back-upper,
+                        back-latissimus-dorsi
+                    </p>
+                    <a
+                        className="hover:underline cursor-pointer w-full text-right"
+                        href="/files/exercises-sample.csv"
+                        download="exercises-sample.csv"
+                    >
+                        Download Sample CSV
+                    </a>
+                </div>
+            </div>
+
             {showToast && (
                 <Toast
                     message={toastMessage}

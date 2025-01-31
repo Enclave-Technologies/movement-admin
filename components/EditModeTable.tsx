@@ -4,7 +4,6 @@ import Select from "react-select";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
 import LoadingSpinner from "./LoadingSpinner";
 import { DEFAULT_WORKOUT_VALUES } from "@/configs/constants";
-import { closestCenter, DndContext } from "@dnd-kit/core";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -242,7 +241,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                 {
                                                                     ...exercise,
                                                                     exerciseId:
-                                                                        workout.$id,
+                                                                        workout.id,
                                                                     motion: workout.motion,
                                                                     fullName:
                                                                         workout.fullName,

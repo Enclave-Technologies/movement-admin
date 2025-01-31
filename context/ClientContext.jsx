@@ -10,6 +10,7 @@ export const UserProvider = ({ children, params }) => {
     const [userData, setUserData] = useState(null); // State to hold user data
     const [userLoading, setUserLoading] = useState(true);
     const [userError, setUserError] = useState(null);
+    const [shouldReload, setShouldReload] = useState(false); // New state variable to track the need for a reload
 
     useEffect(() => {
         const fetchData = async () => {
@@ -30,10 +31,16 @@ export const UserProvider = ({ children, params }) => {
             }
         };
         fetchData();
-    }, [params.id]);
+    }, [params.id, shouldReload]);
+
+    const reloadData = () => {
+        setShouldReload((prevState) => !prevState); // Trigger a reload
+    };
 
     return (
-        <UserContext.Provider value={{ userData, userLoading, userError }}>
+        <UserContext.Provider
+            value={{ userData, userLoading, userError, reloadData }}
+        >
             {children}
         </UserContext.Provider>
     );

@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -41,6 +41,7 @@ const SettingsPage = () => {
     });
 
     const [passwordError, setPasswordError] = useState("");
+    const [dataModified, setDataModified] = useState(false);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
@@ -135,7 +136,7 @@ const SettingsPage = () => {
             ...prevData,
             [name]: value,
         }));
-
+        setDataModified(true);
         console.log(`${name} : ${value}`);
     };
 
@@ -150,12 +151,19 @@ const SettingsPage = () => {
                     withCredentials: true,
                 }
             );
+            setDataModified(false);
             // Handle success case
             console.log("Settings saved successfully");
             // Reload the page on successful submission
             window.location.reload(); // This will refresh the page
+            setToastMessage("Settings saved successfully");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error("Error saving settings:", error);
+            setToastMessage(error.message);
+            setToastType("error");
+            setShowToast(true);
         }
     };
 
@@ -184,6 +192,7 @@ const SettingsPage = () => {
                     ...prevData,
                     imageURL: imageUrl,
                 }));
+                setDataModified(true);
             } catch (error) {
                 console.error("Image upload failed:", error);
                 setImageUploadError(
@@ -194,6 +203,21 @@ const SettingsPage = () => {
             }
         }
     };
+
+    useEffect(() => {
+        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+            if (dataModified) {
+                e.preventDefault();
+                // e.returnValue = "";
+            }
+        };
+
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, [dataModified]);
 
     return pageLoading ? (
         <PageLoading />

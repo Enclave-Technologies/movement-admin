@@ -112,6 +112,7 @@ export async function register(state, formData) {
                 email,
                 phone,
                 trainer_id: uid,
+                trainers: uid,
                 imageUrl: null,
                 gender: gender,
             }
@@ -154,6 +155,7 @@ export async function registerClient(state, formData) {
     }
 
     console.log(validatedResult.data);
+
     const { firstName, lastName, phone, email, trainerId, gender } =
         validatedResult.data;
 
@@ -214,7 +216,9 @@ export async function registerClient(state, formData) {
                         email,
                         phone,
                         trainer_id: trainerId,
+                        trainers: trainerId,
                         imageUrl: null,
+                        gender: gender,
                     }
                 );
                 return {
@@ -264,6 +268,7 @@ export async function registerClient(state, formData) {
                 email,
                 phone,
                 trainer_id: trainerId,
+                trainers: trainerId,
                 gender: gender,
             }
         );

@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useState } from "react";
-import SignupButton from "./ResponsiveButton";
+import SubmitButton from "./ResponsiveButton";
 
 const AddExerciseForm = forwardRef<HTMLFormElement, AddFormProps>(
     ({ action, state }, ref) => {
@@ -298,7 +298,7 @@ const AddExerciseForm = forwardRef<HTMLFormElement, AddFormProps>(
                         )}
                     </div>
 
-                    <SignupButton label="Submit" />
+                    <SubmitButton label="Submit" />
                 </form>
             </div>
         );

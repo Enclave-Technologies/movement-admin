@@ -44,11 +44,11 @@ const ClientDetails = ({ client_id }) => {
         { withCredentials: true }
       );
       const workouts = await axios.get(
-        `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=1000&approved=true`,
+        `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=5000&approved=true`,
         { withCredentials: true }
       );
       setClientPhases(clientPhases.data.phases);
-      setWorkouts(workouts.data);
+      setWorkouts(workouts.data.data);
     } catch (error) {
       console.error(error);
     } finally {
@@ -71,7 +71,6 @@ const ClientDetails = ({ client_id }) => {
       `${API_BASE_URL}/mvmt/v1/client/tracked-workouts?client_id=${client_id}`,
       { withCredentials: true }
     );
-    console.log(clientPhases.data);
     const { nextSession, sessionLogs, progressId } = clientPhases.data;
     setNextSession(nextSession?.[0]);
     const reversedLogs = sessionLogs.reverse();
@@ -86,9 +85,9 @@ const ClientDetails = ({ client_id }) => {
 
   return (
     <TrainerProvider>
-      <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-hidden shadow-md border border-gray-200">
+      <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-visible shadow-md border border-gray-200">
         <Tabs selectedTab={selectedTab} setSelectedTab={setSelectedTab} />
-        <div className="p-8 bg-white w-full">
+        <div className="p-8 bg-white w-full rounded-b-xl">
           {selectedTab == "workout-history" && (
             <WorkoutHistoryTable
               dataLoading={fetchingWorkouts}

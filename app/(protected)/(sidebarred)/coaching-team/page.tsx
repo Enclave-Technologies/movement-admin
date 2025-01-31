@@ -1,56 +1,249 @@
 "use client";
 
-import Searchbar from "@/components/pure-components/Searchbar";
-import TrainerTable from "@/components/TrainerTable";
-import { API_BASE_URL } from "@/configs/constants";
+import { API_BASE_URL, defaultProfileURL } from "@/configs/constants";
 import RightModal from "@/components/pure-components/RightModal";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
-import { LIMIT } from "@/configs/constants";
-import Pagination from "@/components/pure-components/Pagination";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import UserSkeleton from "@/components/pageSkeletons/userSkeleton";
-import { fetchUserDetails } from "@/server_functions/auth";
+import React, { useMemo, useState } from "react";
 import RegisterTrainerForm from "@/components/forms/RegisterTrainerForm";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Image from "next/image";
+import { ColumnDef, ColumnSort, SortingState } from "@tanstack/react-table";
+import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
+import TableActions from "@/components/InfiniteScrollTable/TableActions";
+import LoadingSpinner from "@/components/LoadingSpinner";
+import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
+import Toast from "@/components/Toast";
+import EditTrainerForm from "@/components/forms/edit-trainer-form";
 
 const CoachingTeam = () => {
-    const [allTrainers, setAllTrainers] = useState([]);
-    const [pageNo, setPageNo] = useState<number>(1); // State to hold the last ID of the fetched clients
-    const [totalPages, setTotalPages] = useState<number>(1); // State to hold the last ID of the fetched clients
-    const [pageLoading, setPageLoading] = useState(true);
-    const [trainerDetails, setTrainerDetails] = useState(null);
-    const [search, setSearch] = useState("");
+    const { myDetails: trainerDetails, reloadData } = useGlobalContext();
+    const [modified, setModified] = useState(true);
+    const [added, setAdded] = useState(true);
     const [showRightModal, setShowRightModal] = useState(false);
-    const { countDoc, trainers, reloadData } = useGlobalContext();
+    const [globalFilter, setGlobalFilter] = useState("");
+    const [isFetching, setIsFetching] = useState(false);
+    const [selectedRows, setSelectedRows] = useState([]);
+    const [rows, setRows] = useState([]);
+    const [deletePressed, setDeletePressed] = useState(false);
+    const [modalButtonLoadingState, setModalButtonLoadingState] =
+        useState(false);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState("");
+    const [toastType, setToastType] = useState("success");
 
-    useEffect(() => {
-        const fetchTrainerDetails = async () => {
-            const details = await fetchUserDetails();
-            setTrainerDetails(details);
-        };
-        fetchTrainerDetails();
-    }, []);
+    const [editRow, setEditRow] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
-    useEffect(() => {
-        if (trainers) {
-            const filteredTrainers = trainers.filter(
-                (trainer) =>
-                    trainer.name.toLowerCase().includes(search.toLowerCase()) ||
-                    trainer.jobTitle
-                        .toLowerCase()
-                        .includes(search.toLowerCase()) ||
-                    trainer.email
-                        ?.toLowerCase()
-                        .includes(search.toLowerCase()) ||
-                    trainer.phone?.toLowerCase().includes(search.toLowerCase())
+    const openDeleteConfirmation = () => {
+        setDeletePressed(true);
+    };
+
+    const handleDeleteCancel = () => {
+        setDeletePressed(false);
+    };
+
+    const handleBatchDelete = async () => {
+        setModalButtonLoadingState(true);
+        console.log(selectedRows);
+        try {
+            const response = await axios.delete(
+                `${API_BASE_URL}/mvmt/v1/admin/trainers`,
+                {
+                    data: {
+                        ids: selectedRows.map((row) => row.uid),
+                    },
+                    withCredentials: true,
+                }
             );
 
-            setTotalPages(Math.ceil(filteredTrainers.length / LIMIT));
-            const startIndex = (pageNo - 1) * LIMIT;
-            const endIndex = startIndex + LIMIT;
-            setAllTrainers(filteredTrainers.slice(startIndex, endIndex));
+            setDeletePressed(false);
+            setSelectedRows([]);
+            setModified((prevModified) => !prevModified);
+            setModalButtonLoadingState(false);
+
+            setToastMessage("Coaches deleted successfully");
+            setToastType("success");
+            setShowToast(true);
+        } catch (error) {
+            console.error("Error deleting users:", error);
+            setDeletePressed(false);
+            setModalButtonLoadingState(false);
+            setToastMessage("Error deleting coaches");
+            setToastType("error");
+            setShowToast(true);
         }
-    }, [trainers, pageNo, search]);
+    };
+
+    const handleTrainerEditClicked = (rowData: CoachTemplate) => {
+        setEditRow(rowData);
+        // editRowRef.current = rowData;
+        setShowEditModal(true);
+    };
+
+    const handleToastClose = () => {
+        setShowToast(false);
+    };
+
+    const queryClient = new QueryClient();
+
+    const columns = useMemo<ColumnDef<CoachTemplate>[]>(
+        () => [
+            {
+                accessorKey: "checkbox",
+                header: () => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <input
+                            className=""
+                            type="checkbox"
+                            onClick={() => {
+                                if (selectedRows.length > 0) {
+                                    setSelectedRows([]);
+                                } else {
+                                    setSelectedRows((prevSelectedRows) => {
+                                        const newSelectedRows = Array.from(
+                                            new Set([
+                                                ...prevSelectedRows,
+                                                ...rows.map(
+                                                    (row) => row.original
+                                                ),
+                                            ])
+                                        );
+                                        return newSelectedRows;
+                                    });
+                                }
+                            }}
+                            checked={selectedRows.length > 0 ? true : false}
+                        />
+                    </div>
+                ),
+                cell: (info) => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <input
+                            type="checkbox"
+                            checked={selectedRows.find(
+                                (u) => u.uid === info.row.original.uid
+                            )}
+                            onChange={(event) => {
+                                if (event.target.checked) {
+                                    setSelectedRows((prevSelectedRows) => [
+                                        ...prevSelectedRows,
+                                        info.row.original,
+                                    ]);
+                                } else {
+                                    setSelectedRows((prevSelectedRows) =>
+                                        prevSelectedRows.filter(
+                                            (row, index) =>
+                                                index !== info.row.index
+                                        )
+                                    );
+                                }
+                            }}
+                        />
+                    </div>
+                ),
+                size: 50,
+                enableSorting: false,
+            },
+            {
+                accessorKey: "imageUrl",
+                header: "",
+                cell: (info) => (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                        <Image
+                            src={
+                                info.getValue() &&
+                                String(info.getValue()).trim() !== ""
+                                    ? String(info.getValue())
+                                    : defaultProfileURL
+                            } // Provide a default placeholder
+                            width={32}
+                            height={32}
+                            alt={`Image of ${info.row.original.name}`}
+                            className="rounded-full"
+                        />
+                    </div>
+                ),
+                size: 50,
+                enableSorting: false,
+            },
+            {
+                header: "Name",
+                accessorKey: "name",
+                cell: (info) => (
+                    <div
+                        className="whitespace-nowrap cursor-pointer text-sm font-semibold underline"
+                        onClick={() => {
+                            handleTrainerEditClicked(info.row.original);
+                        }}
+                    >
+                        {info.getValue() as String}
+                    </div>
+                ),
+                size: 200,
+            },
+            {
+                header: "Title",
+                accessorKey: "jobTitle",
+                size: 250,
+                // enableSorting: false,
+            },
+            {
+                header: "Email",
+                accessorKey: "email",
+                size: 250,
+            },
+            {
+                header: "Phone",
+                accessorKey: "phone",
+                size: 150,
+            },
+            // {
+            //     header: "Status",
+            //     accessorKey: "status",
+            // },
+        ],
+        [trainerDetails, rows, selectedRows]
+    );
+
+    async function fetchTrainers(
+        start: number,
+        size: number,
+        sorting: SortingState
+    ) {
+        // let response: any;
+        const pageNo = start / size + 1;
+
+        const url = new URL(`${API_BASE_URL}/mvmt/v1/admin/trainers`);
+        url.searchParams.set("limit", size.toString());
+        url.searchParams.set("pageNo", pageNo.toString());
+
+        if (sorting.length) {
+            const sort = sorting[0] as ColumnSort;
+            const { id, desc } = sort;
+            url.searchParams.set("sort_by", id);
+            url.searchParams.set("sort_order", desc ? "desc" : "asc");
+        }
+
+        if (globalFilter) {
+            url.searchParams.set("search_query", globalFilter);
+        }
+
+        const response = await axios.get(url.toString(), {
+            withCredentials: true,
+        });
+
+        const { data, total } = response.data;
+
+        console.log(data);
+        console.log(total);
+        return {
+            data: data,
+            meta: {
+                totalRowCount: total,
+            },
+        };
+    }
 
     const rightModal = () => {
         return (
@@ -62,62 +255,99 @@ const CoachingTeam = () => {
                 }}
             >
                 <div className="w-full">
-                    <RegisterTrainerForm fetchData={reloadData} />
+                    <RegisterTrainerForm
+                        fetchData={() => {
+                            setAdded((prev) => !prev);
+                            reloadData();
+                        }}
+                    />
                 </div>
             </RightModal>
         );
     };
 
-    if (trainers.length === 0) {
+    const rightEditModal = () => {
         return (
-            <UserSkeleton
-                button_text="Add Trainer"
-                pageTitle="Coaching Team"
-                buttons={totalPages}
-                active_page={pageNo}
-                searchLoadingText="Search trainer by name, email, phone or title"
-                tableHeaders={["", "Name", "Title", "Email", "Phone"]}
-            />
+            <RightModal
+                formTitle="Edit Trainer / Admin"
+                isVisible={showEditModal}
+                hideModal={() => {
+                    setShowEditModal(false);
+                    setEditRow(null);
+                }}
+            >
+                <EditTrainerForm
+                    fetchData={() => {
+                        setAdded((prevAdded) => !prevAdded);
+                    }}
+                    team={trainerDetails.team.name}
+                    clientData={editRow}
+                    // rowData={editRowRef.current}
+                />
+            </RightModal>
         );
+    };
+
+    if (!trainerDetails) {
+        return null;
     }
 
     return (
-        <main className="flex flex-col bg-gray-100 text-black">
+        <main className="flex flex-col bg-transparent text-black">
             <div className="w-full flex flex-col gap-4">
-                {/* <Searchbar
-                    search={search}
-                    setSearch={setSearch}
-                    placeholder="Search trainer by name, email, phone or title"
-                /> */}
-
-                <div className="w-full flex flex-row items-center justify-between">
-                    <h1 className="text-xl font-bold text-black ml-2 leading-tight">
-                        Coaching Team
-                    </h1>
+                <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
+                    <div className="flex flex-row gap-2 items-center">
+                        <span className="text-lg font-bold">Coaching Team</span>
+                        {isFetching && <LoadingSpinner className="h-4 w-4" />}
+                    </div>
                     {trainerDetails?.team.name === "Admins" && (
-                        <button
-                            onClick={() => {
+                        <TableActions
+                            openDeleteConfirmation={openDeleteConfirmation}
+                            columns={columns}
+                            selectedRows={selectedRows}
+                            tableSearchQuery={globalFilter}
+                            setTableSearchQuery={setGlobalFilter}
+                            onClickNewButton={() => {
                                 setShowRightModal(true);
                             }}
-                            className="bg-primary text-white py-2 px-4 rounded-md"
-                        >
-                            + Add Trainer
-                        </button>
+                        />
                     )}
                 </div>
-                {/* <pre>{JSON.stringify(trainerDetails)}</pre> */}
-                <div className="w-full overflow-x-auto">
-                    <TrainerTable search={search} trainers={allTrainers} />
+                <div>
+                    <QueryClientProvider client={queryClient}>
+                        <ScrollTable
+                            setRows={setRows}
+                            queryKey="allUsers"
+                            columns={columns}
+                            fetchData={fetchTrainers}
+                            dataAdded={added}
+                            dataModified={modified}
+                            globalFilter={globalFilter}
+                            setGlobalFilter={setGlobalFilter}
+                            setIsFetching={setIsFetching}
+                        />
+                    </QueryClientProvider>
                 </div>
-
-                <Pagination
-                    totalPages={totalPages}
-                    pageNo={pageNo}
-                    handlePageChange={(page: number) => {
-                        setPageNo(page);
-                    }}
-                />
                 {rightModal()}
+
+                {rightEditModal()}
+                {deletePressed && (
+                    <DeleteConfirmationDialog
+                        title="batch of coaches? 
+                        This will remove them from users. 
+                        Are you sure you want to delete them?"
+                        confirmDelete={handleBatchDelete}
+                        cancelDelete={handleDeleteCancel}
+                        isLoading={modalButtonLoadingState}
+                    />
+                )}
+                {showToast && (
+                    <Toast
+                        message={toastMessage}
+                        onClose={handleToastClose}
+                        type={toastType}
+                    />
+                )}
             </div>
         </main>
     );

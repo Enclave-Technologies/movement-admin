@@ -16,7 +16,7 @@ interface Client {
 }
 
 interface WorkoutData {
-    $id: string;
+    id: string;
     $collectionId: string;
     approved: boolean;
     fullName: string;
@@ -165,6 +165,7 @@ interface Phase {
 }
 
 interface PhaseProps {
+    setClientPhases: any;
     phase: Phase;
     workouts: WorkoutData[];
     onPhaseNameChange: (
@@ -193,6 +194,7 @@ interface PhaseProps {
     setToastMessage;
     setToastType;
     savingState: boolean;
+    handleSessionOrderChange;
 }
 
 interface SessionProps {
@@ -300,62 +302,75 @@ interface CountsDocument {
     users_count: number;
 }
 
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
+interface ScrollTableSkeletonProps {
+    columnCount: number;
+    rowCount: number;
 }
 
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
+type UserTemplate = {
+    uid: string;
+    name: string;
+    email: string;
+    phone?: string;
+    trainer_id?: string;
+    trainer_name?: string;
+    imageUrl?: string;
+    gender?: string;
+};
+
+type ExerciseTemplate = {
+    id: string;
+    targetArea: string;
+    fullName: string;
+    shortName: string;
+    videoUrl: string;
+    approved: boolean;
+    motion: string;
+};
+
+type Person = {
+    id: number;
+    firstName: string;
+    lastName: string;
+    age: number;
+    visits: number;
+    progress: number;
+    status: "relationship" | "complicated" | "single";
+    createdAt: Date;
+};
+
+type ApiResponse = {
+    data: any[];
+    meta: {
+        totalRowCount: number;
+    };
+};
+
+interface CoachTemplate {
+    // Unique user ID (uid)
+    uid: string;
+    // User's full name
+    name: string;
+    // User's email address
+    email: string;
+    // Optional phone number for the user
+    phone?: string;
+    // Optional URL for the user's profile image
+    imageUrl?: string;
+    jobTitle?: string;
+    gender?: string;
+    role: string;
 }
 
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
+interface BatchConfirmationDialogProps {
+    title: string;
+    confirmOp: () => void;
+    cancelOp: () => void;
+    loadingState?: boolean;
 }
-
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
-}
-
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
+interface DeleteConfirmationDialogProps {
+    title: string;
+    confirmDelete: () => void;
+    cancelDelete: () => void;
+    isLoading?: boolean;
 }

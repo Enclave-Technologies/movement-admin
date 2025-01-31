@@ -2,7 +2,7 @@ import React from "react";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import { useFormStatus } from "react-dom";
 
-const SignupButton = ({ label }) => {
+const SubmitButton = ({ label }) => {
     // const pending = true;
     const { pending } = useFormStatus();
     // console.log("Pending state:", pending);
@@ -29,4 +29,4 @@ const SignupButton = ({ label }) => {
     );
 };
 
-export default SignupButton;
+export default SubmitButton;

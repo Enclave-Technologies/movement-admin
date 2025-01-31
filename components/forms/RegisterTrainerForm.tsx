@@ -1,6 +1,6 @@
 "use client";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import SignupButton from "../ResponsiveButton";
+import SubmitButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
 import { register } from "@/server_functions/auth";
 import Toast from "../Toast";
@@ -172,7 +172,7 @@ const RegisterTrainerForm = ({ fetchData }) => {
                         </p>
                     )}
                 </div>
-                <SignupButton label="Submit" />
+                <SubmitButton label="Submit" />
             </form>
             {showToast && (
                 <Toast

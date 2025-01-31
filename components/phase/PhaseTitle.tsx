@@ -24,7 +24,6 @@ const TitleEditBox = ({
       <div className="flex flex-row gap-[12px] w-full justify-end">
         <button
           onClick={() => {
-            console.log("clicked");
             setIsEditingTitle(false);
           }}
         >
