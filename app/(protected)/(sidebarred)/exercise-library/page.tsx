@@ -37,7 +37,6 @@ const ExercisePage = () => {
     const [toastType, setToastType] = useState("success");
     const [editRow, setEditRow] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-    // const editRowRef = useRef<ExerciseTemplate | null>(null);
 
     const queryClient = new QueryClient();
 
@@ -100,6 +99,11 @@ const ExercisePage = () => {
             setShowToast(true);
         } catch (error) {
             console.error("Error deleting exercises:", error);
+            setDeletePressed(false);
+            setModalButtonLoadingState(false);
+            setToastMessage("Error deleting exercises");
+            setToastType("error");
+            setShowToast(true);
         }
     };
 
@@ -459,7 +463,9 @@ const ExercisePage = () => {
                 {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
-                        title="this batch of exercises"
+                        title="batch of exercises? 
+                        They might be associated with existing programs. 
+                        Are you sure you want to delete them?"
                         confirmDelete={handleBatchDelete}
                         cancelDelete={handleDeleteCancel}
                         isLoading={modalButtonLoadingState}

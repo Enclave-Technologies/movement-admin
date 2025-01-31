@@ -97,10 +97,14 @@ const RecordWorkout = () => {
     };
 
     useEffect(() => {
-        if (exerciseData.length > 0 && exerciseData !== savedExerciseData) {
-            saveToDatabase();
-            setSavedExerciseData(exerciseData);
-        }
+        const interval = setInterval(() => {
+            if (exerciseData.length > 0 && exerciseData !== savedExerciseData) {
+                saveToDatabase();
+                setSavedExerciseData(exerciseData);
+            }
+        }, 600000); // 10 minutes (600,000 milliseconds)
+
+        return () => clearInterval(interval);
     }, []);
 
     const handleAddSet = (exerciseId) => {

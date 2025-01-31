@@ -302,69 +302,9 @@ interface CountsDocument {
     users_count: number;
 }
 
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
-}
-
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
-}
-
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
-}
-
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
-}
-
 interface ScrollTableSkeletonProps {
     columnCount: number;
     rowCount: number;
-}
-
-interface CountsDocument {
-    $collectionId: string;
-    $createdAt: string;
-    $databaseId: string;
-    $id: string;
-    $permissions: any[];
-    $updatedAt: string;
-    exercises_count: number;
-    trainers_count: number;
-    users_count: number;
 }
 
 type UserTemplate = {
@@ -419,6 +359,7 @@ interface CoachTemplate {
     imageUrl?: string;
     jobTitle?: string;
     gender?: string;
+    role: string;
 }
 
 interface BatchConfirmationDialogProps {
