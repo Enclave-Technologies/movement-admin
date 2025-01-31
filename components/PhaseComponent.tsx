@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import SessionComponent from "./SessionComponent";
-
 import { FaChevronUp, FaChevronRight } from "react-icons/fa";
 import { ID } from "appwrite";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
@@ -60,13 +59,13 @@ const PhaseComponent: FC<PhaseProps> = ({
       .map((session) => session.sessionId)
   );
 
-    const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-    useEffect(() => {
-        if (isEditing && inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, [isEditing, inputRef]);
+  useEffect(() => {
+    if (isEditing && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [isEditing, inputRef]);
 
   const handlePhaseNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhaseName(e.target.value);
@@ -79,16 +78,21 @@ const PhaseComponent: FC<PhaseProps> = ({
     });
   };
 
-    const handlePhaseNameSubmit = () => {
-        console.log("submitting phase name");
-        onPhaseNameChange(phase.phaseId, phaseName).then((res) => {
-            setIsEditing(false);
-        });
-    };
+  const handleActivatePhase = () => {
+    onActivatePhase(phase.phaseId, !phase.isActive);
+  };
 
-    const handleActivatePhase = () => {
-        onActivatePhase(phase.phaseId, !phase.isActive);
+  const handleAddSession = () => {
+    const newSession: MovementSession = {
+      sessionId: ID.unique(),
+      sessionName: "Untitled Session",
+      exercises: [],
+      sessionOrder: phase.sessions.length + 1,
+      sessionTime: "0",
     };
+    onAddSession(phase.phaseId, newSession);
+    setIsCollapsed(false);
+  };
 
   const handleCopySession = (session) => {
     const newSession: MovementSession = {
@@ -122,50 +126,21 @@ const PhaseComponent: FC<PhaseProps> = ({
       sessionOrder: phase.sessions.length + 1,
       sessionTime: "0",
     };
+    onAddSession(phase.phaseId, newSession);
+  };
 
-    const handleCopySession = (session) => {
-        const newSession: MovementSession = {
-            sessionId: ID.unique(),
-            sessionName: `${session.sessionName} (Copy)`,
-            exercises: session.exercises.map((exercise: Exercise) => ({
-                id: ID.unique(),
-                exerciseId: exercise.exerciseId,
-                fullName: exercise.fullName,
-                motion: exercise.motion,
-                targetArea: exercise.targetArea,
-                exerciseVideo: exercise.exerciseVideo || "",
-                repsMin: exercise.repsMin,
-                repsMax: exercise.repsMax,
-                setsMin: exercise.setsMin,
-                setsMax: exercise.setsMax,
-                tempo: exercise.tempo,
-                TUT: exercise.TUT,
-                restMin: exercise.restMin,
-                restMax: exercise.restMax,
-                exerciseOrder: exercise.exerciseOrder,
-                setOrderMarker: exercise.setOrderMarker,
-                bias: exercise.bias,
-                lenShort: exercise.lenShort,
-                impliment: exercise.impliment,
-                grip: exercise.grip,
-                angle: exercise.angle,
-                support: exercise.support,
-                xtraInstructions: exercise.xtraInstructions,
-            })),
-            sessionOrder: phase.sessions.length + 1,
-            sessionTime: "0",
-        };
-        onAddSession(phase.phaseId, newSession);
-    };
+  const handleDeletePhase = () => {
+    setShowPhaseDeleteConfirm(true); // Show confirmation dialog
+  };
 
-    const handleDeletePhase = () => {
-        setShowPhaseDeleteConfirm(true); // Show confirmation dialog
-    };
+  const confirmDeletePhase = () => {
+    onPhaseDelete(phase.phaseId); // Perform delete
+    setShowPhaseDeleteConfirm(false); // Close dialog
+  };
 
-    const confirmDeletePhase = () => {
-        onPhaseDelete(phase.phaseId); // Perform delete
-        setShowPhaseDeleteConfirm(false); // Close dialog
-    };
+  const cancelDeletePhase = () => {
+    setShowPhaseDeleteConfirm(false); // Just close the dialog
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -282,7 +257,12 @@ const PhaseComponent: FC<PhaseProps> = ({
             </label>
           </div>
 
-
+          {/* 
+                    {phase.isActive && (
+                        <span className="px-3 py-1 text-green-500 bg-green-100 rounded-full">
+                            Active
+                        </span>
+                    )} */}
         </div>
       </div>
       <div
@@ -349,7 +329,6 @@ const PhaseComponent: FC<PhaseProps> = ({
       </div>
     </div>
   );
-
 };
 
 export default PhaseComponent;

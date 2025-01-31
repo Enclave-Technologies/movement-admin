@@ -18,21 +18,21 @@ import { HiOutlineDocumentSearch } from "react-icons/hi";
 import { LiaDumbbellSolid } from "react-icons/lia";
 
 const sidebarItems = [
-    {
-        label: "My Clients",
-        icon: FaUsersLine,
-        href: "/my-clients",
-    },
-    {
-        label: "Users",
-        icon: FaUsers,
-        href: "/users",
-    },
-    {
-        label: "Coaching Team",
-        icon: LuUsers2,
-        href: "/coaching-team",
-    },
+  {
+    label: "My Clients",
+    icon: FaUsersLine,
+    href: "/my-clients",
+  },
+  {
+    label: "Users",
+    icon: FaUsers,
+    href: "/users",
+  },
+  {
+    label: "Coaching Team",
+    icon: LuUsers2,
+    href: "/coaching-team",
+  },
 
   {
     label: "Exercise Library",
@@ -47,26 +47,26 @@ const sidebarItems = [
 ];
 
 const Sidebar = ({ isCollapsed, toggleSidebar }) => {
-    const pathname = usePathname();
-    const {
-        trainerData,
-        trainerLoading: loading,
-        trainerError: error,
-    } = useTrainer();
-    const [loadingLogout, setLoadingLogout] = useState(false);
+  const pathname = usePathname();
+  const {
+    trainerData,
+    trainerLoading: loading,
+    trainerError: error,
+  } = useTrainer();
+  const [loadingLogout, setLoadingLogout] = useState(false);
 
-    // console.log(trainerData);
+  // console.log(trainerData);
 
-    const handleLogout = async () => {
-        setLoadingLogout(true);
-        try {
-            await logout();
-        } catch (error) {
-            console.error("Logout failed:", error);
-        } finally {
-            setLoadingLogout(false);
-        }
-    };
+  const handleLogout = async () => {
+    setLoadingLogout(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      setLoadingLogout(false);
+    }
+  };
 
   return (
     <div
@@ -96,10 +96,10 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
               height={32}
             />
 
-                        <button onClick={toggleSidebar}>
-                            <AiOutlineMenu />
-                        </button>
-                    </div>
+            <button onClick={toggleSidebar}>
+              <AiOutlineMenu />
+            </button>
+          </div>
 
           <nav className="flex flex-col p-2 gap-[2px]">
             {sidebarItems.map((item) => {
@@ -125,36 +125,49 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                     )}
                     {!isCollapsed && (
                       <span className="ml-2">{loading ? "" : item.label}</span>
-
                     )}
-                    <button
-                        type="submit"
-                        className="w-full h-12 py-2 border border-transparent 
+                  </div>
+                </Link>
+              );
+            })}
+          </nav>
+        </div>
+        <div className={`${isCollapsed ? "p-2" : "p-3"} flex flex-col gap-4`}>
+          {!isCollapsed ? (
+            <TrainerInfo
+              userDetails={trainerData}
+              loading={loading}
+              error={error}
+            />
+          ) : (
+            <div className="w-16 h-40"></div>
+          )}
+          <button
+            type="submit"
+            className="w-full h-12 py-2 border border-transparent 
                                 rounded-md shadow-sm text-sm font-medium text-white
                                 bg-green-500 hover:bg-green-900
                                 focus:outline-none focus:ring-2 focus:ring-offset-2
                                 transition duration-3000 ease-in-out transform"
-                        disabled={loadingLogout}
-                        onClick={handleLogout}
-                    >
-                        {loadingLogout ? (
-                            <div className="flex items-center justify-center select-none gap-2">
-                                <LoadingSpinner className="w-4 h-4 aspect-square" />
-                                {!isCollapsed && (
-                                    <span className="ml-2">Logging Out...</span>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex items-center justify-center select-none gap-2">
-                                <IoLogOutOutline className="w-6 h-6 stroke-2" />
-                                {!isCollapsed && <span>Logout</span>}
-                            </div>
-                        )}
-                    </button>
-                </div>
-            </div>
+            disabled={loadingLogout}
+            onClick={handleLogout}
+          >
+            {loadingLogout ? (
+              <div className="flex items-center justify-center select-none gap-2">
+                <LoadingSpinner className="w-4 h-4 aspect-square" />
+                {!isCollapsed && <span className="ml-2">Logging Out...</span>}
+              </div>
+            ) : (
+              <div className="flex items-center justify-center select-none gap-2">
+                <IoLogOutOutline className="w-6 h-6 stroke-2" />
+                {!isCollapsed && <span>Logout</span>}
+              </div>
+            )}
+          </button>
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default Sidebar;

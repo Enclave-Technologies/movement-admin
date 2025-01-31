@@ -16,64 +16,62 @@ import { updateSession } from "@/server_functions/session";
 // const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
 const WorkoutPlan = ({
-    pageLoading,
-    setPageLoading,
-    fetchTrackedWorkouts,
-    client_id,
-    workouts,
-    clientPhases,
-    setClientPhases,
-    nextSession,
-    progressId,
-    setShowToast,
-    setToastMessage,
-    setToastType,
+  pageLoading,
+  setPageLoading,
+  fetchTrackedWorkouts,
+  client_id,
+  workouts,
+  clientPhases,
+  setClientPhases,
+  nextSession,
+  progressId,
+  setShowToast,
+  setToastMessage,
+  setToastType,
 }) => {
-    // TODO: Autosave every 2 minutes on this page. Keep a track of what was sent to the backend for saving, and the clientPhases
-    const { userData } = useUser();
-    const [editingExerciseId, setEditingExerciseId] = useState(null);
-    const [phaseActivation, setPhaseActivation] = useState(false);
-    const [phaseAddingState, setPhaseAddingState] = useState(false);
-    const [savingState, setSavingState] = useState(false);
-    // const [sessionAddingButtonState, setSessionAddingButtonState] =
-    //     useState(false);
-    // const [sessionButtonsState, setSessionButtonsState] = useState(false);
+  // TODO: Autosave every 2 minutes on this page. Keep a track of what was sent to the backend for saving, and the clientPhases
+  const { userData } = useUser();
+  const [editingExerciseId, setEditingExerciseId] = useState(null);
+  const [phaseActivation, setPhaseActivation] = useState(false);
+  const [phaseAddingState, setPhaseAddingState] = useState(false);
+  const [savingState, setSavingState] = useState(false);
+  // const [sessionAddingButtonState, setSessionAddingButtonState] =
+  //     useState(false);
+  // const [sessionButtonsState, setSessionButtonsState] = useState(false);
 
-    const handleAddPhase = async () => {
-        setPhaseAddingState(true);
-        // Logic to add a new phase
-        const newPhase: Phase = {
-            phaseId: ID.unique(),
-            phaseName: "Untitled Phase",
-            isActive: false,
-            sessions: [],
-        };
-
-        const modifiedClientPhases = [...clientPhases, newPhase];
-
-        const data: DataResponse = {
-            phases: modifiedClientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setClientPhases(modifiedClientPhases);
-        setPhaseAddingState(false);
+  const handleAddPhase = async () => {
+    setPhaseAddingState(true);
+    // Logic to add a new phase
+    const newPhase: Phase = {
+      phaseId: ID.unique(),
+      phaseName: "Untitled Phase",
+      isActive: false,
+      sessions: [],
     };
 
-    const handleCopyPhase = async (phaseId: string) => {
-        setPhaseAddingState(true);
-        setSavingState(true);
-        // Find the target phase to be copied
-        const targetPhase = clientPhases.find(
-            (phase) => phase.phaseId === phaseId
-        );
-        if (!targetPhase) return;
+    const modifiedClientPhases = [...clientPhases, newPhase];
+
+    const data: DataResponse = {
+      phases: modifiedClientPhases,
+    };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
+    setClientPhases(modifiedClientPhases);
+    setPhaseAddingState(false);
+  };
+
+  const handleCopyPhase = async (phaseId: string) => {
+    setPhaseAddingState(true);
+    setSavingState(true);
+    // Find the target phase to be copied
+    const targetPhase = clientPhases.find((phase) => phase.phaseId === phaseId);
+    if (!targetPhase) return;
 
     // Create a new phase with a unique ID
     const newPhase: Phase = {
@@ -113,89 +111,87 @@ const WorkoutPlan = ({
       })),
     };
 
-
-        const modifiedClientPhases = [...clientPhases, newPhase];
-        const data: DataResponse = {
-            phases: modifiedClientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        console.log("Copying phase...");
-        setClientPhases(modifiedClientPhases);
-        setPhaseAddingState(false);
-        setSavingState(false);
+    const modifiedClientPhases = [...clientPhases, newPhase];
+    const data: DataResponse = {
+      phases: modifiedClientPhases,
     };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
+    console.log("Copying phase...");
+    setClientPhases(modifiedClientPhases);
+    setPhaseAddingState(false);
+    setSavingState(false);
+  };
 
   const updateClientPhase = async (newPhase: any) => {
     // setClientPhases(updatedPhases);
   };
 
+  // const handleDataSubmit = async () => {
+  //     try {
+  //         setPageLoading(true);
+  //         const data: DataResponse = {
+  //             phases: clientPhases,
+  //         };
+  //         const response = await axios.post(
+  //             `${API_BASE_URL}/mvmt/v1/client/phases`,
+  //             {
+  //                 client_id: client_id,
+  //                 data,
+  //             },
+  //             { withCredentials: true }
+  //         );
+  //         console.log(response.data);
+  //     } catch (error) {
+  //         console.error(error);
+  //     } finally {
+  //         setPageLoading(false);
+  //     }
+  // };
 
-    const handleActivatePhase = async (
-        phaseId: string,
-        phaseState: boolean
-    ) => {
-        setPhaseActivation(true);
-        const modifiedPhases = clientPhases.map((phase) => ({
-            ...phase,
-            isActive: phase.phaseId === phaseId ? phaseState : false,
-        }));
-        setClientPhases(modifiedPhases);
-        const data: DataResponse = {
-            phases: modifiedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-
-        fetchTrackedWorkouts();
-        setPhaseActivation(false);
+  const handleActivatePhase = async (phaseId: string, phaseState: boolean) => {
+    setPhaseActivation(true);
+    const modifiedPhases = clientPhases.map((phase) => ({
+      ...phase,
+      isActive: phase.phaseId === phaseId ? phaseState : false,
+    }));
+    setClientPhases(modifiedPhases);
+    const data: DataResponse = {
+      phases: modifiedPhases,
     };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
 
-    const handlePhaseNameChange = async (
-        phaseId: string,
-        newPhaseName: string
-    ) => {
-        // if (!phaseButtonsState.includes(phaseId)) {
-        //     setPhaseButtonsState([...phaseButtonsState, phaseId]);
-        // }
-        setSavingState(true);
-        // Update the phase name in the original data
-        const updatedPhases = clientPhases.map((p) =>
-            p.phaseId === phaseId ? { ...p, phaseName: newPhaseName } : p
-        );
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        try {
-            console.log("Updating phase name...");
-            await axios.post(
-                `${API_BASE_URL}/mvmt/v1/client/phases`,
-                {
-                    client_id: client_id,
-                    data,
-                },
-                { withCredentials: true }
-            );
-            setClientPhases(updatedPhases);
-        } catch (e) {
-            console.error("Failed to update phase name:", e);
-            return false;
-        }
-        // setPhaseButtonsState(phaseButtonsState.filter((id) => id !== phaseId));
-        setSavingState(false);
-        return true;
+    fetchTrackedWorkouts();
+    setPhaseActivation(false);
+  };
+
+  const handlePhaseNameChange = async (
+    phaseId: string,
+    newPhaseName: string
+  ) => {
+    // if (!phaseButtonsState.includes(phaseId)) {
+    //     setPhaseButtonsState([...phaseButtonsState, phaseId]);
+    // }
+    setSavingState(true);
+    // Update the phase name in the original data
+    const updatedPhases = clientPhases.map((p) =>
+      p.phaseId === phaseId ? { ...p, phaseName: newPhaseName } : p
+    );
+    const data: DataResponse = {
+      phases: updatedPhases,
     };
     try {
       await axios.post(
@@ -279,12 +275,25 @@ const WorkoutPlan = ({
     const data: DataResponse = {
       phases: updatedPhases,
     };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
+  };
 
-    const handleExerciseAdd = (phaseId: string, sessionId: string) => {
-        const newExerciseId = ID.unique();
-        // Update the original data with the new exercise
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
+  const handleExerciseAdd = (phaseId: string, sessionId: string) => {
+    const newExerciseId = ID.unique();
+    // Update the original data with the new exercise
+    const updatedPhases = clientPhases.map((phase) =>
+      phase.phaseId === phaseId
+        ? {
+            ...phase,
+            sessions: phase.sessions.map((session) =>
+              session.sessionId === sessionId
                 ? {
                     ...session,
                     exercises: [
@@ -316,234 +325,192 @@ const WorkoutPlan = ({
                       },
                     ],
                   }
-                : phase
-        );
-        setClientPhases(updatedPhases);
-        setEditingExerciseId(newExerciseId);
-    };
+                : session
+            ),
+          }
+        : phase
+    );
+    setClientPhases(updatedPhases);
+    setEditingExerciseId(newExerciseId);
+  };
 
-    const handleExerciseUpdate = (
-        phaseId: string,
-        sessionId: string,
-        updatedExercise: Exercise
-    ) => {
-        // Update the exercise in the specific session and phase
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
+  const handleExerciseUpdate = (
+    phaseId: string,
+    sessionId: string,
+    updatedExercise: Exercise
+  ) => {
+    // Update the exercise in the specific session and phase
+    const updatedPhases = clientPhases.map((phase) =>
+      phase.phaseId === phaseId
+        ? {
+            ...phase,
+            sessions: phase.sessions.map((session) =>
+              session.sessionId === sessionId
                 ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    exercises: session.exercises.map((e) =>
-                                        e.id === updatedExercise.id
-                                            ? updatedExercise
-                                            : e
-                                    ),
-                                }
-                              : session
-                      ),
+                    ...session,
+                    exercises: session.exercises.map((e) =>
+                      e.id === updatedExercise.id ? updatedExercise : e
+                    ),
                   }
-                : phase
-        );
-        setClientPhases(updatedPhases);
+                : session
+            ),
+          }
+        : phase
+    );
+    setClientPhases(updatedPhases);
+  };
+
+  const handleEditExercise = (exerciseId) => {
+    setEditingExerciseId(exerciseId);
+  };
+
+  async function handleExerciseSave() {
+    setSavingState(true);
+    const data: DataResponse = {
+      phases: clientPhases,
     };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
+    setSavingState(false);
+  }
 
-    const handleEditExercise = (exerciseId) => {
-        setEditingExerciseId(exerciseId);
-    };
+  const handleCancelEdit = () => {
+    setEditingExerciseId(null);
+  };
 
-    async function handleExerciseSave() {
-        setSavingState(true);
-        const data: DataResponse = {
-            phases: clientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setSavingState(false);
-    }
-
-    const handleCancelEdit = () => {
-        setEditingExerciseId(null);
-    };
-
-    const handleExerciseDelete = async (
-        phaseId: string,
-        sessionId: string,
-        exerciseId: string
-    ) => {
-        // Remove the exercise from the specific session and phase
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
+  const handleExerciseDelete = async (
+    phaseId: string,
+    sessionId: string,
+    exerciseId: string
+  ) => {
+    // Remove the exercise from the specific session and phase
+    const updatedPhases = clientPhases.map((phase) =>
+      phase.phaseId === phaseId
+        ? {
+            ...phase,
+            sessions: phase.sessions.map((session) =>
+              session.sessionId === sessionId
                 ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    exercises: session.exercises.filter(
-                                        (e) => e.id !== exerciseId
-                                    ),
-                                }
-                              : session
-                      ),
+                    ...session,
+                    exercises: session.exercises.filter(
+                      (e) => e.id !== exerciseId
+                    ),
                   }
-                : phase
-        );
-        setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
+                : session
+            ),
+          }
+        : phase
+    );
+    setClientPhases(updatedPhases);
+    const data: DataResponse = {
+      phases: updatedPhases,
     };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
+  };
 
-    const handleExerciseOrderChange = (
-        phaseId: string,
-        sessionId: string,
-        updatedExercises: Exercise[]
-    ) => {
-        // Update the exercise order in the specific session and phase
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
+  const handleExerciseOrderChange = (
+    phaseId: string,
+    sessionId: string,
+    updatedExercises: Exercise[]
+  ) => {
+    // Update the exercise order in the specific session and phase
+    const updatedPhases = clientPhases.map((phase) =>
+      phase.phaseId === phaseId
+        ? {
+            ...phase,
+            sessions: phase.sessions.map((session) =>
+              session.sessionId === sessionId
                 ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    exercises: updatedExercises.map(
-                                        (exercise, index) => ({
-                                            ...exercise,
-                                            exerciseOrder: index + 1, // Update exerciseOrder to be 1-based index
-                                        })
-                                    ),
-                                }
-                              : session
-                      ),
+                    ...session,
+                    exercises: updatedExercises.map((exercise, index) => ({
+                      ...exercise,
+                      exerciseOrder: index + 1, // Update exerciseOrder to be 1-based index
+                    })),
                   }
-                : phase
-        );
-        setClientPhases(updatedPhases);
+                : session
+            ),
+          }
+        : phase
+    );
+    setClientPhases(updatedPhases);
+  };
+
+  const handlePhaseDelete = async (phaseId: string) => {
+    const updatedPhases = clientPhases.filter(
+      (phase) => phase.phaseId !== phaseId
+    );
+    setClientPhases(updatedPhases);
+    const data: DataResponse = {
+      phases: updatedPhases,
     };
+    await axios.post(
+      `${API_BASE_URL}/mvmt/v1/client/phases`,
+      {
+        client_id: client_id,
+        data,
+      },
+      { withCredentials: true }
+    );
+  };
 
-    const handlePhaseDelete = async (phaseId: string) => {
-        const updatedPhases = clientPhases.filter(
-            (phase) => phase.phaseId !== phaseId
-        );
-        setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-    };
-
-    if (pageLoading) {
-        return (
-            <div className="">
-                <BreadcrumbLoading />
-            </div>
-        );
-    }
-
+  if (pageLoading) {
     return (
-        <div className="w-full h-full">
-            {phaseActivation && (
-                <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center">
-                    <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-between gap-2">
-                        <LoadingSpinner />
-                        <span>
-                            Activating / Deactivating Phase, Please wait.
-                        </span>
-                    </div>
-                </div>
-            )}
-            <div className="flex justify-between">
-                {phaseAddingState ? (
-                    <div className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-gray-300 text-black cursor-not-allowed">
-                        <LoadingSpinner className="text-black w-4 h-4" />{" "}
-                        <span>Adding Phase</span>
-                    </div>
-                ) : (
-                    <button
-                        className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
-                        onClick={handleAddPhase}
-                    >
-                        <FaPlus />
-                        Add Phase
-                    </button>
-                )}
-            </div>
-            {/* <DemoTable exercises={workouts} /> */}
-            <div className="mt-4">
-                <div className="w-full space-y-4">
-                    {clientPhases?.length === 0 ? (
-                        <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
-                            <p className="text-gray-500 text-sm font-medium uppercase">
-                                No phases added yet
-                            </p>
-                            <p className="text-gray-400 text-xs mt-1 uppercase">
-                                Click &ldquo;Add Phase&rdquo; to get started
-                            </p>
-                        </div>
-                    ) : (
-                        clientPhases?.map((phase) => (
-                            <PhaseComponent
-                                key={phase.phaseId}
-                                phase={phase}
-                                workouts={workouts}
-                                handleCopyPhase={handleCopyPhase}
-                                onPhaseNameChange={handlePhaseNameChange}
-                                onPhaseDelete={handlePhaseDelete}
-                                onActivatePhase={handleActivatePhase}
-                                onAddSession={onAddSession}
-                                activePhaseId={
-                                    clientPhases.find((p) => p.isActive)
-                                        ?.phaseId || null
-                                }
-                                onSessionDelete={handleSessionDelete}
-                                onSessionNameChange={handleSessionNameChange}
-                                editingExerciseId={editingExerciseId}
-                                handleAddExercise={handleExerciseAdd}
-                                onExerciseUpdate={handleExerciseUpdate}
-                                onExerciseDelete={handleExerciseDelete}
-                                handleExerciseSave={handleExerciseSave}
-                                onExerciseOrderChange={
-                                    handleExerciseOrderChange
-                                }
-                                onEditExercise={handleEditExercise}
-                                onCancelEdit={handleCancelEdit}
-                                client_id={client_id}
-                                nextSession={nextSession}
-                                progressId={progressId}
-                                setShowToast={setShowToast}
-                                setToastMessage={setToastMessage}
-                                setToastType={setToastType}
-                                savingState={savingState}
-                            />
-                        ))
-                    )}
-                </div>
+      <div className="">
+        <BreadcrumbLoading />
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full h-full">
+      {phaseActivation && (
+        <div className="fixed top-0 left-0 w-full h-full bg-gray-800 bg-opacity-75 z-50 flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-between gap-2">
+            <LoadingSpinner />
+            <span>Activating / Deactivating Phase, Please wait.</span>
+          </div>
+        </div>
+      )}
+      <div className="flex justify-between">
+        {phaseAddingState ? (
+          <div className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-gray-300 text-black cursor-not-allowed">
+            <LoadingSpinner className="text-black w-4 h-4" />{" "}
+            <span>Adding Phase</span>
+          </div>
+        ) : (
+          <button
+            className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
+            onClick={handleAddPhase}
+          >
+            <FaPlus />
+            Add Phase
+          </button>
+        )}
+      </div>
+      {/* <DemoTable exercises={workouts} /> */}
+      <div className="mt-4">
+        <div className="w-full space-y-4">
+          {clientPhases?.length === 0 ? (
+            <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
+              <p className="text-gray-500 text-sm font-medium uppercase">
+                No phases added yet
+              </p>
+              <p className="text-gray-400 text-xs mt-1 uppercase">
+                Click &ldquo;Add Phase&rdquo; to get started
+              </p>
             </div>
           ) : (
             clientPhases?.map((phase) => (
@@ -582,7 +549,9 @@ const WorkoutPlan = ({
             ))
           )}
         </div>
-    );
+      </div>
+    </div>
+  );
 };
 
 export default WorkoutPlan;

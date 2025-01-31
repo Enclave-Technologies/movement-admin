@@ -22,16 +22,6 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
 /* Specific styles for 404 page */
 .not-found-page {
   color: rgb(var(--foreground-rgb));
