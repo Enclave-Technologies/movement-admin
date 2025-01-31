@@ -30,7 +30,15 @@ const RecordWorkout = () => {
         setShowDeleteDialog(true);
     };
 
-    window.addEventListener("beforeunload", handleBeforeUnload);
+    // window.addEventListener("beforeunload", handleBeforeUnload);
+
+    useEffect(() => {
+        window.addEventListener("beforeunload", handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener("beforeunload", handleBeforeUnload);
+        };
+    }, []);
 
     const toggleAccordion = (exId: string) => {
         setOpenExercises((prevOpenExercises) => {
