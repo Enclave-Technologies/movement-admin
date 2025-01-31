@@ -7,7 +7,6 @@ import { API_BASE_URL } from "@/configs/constants";
 import axios from "axios";
 import LoadingSpinner from "./LoadingSpinner";
 import TitleEditBox from "./phase/PhaseTitle";
-import SessionActions from "./session/SessionActions";
 import { RxDragHandleDots1 } from "react-icons/rx";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -36,25 +35,28 @@ const SessionComponent: FC<SessionProps> = ({
   setToastType,
   savingState,
   isPhaseActive,
+
 }) => {
-  const router = useRouter();
-  const [isEditing, setIsEditing] = useState(false);
-  const [startingWorkout, setStartingWorkout] = useState(false);
-  const [sessionName, setSessionName] = useState(session.sessionName);
-  const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
-    useState(false);
-  const [isCollapsed, setIsCollapsed] = useState(true);
-  const inputRef = useRef<HTMLInputElement>(null);
+    const router = useRouter();
+    const [isEditing, setIsEditing] = useState(false);
+    const [startingWorkout, setStartingWorkout] = useState(false);
+    const [sessionName, setSessionName] = useState(session.sessionName);
+    const [showSessionDeleteConfirm, setShowSessionDeleteConfirm] =
+        useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
+    const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (isEditing && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isEditing, inputRef]);
+    useEffect(() => {
+        if (isEditing && inputRef.current) {
+            inputRef.current.focus();
+        }
+    }, [isEditing, inputRef]);
 
-  const handleSessionNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSessionName(e.target.value);
-  };
+    const handleSessionNameChange = (
+        e: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        setSessionName(e.target.value);
+    };
 
   const handleSessionNameSubmit = () => {
     onSessionNameChange(session.sessionId, sessionName).then((res) => {
@@ -66,48 +68,48 @@ const SessionComponent: FC<SessionProps> = ({
     setShowSessionDeleteConfirm(true); // Show confirmation dialog
   };
 
-  const confirmSessionDelete = () => {
-    onSessionDelete(session.sessionId); // Perform delete
-    setShowSessionDeleteConfirm(false); // Close dialog
-  };
+    const confirmSessionDelete = () => {
+        onSessionDelete(session.sessionId); // Perform delete
+        setShowSessionDeleteConfirm(false); // Close dialog
+    };
 
-  const cancelSessionDelete = () => {
-    setShowSessionDeleteConfirm(false); // Just close the dialog
-  };
+    const cancelSessionDelete = () => {
+        setShowSessionDeleteConfirm(false); // Just close the dialog
+    };
 
-  const handleStartSession = async () => {
-    // e.preventDefault();
-    try {
-      setStartingWorkout(true);
-      console.log("Preparing to start workout...");
-      const response = await axios.post(
-        `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
-        {
-          progress_id: progressId,
-          client_id: client_id,
-          phase_id: phaseId,
-          session_id: session.sessionId,
-        },
-        {
-          withCredentials: true,
+    const handleStartSession = async () => {
+        // e.preventDefault();
+        try {
+            setStartingWorkout(true);
+            console.log("Preparing to start workout...");
+            const response = await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
+                {
+                    progress_id: progressId,
+                    client_id: client_id,
+                    phase_id: phaseId,
+                    session_id: session.sessionId,
+                },
+                {
+                    withCredentials: true,
+                }
+            );
+
+            if (response.data.status) {
+                router.push(
+                    `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
+                );
+            } else {
+                setToastMessage(response.data.message);
+                setToastType("error");
+                setStartingWorkout(false);
+                setShowToast(true);
+            }
+        } catch (e) {
+            console.error("Failed to start workout:", e);
+        } finally {
         }
-      );
-
-      if (response.data.status) {
-        router.push(
-          `/record-workout?clientId=${client_id}&phaseId=${phaseId}&sessionId=${session?.sessionId}`
-        );
-      } else {
-        setToastMessage(response.data.message);
-        setToastType("error");
-        setStartingWorkout(false);
-        setShowToast(true);
-      }
-    } catch (e) {
-      console.error("Failed to start workout:", e);
-    } finally {
-    }
-  };
+    };
 
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: session.sessionId });
