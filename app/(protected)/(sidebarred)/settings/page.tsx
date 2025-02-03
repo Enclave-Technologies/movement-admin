@@ -25,6 +25,7 @@ const SettingsPage = () => {
         jobTitle: "",
         email: "",
         phone: "",
+        gender: "",
         emailVerification: false,
         phoneVerification: false,
         $createdAt: "",
@@ -54,7 +55,7 @@ const SettingsPage = () => {
                     `${API_BASE_URL}/mvmt/v1/trainer/settings`,
                     { withCredentials: true }
                 );
-
+                console.log("Settings data:", response.data);
                 setFormData(response.data);
             } catch (error) {
                 console.log(error);
@@ -225,14 +226,6 @@ const SettingsPage = () => {
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-4xl font-bold">Settings</h1>
-                {/* <div>
-                    <button className="px-4 py-2 bg-gray-200 rounded-md mr-2">
-                        Reset
-                    </button>
-                    <button className="px-4 py-2 bg-green-500 text-white rounded-md">
-                        Save
-                    </button>
-                </div> */}
             </div>
 
             <p className="text-gray-600 mb-6">

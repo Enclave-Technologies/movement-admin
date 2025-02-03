@@ -87,6 +87,7 @@ interface TrainerSettings {
     jobTitle: string;
     email: string;
     phone: string;
+    gender: string;
     emailVerification: boolean;
     phoneVerification: boolean;
     $createdAt: string;
