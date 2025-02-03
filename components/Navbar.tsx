@@ -95,7 +95,7 @@ const Navbar = () => {
     }, []);
 
     return (
-        <nav className="sticky top-0 w-full bg-white/90 blur-0 z-50">
+        <nav className="sticky top-0 w-full bg-white/90 blur-0 z-10">
             <div className="flex-1 flex flex-row justify-between items-center relative">
                 <div
                     ref={searchBarRef}
@@ -110,33 +110,6 @@ const Navbar = () => {
                         />
                     )}
                 </div>
-                {/* <div className="flex flex-row gap-2 items-center shadow px-2 py-2 rounded-full border-[1px] border-gray-100">
-          <p className="text-sm">{trainer.name}</p>
-          <Image
-            src={trainer.image}
-            className="aspect-square object-cover rounded-full"
-            alt={trainer.name}
-            // unoptimized
-            width={40}
-            height={40}
-          />
-        </div> */}
-                {/* <div className="flex space-x-4">
-          <button
-            type="submit"
-            className="w-48 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-500 hover:bg-green-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-            disabled={loading}
-            onClick={handleLogout}
-          >
-            {loading ? (
-              <div className="flex items-center justify-center">
-                <LoadingSpinner /> <span className="ml-2">Logging Out...</span>
-              </div>
-            ) : (
-              "Logout"
-            )}
-          </button>
-        </div> */}
             </div>
         </nav>
     );
