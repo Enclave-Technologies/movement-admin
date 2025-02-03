@@ -55,8 +55,6 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
     } = useTrainer();
     const [loadingLogout, setLoadingLogout] = useState(false);
 
-    // console.log(trainerData);
-
     const handleLogout = async () => {
         setLoadingLogout(true);
         try {

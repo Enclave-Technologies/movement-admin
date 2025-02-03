@@ -1,14 +1,11 @@
 "use client";
-import Breadcrumb from "@/components/Breadcrumb";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ID } from "appwrite";
 import { useUser } from "@/context/ClientContext";
 import axios from "axios";
 import BreadcrumbLoading from "@/components/BreadcrumbLoading";
-import Spinner from "@/components/Spinner";
 import PhaseComponent from "@/components/PhaseComponent";
-import { FaPlus, FaSave } from "react-icons/fa";
-import DemoTable from "@/components/DemoTable";
+import { FaPlus } from "react-icons/fa";
 import { API_BASE_URL } from "@/configs/constants";
 import LoadingSpinner from "../LoadingSpinner";
 import { updateSession } from "@/server_functions/session";
@@ -125,7 +122,6 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
-        console.log("Copying phase...");
         setClientPhases(modifiedClientPhases);
         setPhaseAddingState(false);
         setSavingState(false);
@@ -134,6 +130,28 @@ const WorkoutPlan = ({
     const updateClientPhase = async (newPhase: any) => {
         // setClientPhases(updatedPhases);
     };
+
+    // const handleDataSubmit = async () => {
+    //     try {
+    //         setPageLoading(true);
+    //         const data: DataResponse = {
+    //             phases: clientPhases,
+    //         };
+    //         const response = await axios.post(
+    //             `${API_BASE_URL}/mvmt/v1/client/phases`,
+    //             {
+    //                 client_id: client_id,
+    //                 data,
+    //             },
+    //             { withCredentials: true }
+    //         );
+
+    //     } catch (error) {
+    //         console.error(error);
+    //     } finally {
+    //         setPageLoading(false);
+    //     }
+    // };
 
     const handleActivatePhase = async (
         phaseId: string,
@@ -237,7 +255,7 @@ const WorkoutPlan = ({
             sessionId: sessionId,
             sessionName: newSessionName,
         };
-        updateSession(client_id, data);
+        await updateSession(client_id, data);
         setClientPhases(updatedPhases);
         setSavingState(false);
     };

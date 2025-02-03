@@ -100,7 +100,6 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 </div>
                             </div>
                         </div>
-                        {/* <pre></pre> */}
                         <button
                             className="bg-primary px-4 py-2 rounded-md text-sm
                             transition-all duration-200 ease-in-out items-center justify-center uppercase gap-2

@@ -28,8 +28,7 @@ const TableActions = ({
     selectedRows.forEach((row, index) => {
       csvContent += index + 1 + ",";
       csvContent += ((row.id ?? row.uid) as string) + ",";
-      // console.log(JSON.stringify(row, null, 2));
-      // console.log("--------------------");
+
       csvContent += headers
         .filter((h) => typeof h.header == "string" && h.header !== "")
         .map((h) => {

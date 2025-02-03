@@ -11,7 +11,7 @@ const UsersTable = ({ search, clients }) => {
 
     const handleRowClick = (client) => {
         // Implement the action you want to execute on double-click
-        console.log("Client clicked:", client);
+
         // For example, you can redirect to the client details page
         // window.location.href = `client/${client.uid}`;
         router.push(`client/${client.uid}`);

@@ -32,7 +32,7 @@ const DemoTable = ({ exercises: incomingExercise }) => {
             newExercises.splice(originalPos, 1);
             newExercises.splice(newPos, 0, exercises[originalPos]);
             setExercises(newExercises);
-            console.log("drag end");
+
         }
     }
 

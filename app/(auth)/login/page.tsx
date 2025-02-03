@@ -9,7 +9,7 @@ import Link from "next/link";
 
 const Page = () => {
     const [state, action] = useFormState(login, undefined);
-    console.log(state);
+
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-green-500">

@@ -25,6 +25,7 @@ const SettingsPage = () => {
         jobTitle: "",
         email: "",
         phone: "",
+        gender: "",
         emailVerification: false,
         phoneVerification: false,
         $createdAt: "",
@@ -57,7 +58,7 @@ const SettingsPage = () => {
 
                 setFormData(response.data);
             } catch (error) {
-                console.log(error);
+
             } finally {
                 setPageLoading(false);
             }
@@ -97,7 +98,7 @@ const SettingsPage = () => {
         }
 
         // DONE: Implement API call to change password
-        // console.log("Password form submitted:", passwordForm);
+
         try {
             setUploading(true);
             await axios.patch(
@@ -137,7 +138,7 @@ const SettingsPage = () => {
             [name]: value,
         }));
         setDataModified(true);
-        console.log(`${name} : ${value}`);
+
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -153,7 +154,7 @@ const SettingsPage = () => {
             );
             setDataModified(false);
             // Handle success case
-            console.log("Settings saved successfully");
+
             // Reload the page on successful submission
             window.location.reload(); // This will refresh the page
             setToastMessage("Settings saved successfully");
@@ -225,14 +226,6 @@ const SettingsPage = () => {
         <div className="container mx-auto p-4">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-4xl font-bold">Settings</h1>
-                {/* <div>
-                    <button className="px-4 py-2 bg-gray-200 rounded-md mr-2">
-                        Reset
-                    </button>
-                    <button className="px-4 py-2 bg-green-500 text-white rounded-md">
-                        Save
-                    </button>
-                </div> */}
             </div>
 
             <p className="text-gray-600 mb-6">

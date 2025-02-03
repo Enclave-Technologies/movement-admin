@@ -1,14 +1,11 @@
 "use client";
-import React, { forwardRef, use, useEffect, useRef, useState } from "react";
-import SubmitButton from "../ResponsiveButton";
-import { useFormState } from "react-dom";
-import { register } from "@/server_functions/auth";
+import React, { useEffect, useState } from "react";
 import Toast from "../Toast";
 import axios from "axios";
 import { API_BASE_URL } from "@/configs/constants";
 import LoadingSpinner from "../LoadingSpinner";
 
-const EditTrainerForm = ({ fetchData, team, clientData }) => {
+const EditTrainerForm = ({ fetchData, clientData }) => {
     const [firstName, setFirstName] = useState(clientData?.firstName || "");
     const [lastName, setLastName] = useState(clientData?.firstName || "");
     const [phone, setPhone] = useState("");
@@ -24,10 +21,10 @@ const EditTrainerForm = ({ fetchData, team, clientData }) => {
 
     useEffect(() => {
         if (clientData) {
-            const [firstName, lastName] = clientData.name.split(" ");
+            // const [firstName, lastName] = clientData.name.split(" ");
 
-            setFirstName(firstName);
-            setLastName(lastName);
+            setFirstName(clientData.firstName);
+            setLastName(clientData.lastName);
             setPhone(clientData.phone);
             setEmail(clientData.email);
             setGender(clientData.gender);
@@ -46,7 +43,6 @@ const EditTrainerForm = ({ fetchData, team, clientData }) => {
         const formData = new FormData(e.target);
         const data = Object.fromEntries(formData.entries());
 
-        console.log(data);
         // Verify the form data
         if (
             typeof data.firstName !== "string" ||
@@ -64,14 +60,13 @@ const EditTrainerForm = ({ fetchData, team, clientData }) => {
             setToastMessage("Please fill all the fields correctly");
             setToastType("error");
             setShowToast(true);
-            return;
         }
 
         try {
             const response = await axios.put(
                 `${API_BASE_URL}/mvmt/v1/admin/trainers`,
                 {
-                    uid: clientData.uid,
+                    uid: clientData.auth_id,
                     firstName: data.firstName,
                     lastName: data.lastName,
                     phone: data.phone,
@@ -227,26 +222,25 @@ const EditTrainerForm = ({ fetchData, team, clientData }) => {
                         className="mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
-                {team == "Admins" && (
-                    <button
-                        type="submit"
-                        className="w-full flex justify-center py-2 px-4 
+
+                <button
+                    type="submit"
+                    className="w-full flex justify-center py-2 px-4 
     border-white border-2 rounded-md shadow-sm text-sm font-semibold
     text-white bg-green-500 hover:bg-green-900 focus:outline-none 
     focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors 
     duration-300 ease-in-out tracking-wider"
-                        disabled={submitted}
-                    >
-                        {submitted ? (
-                            <div className="flex items-center justify-center">
-                                <LoadingSpinner className="w-4 h-4 aspect-square" />{" "}
-                                <span className="ml-2">Submitting...</span>
-                            </div>
-                        ) : (
-                            `Submit`
-                        )}
-                    </button>
-                )}
+                    disabled={submitted}
+                >
+                    {submitted ? (
+                        <div className="flex items-center justify-center">
+                            <LoadingSpinner className="w-4 h-4 aspect-square" />{" "}
+                            <span className="ml-2">Submitting...</span>
+                        </div>
+                    ) : (
+                        `Submit`
+                    )}
+                </button>
             </form>
             {showToast && (
                 <Toast

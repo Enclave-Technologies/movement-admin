@@ -170,7 +170,7 @@ const AddExerciseForm = ({ fetchData, team }) => {
     }, []);
 
     function handleCsvFile(file) {
-        console.log(file.name);
+
         // check file headers
         // Implement file handling logic here
     }

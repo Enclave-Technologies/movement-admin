@@ -12,7 +12,7 @@ const ExercisesTable = ({
 }) => {
   const [updatingExercise, setUpdatingExercise] = useState<string | null>(null);
 
-  console.log(trainerDetails?.team.name);
+
 
   const handleApprovalChange = async (
     exerciseId: string,
@@ -21,7 +21,7 @@ const ExercisesTable = ({
     setUpdatingExercise(exerciseId);
 
     try {
-      console.log(exerciseId);
+
       const response = await axios.put(
         `${API_BASE_URL}/mvmt/v1/admin/exercises/${exerciseId}`,
         {

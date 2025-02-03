@@ -15,6 +15,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import Toast from "@/components/Toast";
 import EditTrainerForm from "@/components/forms/edit-trainer-form";
+import Link from "next/link";
 
 const CoachingTeam = () => {
     const { myDetails: trainerDetails, reloadData } = useGlobalContext();
@@ -32,9 +33,6 @@ const CoachingTeam = () => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
-    const [editRow, setEditRow] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(false);
-
     const openDeleteConfirmation = () => {
         setDeletePressed(true);
     };
@@ -45,7 +43,7 @@ const CoachingTeam = () => {
 
     const handleBatchDelete = async () => {
         setModalButtonLoadingState(true);
-        console.log(selectedRows);
+
         try {
             const response = await axios.delete(
                 `${API_BASE_URL}/mvmt/v1/admin/trainers`,
@@ -73,12 +71,6 @@ const CoachingTeam = () => {
             setToastType("error");
             setShowToast(true);
         }
-    };
-
-    const handleTrainerEditClicked = (rowData: CoachTemplate) => {
-        setEditRow(rowData);
-        // editRowRef.current = rowData;
-        setShowEditModal(true);
     };
 
     const handleToastClose = () => {
@@ -171,14 +163,12 @@ const CoachingTeam = () => {
                 header: "Name",
                 accessorKey: "name",
                 cell: (info) => (
-                    <div
+                    <Link
+                        href={`/trainer/${info.row.original.uid}`}
                         className="whitespace-nowrap cursor-pointer text-sm font-semibold underline"
-                        onClick={() => {
-                            handleTrainerEditClicked(info.row.original);
-                        }}
                     >
                         {info.getValue() as String}
-                    </div>
+                    </Link>
                 ),
                 size: 200,
             },
@@ -235,8 +225,6 @@ const CoachingTeam = () => {
 
         const { data, total } = response.data;
 
-        console.log(data);
-        console.log(total);
         return {
             data: data,
             meta: {
@@ -262,28 +250,6 @@ const CoachingTeam = () => {
                         }}
                     />
                 </div>
-            </RightModal>
-        );
-    };
-
-    const rightEditModal = () => {
-        return (
-            <RightModal
-                formTitle="Edit Trainer / Admin"
-                isVisible={showEditModal}
-                hideModal={() => {
-                    setShowEditModal(false);
-                    setEditRow(null);
-                }}
-            >
-                <EditTrainerForm
-                    fetchData={() => {
-                        setAdded((prevAdded) => !prevAdded);
-                    }}
-                    team={trainerDetails.team.name}
-                    clientData={editRow}
-                    // rowData={editRowRef.current}
-                />
             </RightModal>
         );
     };
@@ -330,7 +296,6 @@ const CoachingTeam = () => {
                 </div>
                 {rightModal()}
 
-                {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
                         title="batch of coaches? 

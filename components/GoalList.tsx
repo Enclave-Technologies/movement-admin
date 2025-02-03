@@ -20,7 +20,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         trainerError: error,
     } = useTrainer();
 
-    console.log(trainerData);
+
 
     const updateGoalInBackend = useCallback(
         async (id: string, completed: boolean) => {
@@ -37,11 +37,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                     { withCredentials: true }
                 );
 
-                console.log(
-                    `Updating goal ${id} to ${
-                        completed ? "completed" : "not completed"
-                    }`
-                );
+
             } catch (error) {
                 console.error("Failed to update goal:", error);
                 throw error; // Re-throw the error to be handled in GoalTile
@@ -83,7 +79,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                         (goal) => goal.id !== goalToDelete
                     ),
                 }));
-                console.log(updatedGoals);
+
                 setGoals(updatedGoals);
                 setGoalToDelete(null);
                 await axios.delete(
@@ -185,8 +181,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 },
                 { withCredentials: true }
             );
-            console.log("SAVING EDITED GOALS");
-            console.log(goals);
+
 
             // Create a new array of categories
             const updatedGoals = goalTypes.map((goalType) => ({

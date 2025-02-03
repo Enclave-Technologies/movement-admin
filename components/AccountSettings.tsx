@@ -90,14 +90,26 @@ const AccountSettings = ({ formData, handleSubmit, handleInputChange }) => {
                     className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
                 />
             </div>
-
-            {/* <div className="flex justify-end"> */}
-            {/* <button
-                    type="submit"
-                    className="px-4 py-2 bg-green-500  hover:bg-green-900 text-white rounded-md"
+            <div className="mb-4">
+                <label
+                    htmlFor="gender"
+                    className="block text-sm font-medium text-gray-700"
                 >
-                    Save Changes
-                </button> */}
+                    Gender
+                </label>
+                <select
+                    id="gender"
+                    name="gender"
+                    value={formData.gender ?? ""}
+                    onChange={handleInputChange}
+                    className="mt-1 block w-full rounded-md border-black border py-2 px-3 shadow-sm focus:outline-none"
+                >
+                    <option value="">Select gender</option>
+                    <option value="f">Woman</option>
+                    <option value="m">Man</option>
+                </select>
+            </div>
+
             <SubmitButton label="Submit" />
             {/* </div> */}
         </form>

@@ -29,7 +29,7 @@ const WorkoutRecordHeader = ({
   const handleClose = async () => {
     // SAVE THE DATA
     const saved = await handleSave();
-    console.log(saved);
+
     router.push("/");
   };
 

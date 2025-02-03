@@ -24,7 +24,7 @@ const RecentWorkoutHistory = ({ client_id }) => {
         setSessionLog(sessionLogs);
         setProgressId(progressId);
       } catch (e) {
-        console.log(e);
+
       } finally {
         setPageLoading(false);
       }
@@ -36,7 +36,7 @@ const RecentWorkoutHistory = ({ client_id }) => {
     return null;
   }
 
-  console.log(nextSession);
+
 
   return (
     <div className="flex flex-col items-start gap-4 rounded-lg bg-white shadow-md p-4">

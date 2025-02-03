@@ -5,7 +5,7 @@ import { useFormStatus } from "react-dom";
 const SubmitButton = ({ label }) => {
     // const pending = true;
     const { pending } = useFormStatus();
-    // console.log("Pending state:", pending);
+
 
     return (
         <button

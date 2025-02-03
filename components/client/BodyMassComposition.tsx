@@ -21,7 +21,6 @@ const BodyMassComposition = ({ client_id }) => {
 
     async function handleSaveBmc(bmcRecord) {
         try {
-            console.log(JSON.stringify(bmcRecord, null, 2));
             const response = await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/bmc/${client_id}`,
                 { bmiRecord: bmcRecord },
@@ -50,7 +49,6 @@ const BodyMassComposition = ({ client_id }) => {
     }, []);
 
     function addNewEmptyRecord() {
-        console.log(bmiRecords);
         setBmiRecords([
             {
                 $id: ID.unique(),
@@ -109,8 +107,6 @@ const BodyMassComposition = ({ client_id }) => {
     }
 
     async function addBmcToDB(bmcData) {
-        console.log(bmcData);
-
         await axios.post(
             `${API_BASE_URL}/mvmt/v1/client/bmc/${client_id}`,
             { bmiRecord: bmcData },

@@ -9,7 +9,6 @@ import Link from "next/link";
 
 const ConfirmPasswordPage = () => {
     const [state, action] = useFormState(updatePassword, undefined);
-    console.log(state);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-green-500">
