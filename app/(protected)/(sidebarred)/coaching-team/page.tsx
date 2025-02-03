@@ -266,18 +266,18 @@ const CoachingTeam = () => {
                         <span className="text-lg font-bold">Coaching Team</span>
                         {isFetching && <LoadingSpinner className="h-4 w-4" />}
                     </div>
-                    {trainerDetails?.team.name === "Admins" && (
-                        <TableActions
-                            openDeleteConfirmation={openDeleteConfirmation}
-                            columns={columns}
-                            selectedRows={selectedRows}
-                            tableSearchQuery={globalFilter}
-                            setTableSearchQuery={setGlobalFilter}
-                            onClickNewButton={() => {
-                                setShowRightModal(true);
-                            }}
-                        />
-                    )}
+
+                    <TableActions
+                        showDelete={trainerDetails?.team.name === "Admins"}
+                        openDeleteConfirmation={openDeleteConfirmation}
+                        columns={columns}
+                        selectedRows={selectedRows}
+                        tableSearchQuery={globalFilter}
+                        setTableSearchQuery={setGlobalFilter}
+                        onClickNewButton={() => {
+                            setShowRightModal(true);
+                        }}
+                    />
                 </div>
                 <div>
                     <QueryClientProvider client={queryClient}>

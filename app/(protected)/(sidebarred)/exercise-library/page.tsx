@@ -412,6 +412,7 @@ const ExercisePage = () => {
                     </div>
 
                     <TableActions
+                        showDelete={false}
                         openDeleteConfirmation={openDeleteConfirmation}
                         columns={columns}
                         selectedRows={selectedRows}
