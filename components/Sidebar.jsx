@@ -34,16 +34,16 @@ const sidebarItems = [
         href: "/coaching-team",
     },
 
-  {
-    label: "Exercise Library",
-    icon: LiaDumbbellSolid,
-    href: "/exercise-library",
-  },
-  {
-    label: "Settings",
-    icon: FiSettings,
-    href: "/settings",
-  },
+    {
+        label: "Exercise Library",
+        icon: LiaDumbbellSolid,
+        href: "/exercise-library",
+    },
+    {
+        label: "Settings",
+        icon: FiSettings,
+        href: "/settings",
+    },
 ];
 
 const Sidebar = ({ isCollapsed, toggleSidebar }) => {
@@ -68,64 +68,87 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
         }
     };
 
-  return (
-    <div
-      className={`sticky top-0 left-0 h-screen bg-gray-100 text-primary z-40 pt-4 ${
-        isCollapsed ? "w-16" : "w-64"
-      } transition-all duration-300`}
-    >
-      <div
-        className={`${
-          isCollapsed ? "px-0" : "px-2"
-        } flex flex-col justify-between gap-4 h-full`}
-      >
-        <div className="flex flex-col gap-4 h-full">
-          <div
-            className={`flex flex-row ${
-              isCollapsed ? "justify-center" : "justify-between"
-            } w-full top-0 left-0 px-2 min-h-8`}
-          >
-            <Image
-              src={require("@/public/images/Symbol-movement.svg")}
-              className={`aspect-square object-cover rounded-full ${
-                isCollapsed ? "hidden" : "block"
-              }`}
-              alt={"Movement Logo"}
-              // unoptimized
-              width={32}
-              height={32}
-            />
+    return (
+        <div
+            className={`sticky top-0 left-0 h-screen bg-gray-100 text-primary z-40 pt-4 ${
+                isCollapsed ? "w-16" : "w-64"
+            } transition-all duration-300`}
+        >
+            <div
+                className={`${
+                    isCollapsed ? "px-0" : "px-2"
+                } flex flex-col justify-between gap-4 h-full`}
+            >
+                <div className="flex flex-col gap-4 h-full">
+                    <div
+                        className={`flex flex-row ${
+                            isCollapsed ? "justify-center" : "justify-between"
+                        } w-full top-0 left-0 px-2 min-h-8`}
+                    >
+                        <Image
+                            src={require("@/public/images/Symbol-movement.svg")}
+                            className={`aspect-square object-cover rounded-full ${
+                                isCollapsed ? "hidden" : "block"
+                            }`}
+                            alt={"Movement Logo"}
+                            // unoptimized
+                            width={32}
+                            height={32}
+                        />
 
                         <button onClick={toggleSidebar}>
                             <AiOutlineMenu />
                         </button>
                     </div>
 
-          <nav className="flex flex-col p-2 gap-[2px]">
-            {sidebarItems.map((item) => {
-              const isItemActive = pathname === item.href;
-              const className = isItemActive
-                ? "bg-white text-primary font-bold"
-                : "text-slate-500 hover:text-primary hover:bg-white/75 transition-colors";
+                    <nav className="flex flex-col p-2 gap-[2px]">
+                        {sidebarItems.map((item) => {
+                            const isItemActive = pathname === item.href;
+                            const className = isItemActive
+                                ? "bg-white text-primary font-bold"
+                                : "text-slate-500 hover:text-primary hover:bg-white/75 transition-colors";
 
-              // Render other sidebar items regardless of the team
-              return (
-                <Link href={item.href} key={item.label}>
-                  <div
-                    className={`flex items-center whitespace-nowrap ${
-                      isCollapsed ? "justify-center p-2" : "justify-start p-2"
-                    } rounded-md cursor-pointer ${className}`}
-                  >
-                    {loading ? (
-                      <div className="animate-pulse">
-                        <div className="bg-gray-300 rounded-full w-6 h-6"></div>
-                      </div>
+                            // Render other sidebar items regardless of the team
+                            return (
+                                <Link href={item.href} key={item.label}>
+                                    <div
+                                        className={`flex items-center whitespace-nowrap ${
+                                            isCollapsed
+                                                ? "justify-center p-2"
+                                                : "justify-start p-2"
+                                        } rounded-md cursor-pointer ${className}`}
+                                    >
+                                        {loading ? (
+                                            <div className="animate-pulse">
+                                                <div className="bg-gray-300 rounded-full w-6 h-6"></div>
+                                            </div>
+                                        ) : (
+                                            <item.icon className="w-[16px] h-[16px]" />
+                                        )}
+                                        {!isCollapsed && (
+                                            <span className="ml-2">
+                                                {loading ? "" : item.label}
+                                            </span>
+                                        )}
+                                    </div>
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                </div>
+                <div
+                    className={`${
+                        isCollapsed ? "p-2" : "p-3"
+                    } flex flex-col gap-4`}
+                >
+                    {!isCollapsed ? (
+                        <TrainerInfo
+                            userDetails={trainerData}
+                            loading={loading}
+                            error={error}
+                        />
                     ) : (
-                      <item.icon className="w-[16px] h-[16px]" />
-                    )}
-                    {!isCollapsed && (
-                      <span className="ml-2">{loading ? "" : item.label}</span>
-
+                        <div className="w-16 h-40"></div>
                     )}
                     <button
                         type="submit"

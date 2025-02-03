@@ -207,17 +207,25 @@ const EditTrainerForm = ({ fetchData, team, clientData }) => {
                     >
                         Role
                     </label>
-                    <select
+                    {/* <select
                         id="role"
                         name="role"
                         value={role}
-                        disabled
+                        readOnly
                         // onChange={(e) => setRole(e.target.value)}
-                        className="mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                        className="readonly mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     >
                         <option value="Trainers">Trainer</option>
                         <option value="Admins">Admin</option>
-                    </select>
+                    </select> */}
+                    <input
+                        type="role"
+                        id="role"
+                        name="role"
+                        value={role === "Admins" ? "Admin" : "Trainer"}
+                        readOnly
+                        className="mt-1 block w-full px-3 py-2 bg-gray-200 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
                 </div>
                 {team == "Admins" && (
                     <button
