@@ -45,7 +45,7 @@ const ScrollTable = ({
         globalFilter, //refetch when global filter changes
       ],
       queryFn: async ({ pageParam = 0 }) => {
-        console.log(JSON.stringify(sorting), dataAdded, dataModified);
+
 
         const start = (pageParam as number) * LIMIT;
         const fetchedData = await fetchData(start, LIMIT, sorting); // api call
@@ -182,7 +182,7 @@ const ScrollTable = ({
   });
 
   useEffect(() => {
-    console.log("updating rows");
+
     setRows(rows);
   }, [setRows, rows]);
 

@@ -35,7 +35,7 @@ export async function middleware(request) {
         // For all other paths (protected routes)
         if (!user) {
             // If not logged in, redirect to login
-            console.log("Redirecting to /login");
+
             request.cookies.delete({
                 name: SESSION_COOKIE_NAME,
                 httpOnly: true,

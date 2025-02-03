@@ -17,6 +17,7 @@ import {
     exerciseSchema,
 } from "@/server_functions/formSchemas";
 import { Query } from "appwrite";
+import "server-only";
 
 export async function register(state, formData) {
     // 1. Validate fields
@@ -36,7 +37,6 @@ export async function register(state, formData) {
         return { success: false, errors };
     }
 
-    console.log(validatedResult.data);
     const { firstName, lastName, phone, email, jobTitle, role, gender } =
         validatedResult.data;
 
@@ -50,7 +50,6 @@ export async function register(state, formData) {
             "password",
             `${firstName} ${lastName}`
         );
-        // console.log("Create acc");
     } catch (error) {
         if (
             error instanceof AppwriteException &&
@@ -70,10 +69,8 @@ export async function register(state, formData) {
         for (const team of teamList.teams) {
             if (team.name.toLowerCase().includes(role)) {
                 await teams.createMembership(team.$id, [], email, uid);
-                // console.log("Team match");
             }
         }
-        // console.log(teamList);
     } catch (error) {
         console.error(error);
         users.delete(uid);
@@ -118,7 +115,6 @@ export async function register(state, formData) {
             }
         );
     } catch (error) {
-        console.log(error);
         users.delete(uid);
         return {
             success: false,
@@ -154,8 +150,6 @@ export async function registerClient(state, formData) {
         return { success: false, errors };
     }
 
-    console.log(validatedResult.data);
-
     const { firstName, lastName, phone, email, trainerId, gender } =
         validatedResult.data;
 
@@ -169,7 +163,6 @@ export async function registerClient(state, formData) {
             "password",
             `${firstName} ${lastName}`
         );
-        // console.log("Create acc");
     } catch (error) {
         if (
             error instanceof AppwriteException &&
@@ -241,10 +234,8 @@ export async function registerClient(state, formData) {
         for (const team of teamList.teams) {
             if (team.name.toLowerCase().includes("client")) {
                 await teams.createMembership(team.$id, [], email, uid);
-                // console.log("Team match");
             }
         }
-        // console.log(teamList);
     } catch (error) {
         console.error(error);
         users.delete(uid);
@@ -273,7 +264,6 @@ export async function registerClient(state, formData) {
             }
         );
     } catch (error) {
-        console.log(error);
         users.delete(uid);
         return {
             success: false,
@@ -291,7 +281,6 @@ export async function registerClient(state, formData) {
 }
 
 export async function login(state, formData) {
-    console.log("1. LOGIN");
     // 1. Validate fields
     const validatedResult = LoginFormSchema.safeParse({
         email: formData.get("email"),
@@ -304,7 +293,7 @@ export async function login(state, formData) {
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log("2. LOGIN");
+
     // 2. Try logging in
     const { account } = await createAdminClient();
     try {
@@ -329,7 +318,7 @@ export async function login(state, formData) {
             };
         }
         const acc = await sessAccount.get();
-        console.log("================");
+
         const sessionData = {
             session: session.secret,
             $id: acc.$id,
@@ -338,8 +327,6 @@ export async function login(state, formData) {
             name: acc.name,
             team: team.teams[0].name,
         };
-
-        console.log("================");
 
         cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
             httpOnly: true,
@@ -352,9 +339,6 @@ export async function login(state, formData) {
 
         // Retrieve and log the cookie
         // const cookie = cookies().get(SESSION_COOKIE_NAME);
-        // console.log("Cookie set:", cookie);
-
-        console.log("3. LOGIN");
     } catch (error) {
         console.error(error);
         if (
@@ -413,16 +397,11 @@ export async function logout() {
             // domain: "enclave.live",
         });
 
-        console.log(`Cookie ${SESSION_COOKIE_NAME} deleted`);
-
         const cookie_recheck = cookies()?.get(SESSION_COOKIE_NAME)?.value;
-        console.log("Rechecking if cookie still exists! ->", cookie_recheck);
 
         // Redirect to the login page
         redirect("/login");
     } catch (error) {
-        console.log(error);
-
         // Handle errors by deleting the session cookie and redirecting
         cookies().delete({
             name: SESSION_COOKIE_NAME,
@@ -432,8 +411,6 @@ export async function logout() {
             path: "/",
             // domain: "enclave.live",
         });
-
-        console.log(`Cookie ${SESSION_COOKIE_NAME} deleted after error`);
 
         redirect("/login");
     }
@@ -450,7 +427,6 @@ export async function getCurrentUser() {
         const { account } = await createSessionClient(sessionCookie.session);
         return account.get();
     } catch (error) {
-        console.log(error);
         return null;
     }
 
@@ -478,9 +454,6 @@ export async function fetchUserDetails() {
             process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
             accDetails.$id
         );
-        console.log(accDetails);
-        console.log(teams[0]);
-        console.log(fullDetails);
 
         const mergedObject = {
             ...accDetails,
@@ -489,11 +462,8 @@ export async function fetchUserDetails() {
         };
         return mergedObject;
     } catch (error) {
-        console.log(error);
         return null;
     }
-
-    return null;
 }
 
 export async function resetPassword(state, formData) {
@@ -505,10 +475,7 @@ export async function resetPassword(state, formData) {
             email, // email
             "http://movement-admin.enclave.live/confirm-password" // url
         );
-
-        console.log(result);
     } catch (error) {
-        console.log(error);
         return null;
     }
 }
@@ -525,18 +492,13 @@ export async function updatePassword(state, formData) {
             email, // email
             "http://127.0.0.1:3001/confirm-password" // url
         );
-
-        console.log(result);
     } catch (error) {
-        console.log(error);
         return null;
     }
 }
 
 export async function addWorkout(state, formData) {
-    console.log("Form data:");
     for (const [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`);
     }
 
     // 1. Validate fields
@@ -564,7 +526,7 @@ export async function addWorkout(state, formData) {
         const { database } = await createSessionClient(cookie?.session);
 
         const uid = ID.unique();
-        console.log(uid);
+
         const createdDoc = await database.createDocument(
             process.env.NEXT_PUBLIC_DATABASE_ID,
             process.env.NEXT_PUBLIC_COLLECTION_EXERCISES,
@@ -577,8 +539,6 @@ export async function addWorkout(state, formData) {
                 approved: authorization === "Admins",
             }
         );
-        console.log(createdDoc);
-        console.log("Create acc");
     } catch (error) {
         // Log the error
         console.error("Error in addWorkout function:", error);

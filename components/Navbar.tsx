@@ -51,12 +51,12 @@ const Navbar = () => {
 
                     const { data, total } = response.data;
 
-                    console.log(total);
+
                     if (data) {
                         setUsers(data);
                     }
                 } catch (e) {
-                    console.log(e);
+
                 }
             }
             setLoadingResults(false);
@@ -73,7 +73,7 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleOutsideClick = (event) => {
-            // console.log("click");
+
             // Check if the click is outside the search bar container
             if (
                 searchBarRef.current &&

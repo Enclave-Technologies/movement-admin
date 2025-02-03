@@ -55,10 +55,10 @@ const SettingsPage = () => {
                     `${API_BASE_URL}/mvmt/v1/trainer/settings`,
                     { withCredentials: true }
                 );
-                console.log("Settings data:", response.data);
+
                 setFormData(response.data);
             } catch (error) {
-                console.log(error);
+
             } finally {
                 setPageLoading(false);
             }
@@ -98,7 +98,7 @@ const SettingsPage = () => {
         }
 
         // DONE: Implement API call to change password
-        // console.log("Password form submitted:", passwordForm);
+
         try {
             setUploading(true);
             await axios.patch(
@@ -138,7 +138,7 @@ const SettingsPage = () => {
             [name]: value,
         }));
         setDataModified(true);
-        console.log(`${name} : ${value}`);
+
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -154,7 +154,7 @@ const SettingsPage = () => {
             );
             setDataModified(false);
             // Handle success case
-            console.log("Settings saved successfully");
+
             // Reload the page on successful submission
             window.location.reload(); // This will refresh the page
             setToastMessage("Settings saved successfully");

@@ -38,7 +38,7 @@ const Page = () => {
 
     const handleRowClick = (client) => {
         // Implement the action you want to execute on double-click
-        // console.log("Client clicked:", client);
+
         // For example, you can redirect to the client details page
         // window.location.href = `client/${client.uid}`;
         router.push(`client/${client.uid}`);
@@ -54,7 +54,7 @@ const Page = () => {
 
     const handleBatchDelete = async () => {
         setModalButtonLoadingState(true);
-        console.log(selectedRows);
+
         try {
             const response = await axios.delete(
                 `${API_BASE_URL}/mvmt/v1/trainer/clients`,
@@ -235,8 +235,7 @@ const Page = () => {
 
         const { data, total } = response.data;
 
-        console.log(data.length);
-        console.log(total);
+
         return {
             data: data,
             meta: {

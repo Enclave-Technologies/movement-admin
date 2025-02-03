@@ -32,7 +32,7 @@ const TitleEditBox = ({
         <button
           className="primary"
           onClick={() => {
-            console.log("submitting");
+
             handleValueSubmit();
           }}
         >

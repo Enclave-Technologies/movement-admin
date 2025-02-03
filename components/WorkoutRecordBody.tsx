@@ -36,7 +36,7 @@ const WorkoutRecordBody = ({
             }
             superset = workoutRecords[i].marker[0];
         }
-        console.log(sets);
+
         return sets;
     }, [workoutRecords]);
 

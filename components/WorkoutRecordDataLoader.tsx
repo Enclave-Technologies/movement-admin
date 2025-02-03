@@ -38,7 +38,7 @@ const SearchParamsLoader = ({
                 `${API_BASE_URL}/mvmt/v1/client/workout-tracker?client_id=${clientId}&phase_id=${phaseId}&session_id=${sessionId}`,
                 { withCredentials: true }
             );
-            // console.log(JSON.stringify(response.data, null, 2));
+
 
             const {
                 // recommendedWorkouts,

@@ -79,7 +79,7 @@ const SessionComponent: FC<SessionProps> = ({
     // e.preventDefault();
     try {
       setStartingWorkout(true);
-      console.log("Preparing to start workout...");
+
       const response = await axios.post(
         `${API_BASE_URL}/mvmt/v1/client/start-workouts`,
         {

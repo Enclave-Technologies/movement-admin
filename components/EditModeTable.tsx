@@ -89,7 +89,7 @@ const EditModeTable: FC<EditableTableProps> = ({
     //     newExercises.splice(originalPos, 1);
     //     newExercises.splice(newPos, 0, exercises[originalPos]);
     //     // onExerciseOrderChange(phaseId, sessionId, newExercises);
-    //     console.log("drag end");
+
     //   }
     // }
 

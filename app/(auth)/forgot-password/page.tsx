@@ -9,7 +9,6 @@ import Link from "next/link";
 
 const ForgotPasswordPage = () => {
     const [state, action] = useFormState(resetPassword, undefined);
-    console.log(state);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-green-500">
