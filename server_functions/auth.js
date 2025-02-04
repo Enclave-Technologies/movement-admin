@@ -115,7 +115,7 @@ export async function register(state, formData) {
             }
         );
         // Include in clients team too
-        for (const team in teamList.teams) {
+        for (const team of teamList.teams) {
             if (team.name.toLowerCase() === "clients") {
                 await teams.createMembership(team.$id, [], email, uid);
             }

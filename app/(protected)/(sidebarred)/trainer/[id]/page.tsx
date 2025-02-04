@@ -7,6 +7,7 @@ import {
     CardFooter,
     CardHeader,
 } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { defaultProfileURL } from "@/configs/constants";
 import { fetchUserDetails } from "@/server_functions/auth";
@@ -63,6 +64,13 @@ export default async function ProfilePage({
                             {myInfo.team.includes("Admins") && (
                                 <EditTrainer trainerDetails={trainerDt} />
                             )}
+                        </div>
+                        <div className="flex flex-wrap gap-2 mt-2 text-white">
+                            {/* <Badge>{JSON.stringify(trainerDt)}</Badge> */}
+                            <Badge>TypeScript</Badge>
+                            <Badge>Node.js</Badge>
+                            <Badge>GraphQL</Badge>
+                            <Badge>Next.js</Badge>
                         </div>
                     </CardHeader>
                     <Separator />

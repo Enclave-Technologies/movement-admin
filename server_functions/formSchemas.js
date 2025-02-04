@@ -7,7 +7,7 @@ export const RegisterFormSchema = z.object({
     phone: z.string().max(20, "Phone should be less than 20 letters"),
     email: z.string().email("Invalid email address"),
     jobTitle: z.string().min(2, "Job Title must be at least 2 letters"),
-    role: z.enum(["admin", "trainer"]),
+    role: z.enum(["admins", "trainers"]),
     gender: z.enum(["m", "f"]),
 });
 
