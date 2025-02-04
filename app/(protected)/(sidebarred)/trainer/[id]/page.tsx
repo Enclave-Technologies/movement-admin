@@ -60,7 +60,7 @@ export default async function ProfilePage({
                                     </p>
                                 </div>
                             </div>
-                            {myInfo.team.name === "Admins" && (
+                            {myInfo.team.includes("Admins") && (
                                 <EditTrainer trainerDetails={trainerDt} />
                             )}
                         </div>

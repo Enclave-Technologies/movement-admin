@@ -158,6 +158,7 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
             setShowToast(true);
             return;
         }
+
         try {
             const response = await axios.put(
                 `${API_BASE_URL}/mvmt/v1/admin/exercises`,
@@ -169,7 +170,11 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
                             targetArea: data.targetArea,
                             fullName: data.fullName,
                             shortName: data.shortName,
-                            approved: "Admins" === data.authorization,
+                            approved:
+                                typeof data.authorization === "string" &&
+                                data.authorization
+                                    .split(",")
+                                    .includes("Admins"),
                         },
                     ],
                 },

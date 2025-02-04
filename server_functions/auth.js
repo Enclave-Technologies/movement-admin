@@ -64,8 +64,8 @@ export async function register(state, formData) {
     }
 
     // 3. If successful in creating team association
+    const teamList = await teams.list();
     try {
-        const teamList = await teams.list();
         for (const team of teamList.teams) {
             if (team.name.toLowerCase().includes(role)) {
                 await teams.createMembership(team.$id, [], email, uid);
@@ -114,6 +114,12 @@ export async function register(state, formData) {
                 gender: gender,
             }
         );
+        // Include in clients team too
+        for (const team in teamList.teams) {
+            if (team.name.toLowerCase() === "clients") {
+                await teams.createMembership(team.$id, [], email, uid);
+            }
+        }
     } catch (error) {
         users.delete(uid);
         return {
@@ -214,6 +220,13 @@ export async function registerClient(state, formData) {
                         gender: gender,
                     }
                 );
+
+                const teamList = await teams.list();
+                for (const team of teamList.teams) {
+                    if (team.name.toLowerCase().includes("client")) {
+                        await teams.createMembership(team.$id, [], email, uid);
+                    }
+                }
                 return {
                     success: true,
                     errors: {},
@@ -305,27 +318,40 @@ export async function login(state, formData) {
         const { account: sessAccount, teams: sessTeam } =
             await createSessionClient(session.secret);
         const team = await sessTeam.list();
-        if (team.total === 0 || team.teams[0].name === "Clients") {
+        const teamAssociations = team.teams.map((team) => team.name);
+
+        let hasAdminsOrTrainers = false;
+        for (const team of teamAssociations) {
+            if (team === "Admins" || team === "Trainers") {
+                hasAdminsOrTrainers = true;
+                break;
+            }
+        }
+
+        if (team.total === 0 || !hasAdminsOrTrainers) {
             await sessAccount.deleteSession("current");
             return {
                 success: false,
                 errors: {
-                    email: ["Please use the client App to login."],
+                    email: [
+                        "Invalid credentials. Please check the email and password.",
+                    ],
                     password: [
                         "Invalid credentials. Please check the email and password.",
                     ],
                 },
             };
         }
+
         const acc = await sessAccount.get();
 
         const sessionData = {
             session: session.secret,
             $id: acc.$id,
-            // role: "admin",
             email: acc.email,
             name: acc.name,
-            team: team.teams[0].name,
+            team: teamAssociations,
+            // team.teams[0].name,
         };
 
         cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
@@ -455,13 +481,16 @@ export async function fetchUserDetails() {
             accDetails.$id
         );
 
+        const teamAssociations = teams.map((team) => team.name);
+
         const mergedObject = {
             ...accDetails,
-            team: teams[0],
+            team: teamAssociations,
             ...fullDetails,
         };
         return mergedObject;
     } catch (error) {
+        console.error(error);
         return null;
     }
 }
@@ -536,7 +565,7 @@ export async function addWorkout(state, formData) {
                 targetArea,
                 fullName,
                 shortName,
-                approved: authorization === "Admins",
+                approved: authorization.includes("Admins"),
             }
         );
     } catch (error) {

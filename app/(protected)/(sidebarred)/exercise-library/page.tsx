@@ -288,7 +288,7 @@ const ExercisePage = () => {
                 size: 180,
                 cell: (info) => (
                     <div className="flex items-center">
-                        {trainerDetails?.team.name === "Admins" ? (
+                        {trainerDetails?.team.includes("Admins") ? (
                             <select
                                 value={info.getValue() ? "true" : "false"}
                                 onChange={(e) =>
@@ -370,7 +370,7 @@ const ExercisePage = () => {
                     fetchData={() => {
                         setAdded((prevAdded) => !prevAdded);
                     }}
-                    team={trainerDetails?.team.name}
+                    team={trainerDetails?.team}
                 />
             </RightModal>
         );
@@ -390,7 +390,7 @@ const ExercisePage = () => {
                     refreshTable={() => {
                         setAdded((prevAdded) => !prevAdded);
                     }}
-                    team={trainerDetails?.team.name}
+                    team={trainerDetails?.team}
                     rowData={editRow}
                     // rowData={editRowRef.current}
                 />
@@ -412,7 +412,7 @@ const ExercisePage = () => {
                     </div>
 
                     <TableActions
-                        showDelete={false}
+                        showDelete={trainerDetails?.team.includes("Admins")}
                         openDeleteConfirmation={openDeleteConfirmation}
                         columns={columns}
                         selectedRows={selectedRows}

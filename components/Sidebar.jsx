@@ -137,7 +137,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar }) => {
                 <div
                     className={`${
                         isCollapsed ? "p-2" : "p-3"
-                    } flex flex-col gap-4`}
+                    } flex flex-col gap-4 pb-32 md:pb-4`}
                 >
                     {!isCollapsed ? (
                         <TrainerInfo

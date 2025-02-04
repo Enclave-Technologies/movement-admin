@@ -11,6 +11,7 @@ const TableActions = ({
     additionalActions = null,
     openDeleteConfirmation = null,
     showDelete = true,
+    showNew = true,
 }) => {
     const [isSearchExpanded, setIsSearchExpanded] = useState(false);
 
@@ -100,12 +101,14 @@ const TableActions = ({
                     />
                 </div>
             </div>
-            <button
-                onClick={onClickNewButton}
-                className="bg-primary hover:bg-green-900 text-white px-4 h-8 rounded-md"
-            >
-                New
-            </button>
+            {showNew && (
+                <button
+                    onClick={onClickNewButton}
+                    className="bg-primary hover:bg-green-900 text-white px-4 h-8 rounded-md"
+                >
+                    New
+                </button>
+            )}
         </div>
     );
 };

@@ -268,7 +268,8 @@ const CoachingTeam = () => {
                     </div>
 
                     <TableActions
-                        showDelete={trainerDetails?.team.name === "Admins"}
+                        showDelete={trainerDetails?.team.includes("Admins")}
+                        showNew={trainerDetails?.team.includes("Admins")}
                         openDeleteConfirmation={openDeleteConfirmation}
                         columns={columns}
                         selectedRows={selectedRows}
