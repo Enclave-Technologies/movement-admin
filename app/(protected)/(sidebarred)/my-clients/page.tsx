@@ -1,6 +1,7 @@
 "use client";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import AddUserForm from "@/components/forms/add-user-form";
+import EditUserForm from "@/components/forms/edit-user-form";
 import ScrollTable from "@/components/InfiniteScrollTable/ScrollTable";
 import TableActions from "@/components/InfiniteScrollTable/TableActions";
 import LoadingSpinner from "@/components/LoadingSpinner";
@@ -8,6 +9,7 @@ import ScrollTableSkeleton from "@/components/pageSkeletons/scrollTableSkeleton"
 import RightModal from "@/components/pure-components/RightModal";
 import Searchbar from "@/components/pure-components/Searchbar";
 import Toast from "@/components/Toast";
+import { Button } from "@/components/ui/button";
 import { API_BASE_URL, defaultProfileURL } from "@/configs/constants";
 import { useGlobalContext } from "@/context/GlobalContextProvider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -35,6 +37,9 @@ const Page = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+
+    const [userDataState, setUserDataState] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const handleRowClick = (client) => {
         // Implement the action you want to execute on double-click
@@ -197,10 +202,21 @@ const Page = () => {
                 size: 250,
                 enableSorting: false,
             },
-            // {
-            //     header: "Status",
-            //     accessorKey: "status",
-            // },
+            {
+                header: "",
+                accessorKey: "actions",
+                cell: (info) => (
+                    <Button
+                        className="text-white"
+                        onClick={() => {
+                            setUserDataState(info.row.original);
+                            setShowEditModal(true);
+                        }}
+                    >
+                        Edit
+                    </Button>
+                ),
+            },
         ],
         [rows, selectedRows]
     );
@@ -235,7 +251,6 @@ const Page = () => {
 
         const { data, total } = response.data;
 
-
         return {
             data: data,
             meta: {
@@ -259,6 +274,28 @@ const Page = () => {
                     }}
                     trainerId={myDetails?.$id}
                 />
+            </RightModal>
+        );
+    };
+
+    const rightEditModal = () => {
+        return (
+            <RightModal
+                formTitle="Add User"
+                isVisible={showEditModal}
+                hideModal={() => {
+                    setShowEditModal(false);
+                    setUserDataState(null);
+                }}
+            >
+                <div>
+                    <EditUserForm
+                        fetchData={() => {
+                            setModified((prevModified) => !prevModified);
+                        }}
+                        clientData={userDataState}
+                    />
+                </div>
             </RightModal>
         );
     };
@@ -309,6 +346,7 @@ const Page = () => {
                     </QueryClientProvider>
                 </div>
                 {rightModal()}
+                {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
                         title="batch of users? 

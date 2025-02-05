@@ -14,12 +14,31 @@ export async function trainerDetails(id: string) {
     const { database } = await createSessionClient(
         JSON.parse(session.value).session
     );
+    const { users } = await createAdminClient();
 
-    const trainerDeets = await database.getDocument(
+    const trainerDocs = await database.getDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID,
         process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
         id
     );
+
+    const moreInfo = await users.listMemberships(id);
+    const teamNames = moreInfo.memberships.map(
+        (membership) => membership.teamName
+    );
+
+    const trainerDeets: TrainerData = {
+        ...trainerDocs,
+        teamNames,
+        auth_id: trainerDocs.auth_id,
+        firstName: trainerDocs.firstName,
+        lastName: trainerDocs.lastName,
+        imageURL: trainerDocs.imageURL,
+        jobTitle: trainerDocs.jobTitle,
+        phone: trainerDocs.phone,
+        email: trainerDocs.email,
+        gender: trainerDocs.gender,
+    };
 
     const { documents: clientInfo } = await database.listDocuments(
         process.env.NEXT_PUBLIC_DATABASE_ID,

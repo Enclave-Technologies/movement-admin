@@ -59,18 +59,18 @@ export default async function ProfilePage({
                                     <p className="text-muted-foreground">
                                         {trainerDt.jobTitle}
                                     </p>
+                                    <div className="flex flex-wrap gap-2 mt-2 text-white">
+                                        {trainerDt.teamNames.map((teamName) => (
+                                            <Badge key={teamName}>
+                                                {teamName}
+                                            </Badge>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
                             {myInfo.team.includes("Admins") && (
                                 <EditTrainer trainerDetails={trainerDt} />
                             )}
-                        </div>
-                        <div className="flex flex-wrap gap-2 mt-2 text-white">
-                            {/* <Badge>{JSON.stringify(trainerDt)}</Badge> */}
-                            <Badge>TypeScript</Badge>
-                            <Badge>Node.js</Badge>
-                            <Badge>GraphQL</Badge>
-                            <Badge>Next.js</Badge>
                         </div>
                     </CardHeader>
                     <Separator />

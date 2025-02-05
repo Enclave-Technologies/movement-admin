@@ -6,6 +6,7 @@ import { Button } from "../ui/button";
 import { MdEdit } from "react-icons/md";
 
 const EditTrainer = ({ trainerDetails }) => {
+
     const [editRow, setEditRow] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
 

@@ -16,6 +16,7 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import Toast from "@/components/Toast";
 import EditTrainerForm from "@/components/forms/edit-trainer-form";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 const CoachingTeam = () => {
     const { myDetails: trainerDetails, reloadData } = useGlobalContext();
@@ -32,6 +33,8 @@ const CoachingTeam = () => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+    const [editRow, setEditRow] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const openDeleteConfirmation = () => {
         setDeletePressed(true);
@@ -75,6 +78,33 @@ const CoachingTeam = () => {
 
     const handleToastClose = () => {
         setShowToast(false);
+    };
+
+    const handleTrainerEditClicked = (rowData: CoachTemplate) => {
+        setEditRow(rowData);
+        // editRowRef.current = rowData;
+        setShowEditModal(true);
+    };
+
+    const rightEditModal = () => {
+        return (
+            <RightModal
+                formTitle="Edit Trainer / Admin"
+                isVisible={showEditModal}
+                hideModal={() => {
+                    setShowEditModal(false);
+                    setEditRow(null);
+                }}
+            >
+                <EditTrainerForm
+                    fetchData={() => {
+                        setModified((prevState) => !prevState);
+                    }}
+                    clientData={editRow}
+                    // rowData={editRowRef.current}
+                />
+            </RightModal>
+        );
     };
 
     const queryClient = new QueryClient();
@@ -186,12 +216,39 @@ const CoachingTeam = () => {
             {
                 header: "Phone",
                 accessorKey: "phone",
-                size: 150,
+                size: 200,
             },
-            // {
-            //     header: "Status",
-            //     accessorKey: "status",
-            // },
+            {
+                header: "",
+                accessorKey: "actions",
+                cell: (info) =>
+                    trainerDetails?.team.includes("Admins") && (
+                        <Button
+                            className="text-white"
+                            onClick={() => {
+                                const coachData = {
+                                    uid: info.row.original.uid,
+                                    auth_id: info.row.original.uid,
+                                    name: info.row.original.name,
+                                    firstName:
+                                        info.row.original.name.split(" ")[0],
+                                    lastName:
+                                        info.row.original.name.split(" ")[1],
+                                    email: info.row.original.email,
+                                    phone: info.row.original.phone,
+                                    imageUrl: info.row.original.imageUrl,
+                                    gender: info.row.original.gender,
+                                    jobTitle: info.row.original.jobTitle,
+                                    role: info.row.original.role,
+                                };
+
+                                handleTrainerEditClicked(coachData);
+                            }}
+                        >
+                            Edit
+                        </Button>
+                    ),
+            },
         ],
         [trainerDetails, rows, selectedRows]
     );
@@ -266,7 +323,7 @@ const CoachingTeam = () => {
                         <span className="text-lg font-bold">Coaching Team</span>
                         {isFetching && <LoadingSpinner className="h-4 w-4" />}
                     </div>
-
+                    {/* <pre>{JSON.stringify(trainerDetails.team, null, 2)}</pre> */}
                     <TableActions
                         showDelete={trainerDetails?.team.includes("Admins")}
                         showNew={trainerDetails?.team.includes("Admins")}
@@ -296,7 +353,7 @@ const CoachingTeam = () => {
                     </QueryClientProvider>
                 </div>
                 {rightModal()}
-
+                {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
                         title="batch of coaches? 

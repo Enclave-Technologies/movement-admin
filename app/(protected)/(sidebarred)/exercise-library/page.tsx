@@ -15,6 +15,7 @@ import BatchConfirmationDialog from "@/components/InfiniteScrollTable/batchConfi
 import Toast from "@/components/Toast";
 import { TbCheck, TbCross } from "react-icons/tb";
 import EditExerciseForm from "@/components/forms/edit-exercise-form";
+import { Button } from "@/components/ui/button";
 
 const ExercisePage = () => {
     const [modified, setModified] = useState(true);
@@ -255,15 +256,8 @@ const ExercisePage = () => {
                 size: 300,
                 cell: (info) => (
                     <div
-                        className={`px-4 py-2 font-semibold underline cursor-pointer"
-                        }`}
-                        onClick={() => {
-                            handleExerciseEditClicked(info.row.original);
-                            // alert(
-                            //     `clicked ${JSON.stringify(info.row.original)}`
-                            // );
-                            // handleApprovalClick(info.row.original)
-                        }}
+                    // className={`px-4 py-2 font-semibold underline cursor-pointer"
+                    // }`}
                     >
                         {info.getValue() as string}
                     </div>
@@ -312,6 +306,24 @@ const ExercisePage = () => {
                             "Not Approved"
                         )}
                     </div>
+                ),
+            },
+            {
+                header: "",
+                accessorKey: "actions",
+                cell: (info) => (
+                    <Button
+                        className="text-white"
+                        onClick={() => {
+                            handleExerciseEditClicked(info.row.original);
+                            // alert(
+                            //     `clicked ${JSON.stringify(info.row.original)}`
+                            // );
+                            // handleApprovalClick(info.row.original)
+                        }}
+                    >
+                        Edit
+                    </Button>
                 ),
             },
         ],

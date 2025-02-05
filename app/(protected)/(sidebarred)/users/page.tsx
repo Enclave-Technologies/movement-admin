@@ -16,6 +16,8 @@ import TableActions from "@/components/InfiniteScrollTable/TableActions";
 import LoadingSpinner from "@/components/LoadingSpinner";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import Toast from "@/components/Toast";
+import { Button } from "@/components/ui/button";
+import EditUserForm from "@/components/forms/edit-user-form";
 
 export default function AllClients() {
     const [modified, setModified] = useState(true);
@@ -32,6 +34,9 @@ export default function AllClients() {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+
+    const [userDataState, setUserDataState] = useState(null);
+    const [showEditModal, setShowEditModal] = useState(false);
 
     const router = useRouter();
 
@@ -204,10 +209,21 @@ export default function AllClients() {
                 size: 250,
                 enableSorting: false,
             },
-            // {
-            //     header: "Status",
-            //     accessorKey: "status",
-            // },
+            {
+                header: "",
+                accessorKey: "actions",
+                cell: (info) => (
+                    <Button
+                        className="text-white"
+                        onClick={() => {
+                            setUserDataState(info.row.original);
+                            setShowEditModal(true);
+                        }}
+                    >
+                        Edit
+                    </Button>
+                ),
+            },
         ],
         [rows, selectedRows]
     );
@@ -241,8 +257,6 @@ export default function AllClients() {
 
         const { data, total } = response.data;
 
-
-
         return {
             data: data,
             meta: {
@@ -265,6 +279,28 @@ export default function AllClients() {
                         setAdded((prevAdded) => !prevAdded);
                     }}
                 />
+            </RightModal>
+        );
+    };
+
+    const rightEditModal = () => {
+        return (
+            <RightModal
+                formTitle="Add User"
+                isVisible={showEditModal}
+                hideModal={() => {
+                    setShowEditModal(false);
+                    setUserDataState(null);
+                }}
+            >
+                <div>
+                    <EditUserForm
+                        fetchData={() => {
+                            setModified((prevModified) => !prevModified);
+                        }}
+                        clientData={userDataState}
+                    />
+                </div>
             </RightModal>
         );
     };
@@ -304,6 +340,7 @@ export default function AllClients() {
                     </QueryClientProvider>
                 </div>
                 {rightModal()}
+                {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
                         title="batch of users? 

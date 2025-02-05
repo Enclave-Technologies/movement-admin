@@ -94,6 +94,25 @@ interface TrainerSettings {
     $updatedAt: string;
     accessedAt: string;
 }
+
+interface TrainerData {
+    auth_id: string;
+    firstName: string;
+    lastName: string;
+    imageURL: string;
+    jobTitle: string;
+    phone: string;
+    email: string;
+    gender: string;
+    $id: string;
+    $createdAt: string;
+    $updatedAt: string;
+    $permissions: string[];
+    $databaseId: string;
+    $collectionId: string;
+    teamNames: string[];
+}
+
 interface trainerSidebarInfo {
     name: string;
     image: string;

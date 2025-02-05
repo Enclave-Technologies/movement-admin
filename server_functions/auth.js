@@ -330,6 +330,7 @@ export async function login(state, formData) {
 
         if (team.total === 0 || !hasAdminsOrTrainers) {
             await sessAccount.deleteSession("current");
+            console.error("Client attempted Login: ", email);
             return {
                 success: false,
                 errors: {
