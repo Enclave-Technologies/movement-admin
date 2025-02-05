@@ -499,13 +499,13 @@ const WorkoutPlan = ({
             )}
             <div className="flex justify-between">
                 {phaseAddingState ? (
-                    <div className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-gray-300 text-black cursor-not-allowed">
+                    <div className="text-sm flex items-center justify-center px-4 secondary-btn capitalize gap-2 bg-gray-300 text-black cursor-not-allowed">
                         <LoadingSpinner className="text-black w-4 h-4" />{" "}
                         <span>Adding Phase</span>
                     </div>
                 ) : (
                     <button
-                        className="text-sm flex items-center justify-center px-4 secondary-btn uppercase gap-2 bg-green-500 text-white"
+                        className="text-sm flex items-center justify-center px-4 secondary-btn capitalize gap-2 bg-green-500 text-white"
                         onClick={handleAddPhase}
                     >
                         <FaPlus />
@@ -518,10 +518,10 @@ const WorkoutPlan = ({
                 <div className="w-full space-y-4">
                     {clientPhases?.length === 0 ? (
                         <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
-                            <p className="text-gray-500 text-sm font-medium uppercase">
+                            <p className="text-gray-500 text-sm font-medium capitalize">
                                 No phases added yet
                             </p>
-                            <p className="text-gray-400 text-xs mt-1 uppercase">
+                            <p className="text-gray-400 text-xs mt-1 capitalize">
                                 Click &ldquo;Add Phase&rdquo; to get started
                             </p>
                         </div>

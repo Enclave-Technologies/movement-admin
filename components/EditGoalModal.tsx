@@ -20,7 +20,7 @@ const EditGoalModal = ({ isOpen, onClose, onSaveGoal, goalTypes, goal }) => {
     if (!isOpen || !editedGoal) return null;
 
     return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-90 flex items-center justify-center  z-20">
             <div className="bg-white p-6 rounded shadow-lg max-w-lg w-full">
                 <h1 className="text-lg font-bold mb-4">Edit Goal</h1>
                 <select

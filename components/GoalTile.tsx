@@ -42,7 +42,7 @@ export const GoalTile: React.FC<GoalTileProps> = ({
                 onClick={handleClick}
                 disabled={isEditMode}
             >
-                <p className="uppercase">{goal.description}</p>
+                <p className="capitalize">{goal.description}</p>
                 {!isEditMode && (
                     <div
                         className={`w-6 aspect-square border rounded-full flex items-center justify-center ${

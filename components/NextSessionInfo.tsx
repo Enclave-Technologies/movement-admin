@@ -10,7 +10,7 @@ const NextSessionInfo = ({
     return (
         <div className="border rounded-lg p-2 mb-5 border-green-500">
             <div className="flex justify-between items-center bg-gray-50 p-2">
-                <div className="text-left uppercase flex flex-col">
+                <div className="text-left capitalize flex flex-col">
                     {sessionInfo ? (
                         <>
                             <div>
@@ -37,7 +37,7 @@ const NextSessionInfo = ({
                 </div>
                 <button
                     onClick={sessionInfo ? handleStartWorkout : undefined}
-                    className={`px-4 py-2 flex justify-center text-white rounded-lg uppercase w-48 ${
+                    className={`px-4 py-2 flex justify-center text-white rounded-lg capitalize w-48 ${
                         sessionInfo && !workoutPressed
                             ? "bg-green-500"
                             : "bg-gray-400 cursor-not-allowed"

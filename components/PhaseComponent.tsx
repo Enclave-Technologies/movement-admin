@@ -281,10 +281,10 @@ const PhaseComponent: FC<PhaseProps> = ({
                 {/* Render session components here */}
                 {phase.sessions.length === 0 ? (
                     <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
-                        <p className="text-gray-500 text-sm font-medium uppercase">
+                        <p className="text-gray-500 text-sm font-medium capitalize">
                             No sessions added yet
                         </p>
-                        <p className="text-gray-400 text-xs mt-1 uppercase">
+                        <p className="text-gray-400 text-xs mt-1 capitalize">
                             Click &ldquo;Add Session&rdquo; to get started
                         </p>
                     </div>

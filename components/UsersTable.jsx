@@ -23,7 +23,7 @@ const UsersTable = ({ search, clients }) => {
                 return (
                     <th
                         key={index}
-                        className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"
+                        className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap"
                     >
                         {header}
                     </th>
@@ -70,7 +70,7 @@ const UsersTable = ({ search, clients }) => {
                 <td className="pl-5 whitespace-nowrap text-sm underline">
                     {client.trainer_name || "Not Assigned"}
                 </td>
-                <td className="pl-5 whitespace-nowrap uppercase text-sm">
+                <td className="pl-5 whitespace-nowrap capitalize text-sm">
                     <Link href={`client/${client.uid}`}>
                         <p className="text-sm underline text-green-500 hover:text-gold-500">
                             View Details

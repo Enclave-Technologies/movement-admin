@@ -18,6 +18,7 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import Toast from "@/components/Toast";
 import { Button } from "@/components/ui/button";
 import EditUserForm from "@/components/forms/edit-user-form";
+import { TbEdit } from "react-icons/tb";
 
 export default function AllClients() {
     const [modified, setModified] = useState(true);
@@ -182,7 +183,7 @@ export default function AllClients() {
                 accessorKey: "name",
                 cell: (info) => (
                     <div
-                        className="whitespace-nowrap cursor-pointer text-sm font-semibold underline"
+                        className="whitespace-nowrap cursor-pointer text-sm hover:underline"
                         onClick={() => handleRowClick(info?.row.original)}
                     >
                         {info?.getValue() as String}
@@ -213,16 +214,19 @@ export default function AllClients() {
                 header: "",
                 accessorKey: "actions",
                 cell: (info) => (
-                    <Button
-                        className="text-white"
+                    <button
+                        className="hover:bg-gray-100 h-8 w-8 rounded-md flex items-center justify-center text-gray-600 "
                         onClick={() => {
                             setUserDataState(info.row.original);
                             setShowEditModal(true);
                         }}
                     >
-                        Edit
-                    </Button>
+                        <TbEdit />
+                    </button>
                 ),
+                meta: {
+                    className: "sticky right-0 border-l-[1px] border-gray-500",
+                },
             },
         ],
         [rows, selectedRows]

@@ -36,7 +36,7 @@ export function ClientTable({ clientList }: { clientList: any[] }) {
                         </TableCell>
                         <TableCell>{`${client.firstName} ${client.lastName}`}</TableCell>
                         <TableCell>{client.email}</TableCell>
-                        <TableCell className="text-right uppercase">
+                        <TableCell className="text-right capitalize">
                             {client.gender}
                         </TableCell>
                     </TableRow>

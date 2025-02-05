@@ -18,6 +18,7 @@ import axios from "axios";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
+import { TbEdit } from "react-icons/tb";
 
 const Page = () => {
     const { myDetails } = useGlobalContext();
@@ -178,7 +179,7 @@ const Page = () => {
                 accessorKey: "name",
                 cell: (info) => (
                     <div
-                        className="whitespace-nowrap cursor-pointer text-sm font-semibold underline"
+                        className="whitespace-nowrap cursor-pointer text-sm hover:underline"
                         onClick={() => handleRowClick(info.row.original)}
                     >
                         {info.getValue() as String}
@@ -206,16 +207,19 @@ const Page = () => {
                 header: "",
                 accessorKey: "actions",
                 cell: (info) => (
-                    <Button
-                        className="text-white"
+                    <button
+                        className="hover:bg-gray-100 h-8 w-8 rounded-md flex items-center justify-center text-gray-600 "
                         onClick={() => {
                             setUserDataState(info.row.original);
                             setShowEditModal(true);
                         }}
                     >
-                        Edit
-                    </Button>
+                        <TbEdit />
+                    </button>
                 ),
+                meta: {
+                    className: "sticky right-0 border-l-[1px] border-gray-500",
+                },
             },
         ],
         [rows, selectedRows]

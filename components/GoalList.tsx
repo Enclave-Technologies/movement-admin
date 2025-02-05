@@ -20,8 +20,6 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         trainerError: error,
     } = useTrainer();
 
-
-
     const updateGoalInBackend = useCallback(
         async (id: string, completed: boolean) => {
             try {
@@ -36,8 +34,6 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                     },
                     { withCredentials: true }
                 );
-
-
             } catch (error) {
                 console.error("Failed to update goal:", error);
                 throw error; // Re-throw the error to be handled in GoalTile
@@ -182,7 +178,6 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 { withCredentials: true }
             );
 
-
             // Create a new array of categories
             const updatedGoals = goalTypes.map((goalType) => ({
                 type: `${goalType.value}`.toLowerCase(),
@@ -271,7 +266,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         ${
             isEditMode
                 ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-                : "flex items-center justify-center uppercase gap-2 bg-green-500 text-white"
+                : "flex items-center justify-center capitalize gap-2 bg-green-500 text-white"
         }
     `}
                     onClick={() => setIsModalOpen(true)}
@@ -282,7 +277,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 </button>
 
                 <button
-                    className="flex items-center justify-center uppercase secondary-btn gap-2 px-4 py-2 rounded-md text-sm
+                    className="flex items-center justify-center capitalize secondary-btn gap-2 px-4 py-2 rounded-md text-sm
         transition-all duration-200 ease-in-out
         focus:outline-none focus:ring-2 focus:ring-offset-2"
                     // {`secondary-btn ${
@@ -316,7 +311,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                         key={idx}
                         className="flex flex-col w-full items-start gap-4"
                     >
-                        <h1 className="uppercase text-xl font-bold">
+                        <h1 className="capitalize text-xl font-bold">
                             {goal.type} Goals
                         </h1>
                         <div className="flex flex-col gap-1 w-full">
@@ -350,10 +345,10 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                                 ))
                             ) : (
                                 <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
-                                    <p className="text-gray-500 text-sm font-medium uppercase">
+                                    <p className="text-gray-500 text-sm font-medium capitalize">
                                         No goals added yet for {goal.type}
                                     </p>
-                                    <p className="text-gray-400 text-xs mt-1 uppercase">
+                                    <p className="text-gray-400 text-xs mt-1 capitalize">
                                         Click &ldquo;Add Goal&rdquo; to get
                                         started
                                     </p>

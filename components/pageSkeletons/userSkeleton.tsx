@@ -37,7 +37,7 @@ const UserSkeleton = ({
                                         return (
                                             <th
                                                 key={index}
-                                                className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"
+                                                className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap"
                                             >
                                                 {header}
                                             </th>

@@ -13,7 +13,7 @@ import LoadingSpinner from "@/components/LoadingSpinner";
 import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import BatchConfirmationDialog from "@/components/InfiniteScrollTable/batchConfirmationDialog";
 import Toast from "@/components/Toast";
-import { TbCheck, TbCross } from "react-icons/tb";
+import { TbCheck, TbCross, TbEdit } from "react-icons/tb";
 import EditExerciseForm from "@/components/forms/edit-exercise-form";
 import { Button } from "@/components/ui/button";
 
@@ -312,19 +312,18 @@ const ExercisePage = () => {
                 header: "",
                 accessorKey: "actions",
                 cell: (info) => (
-                    <Button
-                        className="text-white"
+                    <button
+                        className="hover:bg-gray-100 h-8 w-8 rounded-md flex items-center justify-center text-gray-600 "
                         onClick={() => {
                             handleExerciseEditClicked(info.row.original);
-                            // alert(
-                            //     `clicked ${JSON.stringify(info.row.original)}`
-                            // );
-                            // handleApprovalClick(info.row.original)
                         }}
                     >
-                        Edit
-                    </Button>
+                        <TbEdit />
+                    </button>
                 ),
+                meta: {
+                    className: "sticky right-0 border-l-[1px] border-gray-500",
+                },
             },
         ],
         [trainerDetails, rows, selectedRows]

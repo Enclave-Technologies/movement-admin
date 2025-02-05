@@ -97,10 +97,10 @@ const EditModeTable: FC<EditableTableProps> = ({
         <div className="overflow-y-hidden pb-72">
             {exercises.length === 0 ? (
                 <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
-                    <p className="text-gray-500 text-sm font-medium uppercase">
+                    <p className="text-gray-500 text-sm font-medium capitalize">
                         No exercises added yet
                     </p>
-                    <p className="text-gray-400 text-xs mt-1 uppercase">
+                    <p className="text-gray-400 text-xs mt-1 capitalize">
                         Click &ldquo;Add exercise&rdquo; to get started
                     </p>
                 </div>

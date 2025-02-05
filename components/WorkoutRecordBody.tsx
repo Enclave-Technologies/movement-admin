@@ -59,7 +59,7 @@ const WorkoutRecordBody = ({
                             >
                                 <div
                                     className="cursor-pointer text-white flex flex-col items-start justify-start 
-                rounded-lg text-lg uppercase"
+                rounded-lg text-lg capitalize"
                                 >
                                     {index === 0 ? (
                                         <div

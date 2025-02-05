@@ -17,6 +17,7 @@ import Toast from "@/components/Toast";
 import EditTrainerForm from "@/components/forms/edit-trainer-form";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { TbEdit } from "react-icons/tb";
 
 const CoachingTeam = () => {
     const { myDetails: trainerDetails, reloadData } = useGlobalContext();
@@ -195,7 +196,7 @@ const CoachingTeam = () => {
                 cell: (info) => (
                     <Link
                         href={`/trainer/${info.row.original.uid}`}
-                        className="whitespace-nowrap cursor-pointer text-sm font-semibold underline"
+                        className="whitespace-nowrap cursor-pointer text-sm hover:underline"
                     >
                         {info.getValue() as String}
                     </Link>
@@ -223,8 +224,8 @@ const CoachingTeam = () => {
                 accessorKey: "actions",
                 cell: (info) =>
                     trainerDetails?.team.includes("Admins") && (
-                        <Button
-                            className="text-white"
+                        <button
+                            className="hover:bg-gray-100 h-8 w-8 rounded-md flex items-center justify-center text-gray-600 "
                             onClick={() => {
                                 const coachData = {
                                     uid: info.row.original.uid,
@@ -245,9 +246,12 @@ const CoachingTeam = () => {
                                 handleTrainerEditClicked(coachData);
                             }}
                         >
-                            Edit
-                        </Button>
+                            <TbEdit />
+                        </button>
                     ),
+                meta: {
+                    className: "sticky right-0 border-l-[1px] border-gray-500",
+                },
             },
         ],
         [trainerDetails, rows, selectedRows]

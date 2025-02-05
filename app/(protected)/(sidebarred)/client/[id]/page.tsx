@@ -102,7 +102,7 @@ const Page = ({ params }: { params: { id: string } }) => {
                         </div>
                         <button
                             className="bg-primary px-4 py-2 rounded-md text-sm
-                            transition-all duration-200 ease-in-out items-center justify-center uppercase gap-2
+                            transition-all duration-200 ease-in-out items-center justify-center capitalize gap-2
                             focus:outline-none focus:ring-2 focus:ring-offset-2 text-white flex"
                             onClick={() => {
                                 setUserDataState(userData);

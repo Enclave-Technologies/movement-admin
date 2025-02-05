@@ -51,13 +51,10 @@ const Navbar = () => {
 
                     const { data, total } = response.data;
 
-
                     if (data) {
                         setUsers(data);
                     }
-                } catch (e) {
-
-                }
+                } catch (e) {}
             }
             setLoadingResults(false);
         };
@@ -73,7 +70,6 @@ const Navbar = () => {
 
     useEffect(() => {
         const handleOutsideClick = (event) => {
-
             // Check if the click is outside the search bar container
             if (
                 searchBarRef.current &&
@@ -96,7 +92,7 @@ const Navbar = () => {
 
     return (
         <nav className="sticky top-0 w-full bg-white/90 blur-0 z-10">
-            <div className="flex-1 flex flex-row justify-between items-center relative">
+            <div className="flex-1 flex flex-row justify-between items-center px-6 py-4 relative">
                 <div
                     ref={searchBarRef}
                     className="relative flex flex-col items-center flex-1"

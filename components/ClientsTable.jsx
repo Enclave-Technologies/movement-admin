@@ -57,20 +57,20 @@ const ClientsTable = ({
                     <table className="w-full text-left rounded-md overflow-hidden">
                         <thead>
                             <tr className="bg-green-500 text-white">
-                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"></th>
-                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
+                                <th className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap"></th>
+                                <th className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap">
                                     Full Name
                                 </th>
-                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
+                                <th className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap">
                                     Email
                                 </th>
-                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
+                                <th className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap">
                                     Phone Number
                                 </th>
-                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap">
+                                <th className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap">
                                     Trainer
                                 </th>
-                                <th className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"></th>
+                                <th className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap"></th>
                             </tr>
                         </thead>
                         <tbody className="border-t-2 border-white">
@@ -114,7 +114,7 @@ const ClientsTable = ({
                                     <td className="pl-5 whitespace-nowrap text-sm">
                                         {client.trainer_name || "Not Assigned"}
                                     </td>
-                                    <td className="pl-5 whitespace-nowrap uppercase text-sm">
+                                    <td className="pl-5 whitespace-nowrap capitalize text-sm">
                                         <Link href={`client/${client.uid}`}>
                                             <p
                                                 className="text-sm underline

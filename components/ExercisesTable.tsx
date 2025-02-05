@@ -58,7 +58,7 @@ const ExercisesTable = ({
                 return (
                     <th
                         key={index}
-                        className="sticky right-0 z-10 text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"
+                        className="sticky right-0 z-10 text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap"
                     >
                         <div className="inline-block whitespace-nowrap">
                             Approved
@@ -69,7 +69,7 @@ const ExercisesTable = ({
             return (
                 <th
                     key={index}
-                    className="text-xs uppercase font-bold pl-5 pr-4 h-8  whitespace-nowrap"
+                    className="text-xs capitalize font-bold pl-5 pr-4 h-8  whitespace-nowrap"
                 >
                     {header}
                 </th>

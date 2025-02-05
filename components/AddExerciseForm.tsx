@@ -77,7 +77,11 @@ const AddExerciseForm = forwardRef<HTMLFormElement, AddFormProps>(
 
         return (
             <div>
-                <form className="space-y-4 uppercase" action={action} ref={ref}>
+                <form
+                    className="space-y-4 capitalize"
+                    action={action}
+                    ref={ref}
+                >
                     <div>
                         <label
                             htmlFor="motion"
