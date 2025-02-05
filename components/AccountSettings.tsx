@@ -1,7 +1,14 @@
 import React from "react";
 import SubmitButton from "./ResponsiveButton";
+import { Button } from "./ui/button";
+import LoadingSpinner from "./LoadingSpinner";
 
-const AccountSettings = ({ formData, handleSubmit, handleInputChange }) => {
+const AccountSettings = ({
+    formData,
+    buttonState,
+    handleSubmit,
+    handleInputChange,
+}) => {
     return (
         <form onSubmit={handleSubmit}>
             <div className="mb-4">
@@ -110,7 +117,18 @@ const AccountSettings = ({ formData, handleSubmit, handleInputChange }) => {
                 </select>
             </div>
 
-            <SubmitButton label="Submit" />
+            <Button type="submit" className="text-white" disabled={buttonState}>
+                {buttonState ? (
+                    <>
+                        <LoadingSpinner className="w-4 h-4 aspect-square" />
+                        {" Submitting"}
+                    </>
+                ) : (
+                    "Submit"
+                )}
+            </Button>
+
+            {/* <SubmitButton label="Submit" /> */}
             {/* </div> */}
         </form>
     );

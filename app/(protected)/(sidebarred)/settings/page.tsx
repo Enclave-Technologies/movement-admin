@@ -44,6 +44,8 @@ const SettingsPage = () => {
     const [passwordError, setPasswordError] = useState("");
     const [dataModified, setDataModified] = useState(false);
     const [showToast, setShowToast] = useState(false);
+    const [passwordSubmitState, setPasswordSubmitState] = useState(false);
+    const [profileSubmitState, setProfileSubmitState] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
@@ -58,7 +60,6 @@ const SettingsPage = () => {
 
                 setFormData(response.data);
             } catch (error) {
-
             } finally {
                 setPageLoading(false);
             }
@@ -76,10 +77,12 @@ const SettingsPage = () => {
 
     const handlePasswordSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setPasswordSubmitState(true);
         setPasswordError("");
 
         if (passwordForm.newPassword !== passwordForm.confirmPassword) {
             setPasswordError("New passwords do not match.");
+            setPasswordSubmitState(false);
             return;
         }
 
@@ -87,6 +90,7 @@ const SettingsPage = () => {
             setPasswordError(
                 "New password must be at least 8 characters long."
             );
+            setPasswordSubmitState(false);
             return;
         }
 
@@ -94,6 +98,7 @@ const SettingsPage = () => {
             setPasswordError(
                 "New password cannot be the same as old password."
             );
+            setPasswordSubmitState(false);
             return;
         }
 
@@ -115,13 +120,15 @@ const SettingsPage = () => {
             // Reload the page on successful submission
             // window.location.reload(); // This will refresh the page
         } catch (error) {
-            console.error("Error saving settings:", error);
+            console.log("Error saving settings:", error);
+            setPasswordSubmitState(false);
             // Handle success case
             setToastMessage(error.message);
             setToastType("error");
             setShowToast(true);
         } finally {
             setUploading(false);
+            setPasswordSubmitState(false);
         }
         // Reset form after successful submission
         setPasswordForm({
@@ -138,11 +145,11 @@ const SettingsPage = () => {
             [name]: value,
         }));
         setDataModified(true);
-
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setProfileSubmitState(true);
         // DONE: Implement API call to save account settings
         try {
             await axios.patch(
@@ -156,11 +163,13 @@ const SettingsPage = () => {
             // Handle success case
 
             // Reload the page on successful submission
-            window.location.reload(); // This will refresh the page
+            setProfileSubmitState(false);
             setToastMessage("Settings saved successfully");
             setToastType("success");
             setShowToast(true);
+            window.location.reload(); // This will refresh the page
         } catch (error) {
+            setProfileSubmitState(false);
             console.error("Error saving settings:", error);
             setToastMessage(error.message);
             setToastType("error");
@@ -251,6 +260,7 @@ const SettingsPage = () => {
                         formData={formData}
                         handleInputChange={handleInputChange}
                         handleSubmit={handleSubmit}
+                        buttonState={profileSubmitState}
                     />
                 </div>
                 {/* ChangePassword component */}
@@ -259,6 +269,7 @@ const SettingsPage = () => {
                     handlePasswordSubmit={handlePasswordSubmit}
                     passwordError={passwordError}
                     passwordForm={passwordForm}
+                    buttonStatus={passwordSubmitState}
                 />
             </div>
             {showToast && (
