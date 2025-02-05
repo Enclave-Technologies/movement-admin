@@ -103,8 +103,8 @@ export default async function ProfilePage({
                             </div>
                             <div>
                                 <h3 className="font-medium">Gender</h3>
-                                <p className="text-muted-foreground whitespace-normal">
-                                    {trainerDt.gender === "m" ? "Man" : "Woman"}
+                                <p className="text-muted-foreground whitespace-normal uppercase">
+                                    {trainerDt.gender}
                                 </p>
                             </div>
                             <div>

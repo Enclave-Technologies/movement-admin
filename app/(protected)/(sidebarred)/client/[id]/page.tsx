@@ -77,9 +77,9 @@ const Page = ({ params }: { params: { id: string } }) => {
                                 <div className="flex flex-col items-start">
                                     <h2 className="text-lg md:text-2xl lg:text-xl font-bold text-gray-800 whitespace-nowrap overflow-hidden text-ellipsis">
                                         {userData?.name} (
-                                        {userData?.gender === "m"
-                                            ? "He"
-                                            : "She"}
+                                        {userData?.gender
+                                            ? userData.gender.toUpperCase()
+                                            : "N/A"}
                                         )
                                     </h2>
                                     <p className="text-base text-gray-600">
@@ -90,8 +90,8 @@ const Page = ({ params }: { params: { id: string } }) => {
                                     </p>
                                     {/* <p className="text-base text-gray-600"></p> */}
                                     <p className="text-sm text-gray-500">
-                                        <span className="uppercase">
-                                            Training under:
+                                        <span className="capitalize">
+                                            Coach:
                                         </span>{" "}
                                         {userData?.trainer_name
                                             ? userData?.trainer_name
