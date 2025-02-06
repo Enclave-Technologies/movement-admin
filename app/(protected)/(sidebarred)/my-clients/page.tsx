@@ -217,6 +217,7 @@ const Page = () => {
                         <TbEdit />
                     </button>
                 ),
+                size: 49,
                 meta: {
                     className: "sticky right-0 border-l-[1px] border-gray-500",
                 },

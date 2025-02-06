@@ -46,7 +46,7 @@ const MemoizedCell = memo(({ cell }: MemoizedCellProps) => (
             display: "flex",
             width: cell.column.getSize(),
         }}
-        className={`pl-5 whitespace-normal text-sm bg-inherit ${
+        className={`p-1 whitespace-normal text-sm bg-inherit h-full items-center justify-left ${
             cell.column.columnDef.meta?.className ?? ""
         } `}
     >

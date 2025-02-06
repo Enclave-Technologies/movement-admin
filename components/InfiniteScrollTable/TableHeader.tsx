@@ -12,7 +12,7 @@ const TableHeader = ({ table }) => {
                     {headerGroup.headers.map((header) => (
                         <th
                             key={header.id}
-                            className={`text-sm font-bold pl-5 pr-4 h-10 items-center whitespace-nowrap ${
+                            className={`text-sm font-bold pl-1 pr-4 h-10 items-center justify-left whitespace-nowrap ${
                                 header.column.columnDef.meta?.className ?? ""
                             }  ${
                                 header.column.getCanSort()

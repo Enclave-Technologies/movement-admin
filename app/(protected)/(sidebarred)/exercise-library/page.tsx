@@ -321,8 +321,10 @@ const ExercisePage = () => {
                         <TbEdit />
                     </button>
                 ),
+                size: 49,
                 meta: {
-                    className: "sticky right-0 border-l-[1px] border-gray-500",
+                    className:
+                        "sticky right-0 border-l-[1px] border-gray-500 items-center",
                 },
             },
         ],
