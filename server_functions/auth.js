@@ -19,280 +19,6 @@ import {
 import { Query } from "appwrite";
 import "server-only";
 
-export async function register(state, formData) {
-    // 1. Validate fields
-    const validatedResult = RegisterFormSchema.safeParse({
-        firstName: formData.get("firstName"),
-        lastName: formData.get("lastName"),
-        phone: formData.get("phone"),
-        email: formData.get("email"),
-        jobTitle: formData.get("jobTitle"),
-        role: formData.get("role"),
-        gender: formData.get("gender"),
-    });
-
-    if (!validatedResult.success) {
-        // Handle validation errors
-        const errors = validatedResult.error.formErrors.fieldErrors;
-        return { success: false, errors };
-    }
-
-    const { firstName, lastName, phone, email, jobTitle, role, gender } =
-        validatedResult.data;
-
-    // 2. Try creating with details
-    const { account, database, users, teams } = await createAdminClient();
-    const uid = ID.unique();
-    try {
-        await account.create(
-            uid,
-            email,
-            "password",
-            `${firstName} ${lastName}`
-        );
-    } catch (error) {
-        if (
-            error instanceof AppwriteException &&
-            error.code === 409 &&
-            error.type === "user_already_exists"
-        ) {
-            return {
-                success: false,
-                errors: { email: ["Email already exists, please login"] },
-            };
-        }
-    }
-
-    // 3. If successful in creating team association
-    const teamList = await teams.list();
-    try {
-        for (const team of teamList.teams) {
-            if (team.name.toLowerCase().includes(role)) {
-                await teams.createMembership(team.$id, [], email, uid);
-            }
-        }
-    } catch (error) {
-        console.error(error);
-        users.delete(uid);
-
-        return {
-            success: false,
-            errors: { email: ["An error occurred. Please try again."] },
-        };
-    }
-
-    // 4. If that is successful, create the trainer object
-    try {
-        await database.createDocument(
-            process.env.NEXT_PUBLIC_DATABASE_ID,
-            process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
-            uid,
-            {
-                auth_id: uid,
-                firstName: firstName,
-                lastName: lastName,
-                jobTitle: jobTitle,
-                phone: phone,
-                email: email,
-                gender: gender,
-            }
-        );
-
-        await database.createDocument(
-            process.env.NEXT_PUBLIC_DATABASE_ID,
-            process.env.NEXT_PUBLIC_COLLECTION_USERS,
-            uid,
-            {
-                auth_id: uid,
-                firstName,
-                lastName,
-                email,
-                phone,
-                trainer_id: uid,
-                trainers: uid,
-                imageUrl: null,
-                gender: gender,
-            }
-        );
-        // Include in clients team too
-        for (const team of teamList.teams) {
-            if (team.name.toLowerCase() === "clients") {
-                await teams.createMembership(team.$id, [], email, uid);
-            }
-        }
-    } catch (error) {
-        users.delete(uid);
-        return {
-            success: false,
-            errors: {
-                email: [error.message],
-            },
-        };
-    }
-
-    // reset the form
-    // Reset the form fields
-
-    return {
-        success: true,
-        errors: {},
-        message: `Trainer ${firstName} added successfully to both trainer list and client list!`,
-    };
-}
-
-export async function registerClient(state, formData) {
-    // 1. Validate fields
-    const validatedResult = ClientFormSchema.safeParse({
-        firstName: formData.get("firstName"),
-        lastName: formData.get("lastName"),
-        phone: formData.get("phone"),
-        email: formData.get("email"),
-        trainerId: formData.get("trainerId"),
-        gender: formData.get("gender"),
-    });
-    if (!validatedResult.success) {
-        // Handle validation errors
-        const errors = validatedResult.error.formErrors.fieldErrors;
-        return { success: false, errors };
-    }
-
-    const { firstName, lastName, phone, email, trainerId, gender } =
-        validatedResult.data;
-
-    // 2. Try creating with details
-    const { account, database, users, teams } = await createAdminClient();
-    const uid = ID.unique();
-    try {
-        await account.create(
-            uid,
-            email,
-            "password",
-            `${firstName} ${lastName}`
-        );
-    } catch (error) {
-        if (
-            error instanceof AppwriteException &&
-            error.code === 409 &&
-            error.type === "user_already_exists"
-        ) {
-            // Check if user is already a trainer, then just add them to the user list.
-            // get user_doc from users table
-            const user_doc = await database.listDocuments(
-                process.env.NEXT_PUBLIC_DATABASE_ID,
-                process.env.NEXT_PUBLIC_COLLECTION_USERS,
-                [Query.equal("email", [email])]
-            );
-
-            // Get auth doc from auth table
-            const auth_doc = await users.list([Query.equal("email", [email])]);
-
-            // Get trainer doc from trainers table
-            let trainer_doc = null;
-            if (auth_doc.total === 1) {
-                try {
-                    trainer_doc = await database.getDocument(
-                        process.env.NEXT_PUBLIC_DATABASE_ID,
-                        process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
-                        auth_doc.users[0].$id
-                    );
-                } catch (error) {
-                    trainer_doc = null;
-                }
-            }
-
-            // Now check, if trainer_doc and user_doc.total === 0
-            // If yes, create user doc, send success
-            // else raise email is registered error
-            if (trainer_doc && user_doc.total === 0) {
-                await database.createDocument(
-                    process.env.NEXT_PUBLIC_DATABASE_ID,
-                    process.env.NEXT_PUBLIC_COLLECTION_USERS,
-                    trainer_doc.$id,
-                    {
-                        auth_id: trainer_doc.$id,
-                        firstName,
-                        lastName,
-                        email,
-                        phone,
-                        trainer_id: trainerId,
-                        trainers: trainerId,
-                        imageUrl: null,
-                        gender: gender,
-                    }
-                );
-
-                const teamList = await teams.list();
-                for (const team of teamList.teams) {
-                    if (team.name.toLowerCase().includes("client")) {
-                        await teams.createMembership(team.$id, [], email, uid);
-                    }
-                }
-                return {
-                    success: true,
-                    errors: {},
-                    message: `User ${firstName} added successfully!`,
-                };
-            }
-
-            return {
-                success: false,
-                errors: { email: ["Email already exists, please login"] },
-            };
-        }
-    }
-
-    // 3. If successful in creating team association
-    try {
-        const teamList = await teams.list();
-        for (const team of teamList.teams) {
-            if (team.name.toLowerCase().includes("client")) {
-                await teams.createMembership(team.$id, [], email, uid);
-            }
-        }
-    } catch (error) {
-        console.error(error);
-        users.delete(uid);
-
-        return {
-            success: false,
-            errors: { email: ["An error occurred. Please try again."] },
-        };
-    }
-
-    // 4. If that is successful, create the client object
-    try {
-        await database.createDocument(
-            process.env.NEXT_PUBLIC_DATABASE_ID,
-            process.env.NEXT_PUBLIC_COLLECTION_USERS,
-            uid,
-            {
-                auth_id: uid,
-                firstName,
-                lastName,
-                email,
-                phone,
-                trainer_id: trainerId,
-                trainers: trainerId,
-                gender: gender,
-            }
-        );
-    } catch (error) {
-        users.delete(uid);
-        return {
-            success: false,
-            errors: {
-                email: [error.message],
-            },
-        };
-    }
-
-    return {
-        success: true,
-        errors: {},
-        message: `User ${firstName} added successfully!`,
-    };
-}
-
 export async function login(state, formData) {
     // 1. Validate fields
     const validatedResult = LoginFormSchema.safeParse({
@@ -307,9 +33,9 @@ export async function login(state, formData) {
     }
     const { email, password } = validatedResult.data;
 
-    // 2. Try logging in
-    const { account } = await createAdminClient();
     try {
+        // 2. Try logging in
+        const { account } = await createAdminClient();
         const session = await account.createEmailPasswordSession(
             email,
             password
@@ -317,42 +43,25 @@ export async function login(state, formData) {
 
         const { account: sessAccount, teams: sessTeam } =
             await createSessionClient(session.secret);
-        const team = await sessTeam.list();
-        const teamAssociations = team.teams.map((team) => team.name);
+        const teamAssociations = (await sessTeam.list()).teams.map(
+            (team) => team.name
+        );
 
-        let hasAdminsOrTrainers = false;
-        for (const team of teamAssociations) {
-            if (team === "Admins" || team === "Trainers") {
-                hasAdminsOrTrainers = true;
-                break;
-            }
-        }
-
-        if (team.total === 0 || !hasAdminsOrTrainers) {
-            await sessAccount.deleteSession("current");
-            console.error("Client attempted Login: ", email);
-            return {
-                success: false,
-                errors: {
-                    email: [
-                        "Invalid credentials. Please check the email and password.",
-                    ],
-                    password: [
-                        "Invalid credentials. Please check the email and password.",
-                    ],
-                },
-            };
+        if (
+            !teamAssociations.some(
+                (team) => team === "Admins" || team === "Trainers"
+            )
+        ) {
+            throw new Error("Invalid credentials");
         }
 
         const acc = await sessAccount.get();
-
         const sessionData = {
             session: session.secret,
             $id: acc.$id,
             email: acc.email,
             name: acc.name,
             team: teamAssociations,
-            // team.teams[0].name,
         };
 
         cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
@@ -361,18 +70,10 @@ export async function login(state, formData) {
             secure: true,
             expires: new Date(session.expire),
             path: "/",
-            // domain: "enclave.live",
         });
-
-        // Retrieve and log the cookie
-        // const cookie = cookies().get(SESSION_COOKIE_NAME);
     } catch (error) {
         console.error(error);
-        if (
-            error instanceof AppwriteException &&
-            error.code === 401 &&
-            error.type === "user_invalid_credentials"
-        ) {
+        if (error.message === "Invalid credentials") {
             return {
                 success: false,
                 errors: {
@@ -385,7 +86,6 @@ export async function login(state, formData) {
                 },
             };
         }
-        // Handle other errors
         return {
             success: false,
             errors: {
@@ -407,39 +107,330 @@ export async function logout() {
         const sessionCookie = JSON.parse(
             cookies().get(SESSION_COOKIE_NAME)?.value
         );
+
         if (sessionCookie) {
             const { account } = await createSessionClient(
                 sessionCookie.session
             );
             await account.deleteSession("current");
         }
-
-        // Delete the session cookie with correct attributes
-        (await cookies()).delete({
-            name: SESSION_COOKIE_NAME,
-            httpOnly: true,
-            sameSite: "None",
-            secure: true,
-            path: "/",
-            // domain: "enclave.live",
-        });
-
-        const cookie_recheck = cookies()?.get(SESSION_COOKIE_NAME)?.value;
-
-        // Redirect to the login page
-        redirect("/login");
     } catch (error) {
-        // Handle errors by deleting the session cookie and redirecting
-        cookies().delete({
+        // Ignore errors when deleting the session
+    } finally {
+        // Delete the session cookie regardless of the outcome
+        const cookieOptions = {
             name: SESSION_COOKIE_NAME,
             httpOnly: true,
             sameSite: "None",
             secure: true,
             path: "/",
             // domain: "enclave.live",
-        });
+        };
 
+        cookies().delete(cookieOptions);
         redirect("/login");
+    }
+}
+
+export async function register(state, formData) {
+    // 1. Validate fields
+    const validatedResult = RegisterFormSchema.safeParse({
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        phone: formData.get("phone"),
+        email: formData.get("email"),
+        jobTitle: formData.get("jobTitle"),
+        role: formData.get("role"),
+        gender: formData.get("gender"),
+    });
+
+    if (!validatedResult.success) {
+        return {
+            success: false,
+            errors: validatedResult.error.formErrors.fieldErrors,
+        };
+    }
+
+    const { firstName, lastName, phone, email, jobTitle, role, gender } =
+        validatedResult.data;
+    const { account, database, users, teams } = await createAdminClient();
+    const uid = ID.unique();
+
+    try {
+        // 2. Create user account
+        await createUserAccount(
+            account,
+            uid,
+            email,
+            `${firstName} ${lastName}`
+        );
+
+        // 3. Create team association
+        await createTeamAssociation(teams, email, uid, role);
+
+        // 4. Create trainer and user documents
+        await Promise.all([
+            createTrainerDocument(
+                database,
+                uid,
+                firstName,
+                lastName,
+                jobTitle,
+                phone,
+                email,
+                gender
+            ),
+            createUserDocument(
+                database,
+                uid,
+                firstName,
+                lastName,
+                email,
+                phone,
+                gender
+            ),
+            createClientTeamAssociation(teams, email, uid),
+        ]);
+    } catch (error) {
+        await handleRegistrationError(users, uid, error);
+        return {
+            success: false,
+            errors: { email: [error.message] },
+        };
+    }
+
+    return {
+        success: true,
+        errors: {},
+        message: `Trainer ${firstName} added successfully to both trainer list and client list!`,
+    };
+}
+
+async function createUserAccount(account, uid, email, name) {
+    try {
+        await account.create(uid, email, "password", name);
+    } catch (error) {
+        if (
+            error instanceof AppwriteException &&
+            error.code === 409 &&
+            error.type === "user_already_exists"
+        ) {
+            throw new Error("Email already exists, please login");
+        }
+        throw error;
+    }
+}
+
+async function createTeamAssociation(teams, email, uid, role) {
+    const teamList = await teams.list();
+    for (const team of teamList.teams) {
+        if (team.name.toLowerCase().includes(role)) {
+            await teams.createMembership(team.$id, [], email, uid);
+        }
+    }
+}
+
+async function createTrainerDocument(
+    database,
+    uid,
+    firstName,
+    lastName,
+    jobTitle,
+    phone,
+    email,
+    gender
+) {
+    await database.createDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID,
+        process.env.NEXT_PUBLIC_COLLECTION_TRAINERS,
+        uid,
+        {
+            auth_id: uid,
+            firstName,
+            lastName,
+            jobTitle,
+            phone,
+            email,
+            gender,
+        }
+    );
+}
+
+async function createUserDocument(
+    database,
+    uid,
+    firstName,
+    lastName,
+    email,
+    phone,
+    gender
+) {
+    await database.createDocument(
+        process.env.NEXT_PUBLIC_DATABASE_ID,
+        process.env.NEXT_PUBLIC_COLLECTION_USERS,
+        uid,
+        {
+            auth_id: uid,
+            firstName,
+            lastName,
+            email,
+            phone,
+            trainer_id: uid,
+            trainers: uid,
+            imageUrl: null,
+            gender,
+        }
+    );
+}
+
+async function createClientTeamAssociation(teams, email, uid) {
+    const teamList = await teams.list();
+    for (const team of teamList.teams) {
+        if (team.name.toLowerCase() === "clients") {
+            await teams.createMembership(team.$id, [], email, uid);
+        }
+    }
+}
+
+async function handleRegistrationError(users, uid, error) {
+    console.error(error);
+    await users.delete(uid);
+}
+
+export async function registerClient(state, formData) {
+    const validatedResult = ClientFormSchema.safeParse({
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        phone: formData.get("phone"),
+        email: formData.get("email"),
+        trainerId: formData.get("trainerId"),
+        gender: formData.get("gender"),
+    });
+
+    if (!validatedResult.success) {
+        return {
+            success: false,
+            errors: validatedResult.error.formErrors.fieldErrors,
+        };
+    }
+
+    const { firstName, lastName, phone, email, trainerId, gender } =
+        validatedResult.data;
+    const { account, database, users, teams } = await createAdminClient();
+    const uid = ID.unique();
+
+    try {
+        // 1. Create user account or handle existing user
+        const userExists = await handleExistingUser(
+            account,
+            database,
+            users,
+            uid,
+            email,
+            firstName,
+            lastName,
+            trainerId,
+            gender
+        );
+        if (userExists) {
+            return userExists;
+        }
+
+        // 2. Create team association
+        await createClientTeamAssociation(teams, email, uid);
+
+        // 3. Create user document
+        await createUserDocument(
+            database,
+            uid,
+            firstName,
+            lastName,
+            email,
+            phone,
+            trainerId,
+            gender
+        );
+    } catch (error) {
+        await handleRegistrationError(users, uid, error);
+        return {
+            success: false,
+            errors: { email: [error.message] },
+        };
+    }
+
+    return {
+        success: true,
+        errors: {},
+        message: `User ${firstName} added successfully!`,
+    };
+}
+
+async function handleExistingUser(
+    account,
+    database,
+    users,
+    uid,
+    email,
+    firstName,
+    lastName,
+    trainerId,
+    gender
+) {
+    try {
+        await account.create(
+            uid,
+            email,
+            "password",
+            `${firstName} ${lastName}`
+        );
+    } catch (error) {
+        if (
+            error instanceof AppwriteException &&
+            error.code === 409 &&
+            error.type === "user_already_exists"
+        ) {
+            const userDoc = await database.listDocuments(
+                process.env.NEXT_PUBLIC_DATABASE_ID,
+                process.env.NEXT_PUBLIC_COLLECTION_USERS,
+                [Query.equal("email", [email])]
+            );
+
+            const authDoc = await users.list([Query.equal("email", [email])]);
+
+            if (authDoc.total === 1 && userDoc.total === 0) {
+                const trainerId = authDoc.users[0].$id;
+                await database.createDocument(
+                    process.env.NEXT_PUBLIC_DATABASE_ID,
+                    process.env.NEXT_PUBLIC_COLLECTION_USERS,
+                    trainerId,
+                    {
+                        auth_id: trainerId,
+                        firstName,
+                        lastName,
+                        email,
+                        phone,
+                        trainer_id: trainerId,
+                        trainers: trainerId,
+                        imageUrl: null,
+                        gender,
+                    }
+                );
+
+                await createClientTeamAssociation(teams, email, trainerId);
+
+                return {
+                    success: true,
+                    errors: {},
+                    message: `User ${firstName} added successfully!`,
+                };
+            }
+
+            return {
+                success: false,
+                errors: { email: ["Email already exists, please login"] },
+            };
+        }
+        throw error;
     }
 }
 
