@@ -201,7 +201,7 @@ const ScrollTable = ({
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
                 ref={tableContainerRef}
             >
-                <table className="table-auto bg-white overflow-x-visible touch-action-auto">
+                <table className="w-full bg-white overflow-x-visible touch-action-auto">
                     <TableHeader table={table} />
                     <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
                 </table>
