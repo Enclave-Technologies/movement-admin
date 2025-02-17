@@ -132,7 +132,7 @@ export async function logout() {
     }
 }
 
-export async function register(state, formData) {
+export async function registerCoach(state, formData) {
     // 1. Validate fields
     const validatedResult = RegisterFormSchema.safeParse({
         firstName: formData.get("firstName"),
@@ -154,56 +154,323 @@ export async function register(state, formData) {
     const { firstName, lastName, phone, email, jobTitle, role, gender } =
         validatedResult.data;
     const { account, database, users, teams } = await createAdminClient();
-    const uid = ID.unique();
 
     try {
-        // 2. Create user account
+        // Check if user already exists in auth table
+        const existingUser = await checkExistingUser(users, email);
+
+        if (existingUser) {
+            // User exists, check their team memberships
+            const userTeams = await getUserTeams(users, existingUser.$id);
+
+            console.log("Is only client? ", isOnlyClientMember(userTeams));
+
+            if (isOnlyClientMember(userTeams)) {
+                // User is only a client, add them as a trainer
+                await addExistingUserAsTrainer(
+                    database,
+                    teams,
+                    existingUser,
+                    firstName,
+                    lastName,
+                    jobTitle,
+                    phone,
+                    gender,
+                    role
+                );
+                return {
+                    success: true,
+                    errors: {},
+                    message: `Existing user ${firstName} added successfully as a trainer!`,
+                };
+            } else {
+                // User is already a staff member or admin
+                return {
+                    success: false,
+                    errors: {
+                        email: [
+                            "User is already registered as staff or admin.",
+                        ],
+                    },
+                };
+            }
+        } else {
+            // New user, proceed with full registration
+            const uid = ID.unique();
+            await createNewTrainer(
+                account,
+                database,
+                teams,
+                uid,
+                firstName,
+                lastName,
+                email,
+                phone,
+                jobTitle,
+                gender,
+                role
+            );
+            return {
+                success: true,
+                errors: {},
+                message: `Trainer ${firstName} added successfully!`,
+            };
+        }
+    } catch (error) {
+        console.error(error);
+        return {
+            success: false,
+            errors: { email: [error.message] },
+        };
+    }
+}
+
+export async function registerClient(state, formData) {
+    const validatedResult = ClientFormSchema.safeParse({
+        firstName: formData.get("firstName"),
+        lastName: formData.get("lastName"),
+        phone: formData.get("phone"),
+        email: formData.get("email"),
+        trainerId: formData.get("trainerId"),
+        gender: formData.get("gender"),
+    });
+
+    if (!validatedResult.success) {
+        return {
+            success: false,
+            errors: validatedResult.error.formErrors.fieldErrors,
+        };
+    }
+
+    const { firstName, lastName, phone, email, trainerId, gender } =
+        validatedResult.data;
+    const { account, database, users, teams } = await createAdminClient();
+
+    try {
+        // Check if user already exists in auth table
+        const existingUser = await checkExistingUser(users, email);
+
+        if (existingUser) {
+            // User exists, check their team memberships
+            const userTeams = await getUserTeams(users, existingUser.$id);
+
+            if (isOnlyCoachMember(userTeams)) {
+                // User is only a coach, add them as a client
+
+                await addExistingUserAsClient(
+                    database,
+                    teams,
+                    existingUser,
+                    firstName,
+                    lastName,
+                    phone,
+                    trainerId,
+                    gender
+                );
+                return {
+                    success: true,
+                    errors: {},
+                    message: `Existing coach ${firstName} added successfully as a client!`,
+                };
+            } else if (userTeams.includes("clients")) {
+                // User is already a client
+                return {
+                    success: false,
+                    errors: {
+                        email: ["User is already registered as a client."],
+                    },
+                };
+            }
+        }
+
+        // New user or coach being added as client, proceed with full registration
+        const uid = existingUser ? existingUser.$id : ID.unique();
+        await createNewClient(
+            account,
+            database,
+            teams,
+            uid,
+            firstName,
+            lastName,
+            email,
+            phone,
+            trainerId,
+            gender,
+            existingUser
+        );
+
+        return {
+            success: true,
+            errors: {},
+            message: `Client ${firstName} added successfully!`,
+        };
+    } catch (error) {
+        console.error(error);
+        return {
+            success: false,
+            errors: { email: [error.message] },
+        };
+    }
+}
+
+async function checkExistingUser(users, email) {
+    const existingUsers = await users.list([Query.equal("email", [email])]);
+    return existingUsers.total > 0 ? existingUsers.users[0] : null;
+}
+
+async function getUserTeams(users, userId) {
+    const memberships = await users.listMemberships(userId);
+
+    if (memberships.total > 0) {
+        return memberships.memberships.map((membership) => membership.teamName);
+    }
+    return [];
+}
+
+function isOnlyClientMember(userTeams) {
+    // Assuming 'clients' is the teamName of the clients team
+    return userTeams.length === 1 && userTeams[0].toLowerCase() === "clients";
+}
+
+function isOnlyCoachMember(userTeams) {
+    // Check if 'clients' is not in the userTeams array
+    return !userTeams.some((team) => team.toLowerCase() === "clients");
+}
+
+async function addExistingUserAsTrainer(
+    database,
+    teams,
+    user,
+    firstName,
+    lastName,
+    jobTitle,
+    phone,
+    gender,
+    role
+) {
+    // Add user to trainers collection
+    await createTrainerDocument(
+        database,
+        user.$id,
+        firstName,
+        lastName,
+        jobTitle,
+        phone,
+        user.email,
+        gender
+    );
+
+    // Add user to appropriate team based on role
+    await createTeamAssociation(teams, user.email, user.$id, role);
+}
+
+async function addExistingUserAsClient(
+    database,
+    teams,
+    user,
+    firstName,
+    lastName,
+    phone,
+    trainerId,
+    gender
+) {
+    // Add user to users collection
+    await createUserDocument(
+        database,
+        user.$id,
+        firstName,
+        lastName,
+        user.email,
+        phone,
+        trainerId,
+        gender
+    );
+
+    // Add user to clients team
+    await createClientTeamAssociation(teams, user.email, user.$id);
+}
+
+async function createNewTrainer(
+    account,
+    database,
+    teams,
+    uid,
+    firstName,
+    lastName,
+    email,
+    phone,
+    jobTitle,
+    gender,
+    role
+) {
+    // Create user account
+    await createUserAccount(account, uid, email, `${firstName} ${lastName}`);
+
+    // Create team associations
+    await createTeamAssociation(teams, email, uid, role);
+    await createClientTeamAssociation(teams, email, uid);
+
+    // Create trainer and user documents
+    await Promise.all([
+        createTrainerDocument(
+            database,
+            uid,
+            firstName,
+            lastName,
+            jobTitle,
+            phone,
+            email,
+            gender
+        ),
+        createUserDocument(
+            database,
+            uid,
+            firstName,
+            lastName,
+            email,
+            phone,
+            gender
+        ),
+    ]);
+}
+
+async function createNewClient(
+    account,
+    database,
+    teams,
+    uid,
+    firstName,
+    lastName,
+    email,
+    phone,
+    trainerId,
+    gender,
+    existingUser
+) {
+    if (!existingUser) {
+        // Create user account if it doesn't exist
         await createUserAccount(
             account,
             uid,
             email,
             `${firstName} ${lastName}`
         );
-
-        // 3. Create team association
-        await createTeamAssociation(teams, email, uid, role);
-
-        // 4. Create trainer and user documents
-        await Promise.all([
-            createTrainerDocument(
-                database,
-                uid,
-                firstName,
-                lastName,
-                jobTitle,
-                phone,
-                email,
-                gender
-            ),
-            createUserDocument(
-                database,
-                uid,
-                firstName,
-                lastName,
-                email,
-                phone,
-                gender
-            ),
-            createClientTeamAssociation(teams, email, uid),
-        ]);
-    } catch (error) {
-        await handleRegistrationError(users, uid, error);
-        return {
-            success: false,
-            errors: { email: [error.message] },
-        };
     }
 
-    return {
-        success: true,
-        errors: {},
-        message: `Trainer ${firstName} added successfully to both trainer list and client list!`,
-    };
+    // Create client team association
+    await createClientTeamAssociation(teams, email, uid);
+
+    // Create user document
+    await createUserDocument(
+        database,
+        uid,
+        firstName,
+        lastName,
+        email,
+        phone,
+        trainerId,
+        gender
+    );
 }
 
 async function createUserAccount(account, uid, email, name) {
@@ -215,7 +482,7 @@ async function createUserAccount(account, uid, email, name) {
             error.code === 409 &&
             error.type === "user_already_exists"
         ) {
-            throw new Error("Email already exists, please login");
+            throw new Error("User already exists!");
         }
         throw error;
     }
@@ -263,6 +530,7 @@ async function createUserDocument(
     lastName,
     email,
     phone,
+    trainerId,
     gender
 ) {
     await database.createDocument(
@@ -275,8 +543,8 @@ async function createUserDocument(
             lastName,
             email,
             phone,
-            trainer_id: uid,
-            trainers: uid,
+            trainer_id: trainerId,
+            trainers: trainerId,
             imageUrl: null,
             gender,
         }
@@ -284,154 +552,13 @@ async function createUserDocument(
 }
 
 async function createClientTeamAssociation(teams, email, uid) {
-    const teamList = await teams.list();
-    for (const team of teamList.teams) {
-        if (team.name.toLowerCase() === "clients") {
-            await teams.createMembership(team.$id, [], email, uid);
-        }
-    }
-}
-
-async function handleRegistrationError(users, uid, error) {
-    console.error(error);
-    await users.delete(uid);
-}
-
-export async function registerClient(state, formData) {
-    const validatedResult = ClientFormSchema.safeParse({
-        firstName: formData.get("firstName"),
-        lastName: formData.get("lastName"),
-        phone: formData.get("phone"),
-        email: formData.get("email"),
-        trainerId: formData.get("trainerId"),
-        gender: formData.get("gender"),
-    });
-
-    if (!validatedResult.success) {
-        return {
-            success: false,
-            errors: validatedResult.error.formErrors.fieldErrors,
-        };
-    }
-
-    const { firstName, lastName, phone, email, trainerId, gender } =
-        validatedResult.data;
-    const { account, database, users, teams } = await createAdminClient();
-    const uid = ID.unique();
-
-    try {
-        // 1. Create user account or handle existing user
-        const userExists = await handleExistingUser(
-            account,
-            database,
-            users,
-            uid,
-            email,
-            firstName,
-            lastName,
-            trainerId,
-            gender
-        );
-        if (userExists) {
-            return userExists;
-        }
-
-        // 2. Create team association
-        await createClientTeamAssociation(teams, email, uid);
-
-        // 3. Create user document
-        await createUserDocument(
-            database,
-            uid,
-            firstName,
-            lastName,
-            email,
-            phone,
-            trainerId,
-            gender
-        );
-    } catch (error) {
-        await handleRegistrationError(users, uid, error);
-        return {
-            success: false,
-            errors: { email: [error.message] },
-        };
-    }
-
-    return {
-        success: true,
-        errors: {},
-        message: `User ${firstName} added successfully!`,
-    };
-}
-
-async function handleExistingUser(
-    account,
-    database,
-    users,
-    uid,
-    email,
-    firstName,
-    lastName,
-    trainerId,
-    gender
-) {
-    try {
-        await account.create(
-            uid,
-            email,
-            "password",
-            `${firstName} ${lastName}`
-        );
-    } catch (error) {
-        if (
-            error instanceof AppwriteException &&
-            error.code === 409 &&
-            error.type === "user_already_exists"
-        ) {
-            const userDoc = await database.listDocuments(
-                process.env.NEXT_PUBLIC_DATABASE_ID,
-                process.env.NEXT_PUBLIC_COLLECTION_USERS,
-                [Query.equal("email", [email])]
-            );
-
-            const authDoc = await users.list([Query.equal("email", [email])]);
-
-            if (authDoc.total === 1 && userDoc.total === 0) {
-                const trainerId = authDoc.users[0].$id;
-                await database.createDocument(
-                    process.env.NEXT_PUBLIC_DATABASE_ID,
-                    process.env.NEXT_PUBLIC_COLLECTION_USERS,
-                    trainerId,
-                    {
-                        auth_id: trainerId,
-                        firstName,
-                        lastName,
-                        email,
-                        phone,
-                        trainer_id: trainerId,
-                        trainers: trainerId,
-                        imageUrl: null,
-                        gender,
-                    }
-                );
-
-                await createClientTeamAssociation(teams, email, trainerId);
-
-                return {
-                    success: true,
-                    errors: {},
-                    message: `User ${firstName} added successfully!`,
-                };
-            }
-
-            return {
-                success: false,
-                errors: { email: ["Email already exists, please login"] },
-            };
-        }
-        throw error;
-    }
+    // const teamList = await teams.list();
+    // for (const team of teamList.teams) {
+    //     if (team.name.toLowerCase() === "clients") {
+    //         await teams.createMembership(team.$id, [], email, uid);
+    //     }
+    // }
+    await createTeamAssociation(teams, email, uid, "clients");
 }
 
 export async function getCurrentUser() {
