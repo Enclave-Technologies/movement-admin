@@ -78,7 +78,7 @@ const SessionComponent: FC<SessionProps> = ({
     };
 
     const onExerciseAdd = (phaseId, sessionId) => {
-        setIsCollapsed((prevState) => !prevState);
+        setIsCollapsed(false);
         handleAddExercise(phaseId, sessionId);
     };
 
@@ -164,11 +164,7 @@ const SessionComponent: FC<SessionProps> = ({
                                     <span className="font-medium">
                                         {sessionName}
                                     </span>
-                                    {/* {nextSession?.$id === session.sessionId ? (
-                    <span className="text-xs text-gray-400">(RECOMMENDED)</span>
-                  ) : (
-                    ""
-                  )} */}
+
                                     {isEditing && (
                                         <TitleEditBox
                                             title="Session Title"

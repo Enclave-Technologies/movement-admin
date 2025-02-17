@@ -265,13 +265,6 @@ const PhaseComponent: FC<PhaseProps> = ({
                             />
                         </label>
                     </div>
-
-                    {/* 
-                    {phase.isActive && (
-                        <span className="px-3 py-1 text-green-500 bg-green-100 rounded-full">
-                            Active
-                        </span>
-                    )} */}
                 </div>
             </div>
             <div
