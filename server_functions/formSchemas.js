@@ -30,10 +30,7 @@ export const exerciseSchema = z.object({
     Motion: z.string().min(1, "Motion is required"),
     targetArea: z.string().min(1, "Target Area is required"),
     fullName: z.string().min(1, "Full name is required"),
-    shortName: z
-        .string()
-        .min(1, "Shortend name is required")
-        .max(50, "Cannot be more than 50 letters"),
+    shortName: z.string(),
     authorization: z.string(),
 });
 // .refine((data) => data.recommendedRepsMax >= data.recommendedRepsMin, {

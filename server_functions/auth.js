@@ -654,7 +654,7 @@ export async function addWorkout(state, formData) {
         Motion: formData.get("Motion"),
         targetArea: formData.get("targetArea"),
         fullName: formData.get("fullName"),
-        shortName: formData.get("shortName"),
+        shortName: "", // formData.get("shortName"),
         authorization: formData.get("authorization"),
     });
 

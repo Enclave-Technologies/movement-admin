@@ -72,7 +72,7 @@ const WorkoutRecordBody = ({
                                                 {exercise.marker !== ""
                                                     ? `${exercise.marker}.`
                                                     : `${index + 1}.`}{" "}
-                                                {exercise.shortName}
+                                                {exercise.fullName}
                                             </h2>
                                             <span
                                                 className={`py-2 transition-transform text-white ${

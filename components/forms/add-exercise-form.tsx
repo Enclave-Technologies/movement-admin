@@ -170,7 +170,6 @@ const AddExerciseForm = ({ fetchData, team }) => {
     }, []);
 
     function handleCsvFile(file) {
-
         // check file headers
         // Implement file handling logic here
     }
@@ -250,7 +249,7 @@ const AddExerciseForm = ({ fetchData, team }) => {
                     )}
                 </div>
 
-                <div>
+                {/* <div>
                     <label
                         htmlFor="shortName"
                         className="block text-sm font-medium text-gray-700"
@@ -268,7 +267,7 @@ const AddExerciseForm = ({ fetchData, team }) => {
                             {formState.errors.shortName}
                         </p>
                     )}
-                </div>
+                </div> */}
 
                 <div>
                     <input

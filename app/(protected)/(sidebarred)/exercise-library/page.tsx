@@ -263,11 +263,11 @@ const ExercisePage = () => {
                     </div>
                 ),
             },
-            {
-                accessorKey: "shortName",
-                header: "Shortened Name",
-                size: 250,
-            },
+            // {
+            //    accessorKey: "shortName",
+            //    header: "Shortened Name",
+            //    size: 250,
+            // },
             // {
             //     accessorKey: "approved",
             //     header: "Approval Status",
