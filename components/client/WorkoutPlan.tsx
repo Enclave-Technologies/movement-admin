@@ -131,28 +131,6 @@ const WorkoutPlan = ({
         // setClientPhases(updatedPhases);
     };
 
-    // const handleDataSubmit = async () => {
-    //     try {
-    //         setPageLoading(true);
-    //         const data: DataResponse = {
-    //             phases: clientPhases,
-    //         };
-    //         const response = await axios.post(
-    //             `${API_BASE_URL}/mvmt/v1/client/phases`,
-    //             {
-    //                 client_id: client_id,
-    //                 data,
-    //             },
-    //             { withCredentials: true }
-    //         );
-
-    //     } catch (error) {
-    //         console.error(error);
-    //     } finally {
-    //         setPageLoading(false);
-    //     }
-    // };
-
     const handleActivatePhase = async (
         phaseId: string,
         phaseState: boolean

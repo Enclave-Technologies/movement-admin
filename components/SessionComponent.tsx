@@ -77,6 +77,11 @@ const SessionComponent: FC<SessionProps> = ({
         setShowSessionDeleteConfirm(false); // Just close the dialog
     };
 
+    const onExerciseAdd = (phaseId, sessionId) => {
+        setIsCollapsed((prevState) => !prevState);
+        handleAddExercise(phaseId, sessionId);
+    };
+
     const handleStartSession = async () => {
         // e.preventDefault();
         try {
@@ -187,7 +192,7 @@ const SessionComponent: FC<SessionProps> = ({
                                             handleDeleteSession
                                         }
                                         handleCopySession={handleCopySession}
-                                        handleAddExercise={handleAddExercise}
+                                        handleAddExercise={onExerciseAdd}
                                     />
                                 </div>
                             </div>
