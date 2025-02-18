@@ -271,6 +271,7 @@ const WorkoutPlan = ({
 
     const handleExerciseAdd = (phaseId: string, sessionId: string) => {
         const newExerciseId = ID.unique();
+
         // Update the original data with the new exercise
         const updatedPhases = clientPhases.map((phase) =>
             phase.phaseId === phaseId
@@ -319,11 +320,57 @@ const WorkoutPlan = ({
         setEditingExerciseId(newExerciseId);
     };
 
+    const calculateSessionTime = (exercise: Exercise): number => {
+        const maxReps = exercise.repsMax ?? 12; // Use the provided repsMax or default to 12
+        const maxSets = exercise.setsMax ?? 5; // Use the provided setsMax or default to 5
+        const restTime = exercise.restMax ?? 60; // Use the provided restMax or default to 60
+
+        // Split and parse the tempo
+        const tempoParts = exercise.tempo.split(" ").map(Number);
+        const [eccentric, pause1, concentric, pause2] = tempoParts;
+
+        // Calculate time per repetition based on the parsed tempo
+        const timePerRep =
+            (eccentric || 0) +
+            (pause1 || 0) +
+            (concentric || 0) +
+            (pause2 || 0);
+
+        const exerciseTime = maxReps * timePerRep; // Total exercise time based on max reps
+        const totalRestTime = (maxSets - 1) * restTime; // Total rest time between sets
+
+        return parseFloat(
+            ((exerciseTime * maxSets + totalRestTime) / 60).toFixed(2)
+        ); // Total session time in minutes with 2 decimal places
+    };
+
     const handleExerciseUpdate = (
         phaseId: string,
         sessionId: string,
         updatedExercise: Exercise
     ) => {
+        const session = clientPhases.flatMap((phase) =>
+            phase.sessions.find((session) => session.sessionId === sessionId)
+        )[0];
+
+        const exerciseTime = calculateSessionTime(updatedExercise);
+
+        // Find the current exercise in the session to get its existing time
+        const existingExercise = session.exercises.find(
+            (e) => e.id === updatedExercise.id
+        );
+        const existingExerciseTime = existingExercise
+            ? calculateSessionTime(existingExercise)
+            : 0;
+
+        // Calculate the new sessionTime
+        const currentSessionTime = session.sessionTime ?? 0; // Default to 0 if null
+        const newSessionTime = Number(
+            (currentSessionTime - existingExerciseTime + exerciseTime).toFixed(
+                2
+            )
+        ); // Add exerciseTime to the sessionTime
+
         // Update the exercise in the specific session and phase
         const updatedPhases = clientPhases.map((phase) =>
             phase.phaseId === phaseId
@@ -333,6 +380,7 @@ const WorkoutPlan = ({
                           session.sessionId === sessionId
                               ? {
                                     ...session,
+                                    sessionTime: newSessionTime.toString(), // Update sessionTime
                                     exercises: session.exercises.map((e) =>
                                         e.id === updatedExercise.id
                                             ? updatedExercise
@@ -376,36 +424,68 @@ const WorkoutPlan = ({
         sessionId: string,
         exerciseId: string
     ) => {
-        // Remove the exercise from the specific session and phase
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
-                ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    exercises: session.exercises.filter(
-                                        (e) => e.id !== exerciseId
-                                    ),
+        let existingExerciseTime = 0;
+        let existingSessionTime = 0;
+
+        const updatedPhases = clientPhases.map((phase) => {
+            if (phase.phaseId === phaseId) {
+                return {
+                    ...phase,
+                    sessions: phase.sessions.map((session) => {
+                        if (session.sessionId === sessionId) {
+                            // Get the existing session time directly from the session object
+                            existingSessionTime = Number(session.sessionTime);
+
+                            const exercises = session.exercises.filter((e) => {
+                                // Check if the exercise is the one to be deleted
+                                if (e.id === exerciseId) {
+                                    // Calculate existing exercise time
+                                    existingExerciseTime =
+                                        calculateSessionTime(e);
+                                    return false; // Filter it out
                                 }
-                              : session
-                      ),
-                  }
-                : phase
-        );
+                                return true; // Keep other exercises
+                            });
+
+                            // Calculate the new session time based on existing
+                            const newSessionTime = parseFloat(
+                                Number(
+                                    existingSessionTime - existingExerciseTime
+                                ).toFixed(2)
+                            ).toString();
+
+                            return {
+                                ...session,
+                                exercises,
+                                sessionTime: newSessionTime, // Set the new session time
+                            };
+                        }
+                        return session; // Return session unchanged if it doesn't match
+                    }),
+                };
+            }
+            return phase; // Return phase unchanged
+        });
+
         setClientPhases(updatedPhases);
+
         const data: DataResponse = {
             phases: updatedPhases,
         };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
+
+        try {
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/phases`,
+                {
+                    client_id: client_id,
+                    data,
+                },
+                { withCredentials: true }
+            );
+        } catch (error) {
+            console.error("Error deleting exercise:", error);
+            // Handle error (e.g., show a notification to the user)
+        }
     };
 
     const handleExerciseOrderChange = (
