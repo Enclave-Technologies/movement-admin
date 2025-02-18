@@ -394,3 +394,24 @@ interface DeleteConfirmationDialogProps {
     cancelDelete: () => void;
     isLoading?: boolean;
 }
+
+interface BMCRecord {
+    $id: string; // Unique identifier for the record
+    DATE: string; // Date of the record in 'YYYY-MM-DD' format
+    HEIGHT: number; // Height in centimeters
+    WEIGHT: number; // Weight in kilograms
+    CHIN: number; // Measurement for chin
+    CHEEK: number; // Measurement for cheek
+    PEC: number; // Measurement for pectoral
+    BICEPS: number; // Measurement for biceps
+    TRICEPS: number; // Measurement for triceps
+    SUBSCAP: number; // Measurement for subscapularis
+    MIDAX: number; // Measurement for midaxillary
+    SUPRA: number; // Measurement for supraspinatus
+    "UPPER-THIGH": number; // Measurement for upper thigh
+    UBMIL: number; // Measurement for umbilicus
+    KNEE: number; // Measurement for knee
+    CALF: number; // Measurement for calf
+    QUAD: number; // Measurement for quadriceps
+    BMI: number; // Body Mass Index, computed field
+}

@@ -5,22 +5,32 @@ import Spinner from "../Spinner";
 import LoadingSpinner from "../LoadingSpinner";
 import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 
-const EditableTable = ({
+const BMITable = ({
     headerColumns,
     data,
     setData,
     emptyText,
     handleSave,
     handleDelete,
+    computeBMI,
+    buttonLoading,
 }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [rowToDelete, setRowToDelete] = useState(null); // New state variable
     const [editingRowId, setEditingRowId] = useState(null);
-    const [editedData, setEditedData] = useState({});
+    const [editedData, setEditedData] = useState<BMCRecord | null>(null);
+
+    // When setting editedData for DATE field, format it properly
+    const formatDateToInput = (date) => {
+        const d = new Date(date);
+        return d.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    };
 
     const handleEditRow = (rowId) => {
+        const row = data.find((row) => row.$id === rowId);
+        const formattedRow = { ...row, DATE: formatDateToInput(row.DATE) }; // Format DATE
         setEditingRowId(rowId);
-        setEditedData(data.find((row) => row.$id === rowId));
+        setEditedData(formattedRow);
     };
 
     const handleUpdateRow = async (rowId) => {
@@ -32,15 +42,39 @@ const EditableTable = ({
         await handleSave(editedData);
         setData(updatedData);
         setEditingRowId(null);
-        setEditedData({});
+        setEditedData(null);
         // setSaving(false);
     };
 
     const handleInputChange = (event, field) => {
-        setEditedData({
+        const value = event.target.value;
+
+        // Remove leading zeros for numeric fields
+        const formattedValue =
+            field !== "DATE" ? value.replace(/^0+(?=\d)/, "") : value;
+
+        // Convert to number and fix to 2 decimal places if it's numeric
+        const isNumeric = !isNaN(formattedValue) && formattedValue !== "";
+        const newValue = isNumeric
+            ? parseFloat(formattedValue)
+            : formattedValue;
+
+        // Create a new edited data state based on the current one
+        const newEditedData = {
             ...editedData,
-            [field]: event.target.value,
-        });
+            [field]: newValue, // Update the specific field
+        };
+
+        // Check if we need to calculate BMI
+        if (field === "HEIGHT" || field === "WEIGHT") {
+            newEditedData.BMI = computeBMI(
+                newEditedData.WEIGHT,
+                newEditedData.HEIGHT
+            ); // Calculate BMI
+        }
+
+        // Set the new state with all updates
+        setEditedData(newEditedData);
     };
 
     const confirmDeletion = () => {
@@ -84,7 +118,7 @@ const EditableTable = ({
                                 {column}
                             </th>
                         ))}
-                        <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500 flex justify-center">
+                        <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs border-l-[1px] border-gray-500 flex justify-center">
                             Actions
                         </th>
                     </tr>
@@ -109,19 +143,30 @@ const EditableTable = ({
                                     <>
                                         {colIndex > 0 && (
                                             <td
-                                                key={colIndex}
-                                                className="px-1 py-2 min-w-48"
+                                                key={`${row.$id}-${colIndex}`}
+                                                className="px-1 py-2"
                                             >
                                                 <div className="flex items-center text-center justify-center gap-1">
                                                     <input
-                                                        type="text"
+                                                        type={
+                                                            key === "DATE"
+                                                                ? "date"
+                                                                : "number"
+                                                        }
                                                         value={editedData[key]}
+                                                        readOnly={key === "BMI"}
                                                         onChange={(e) =>
                                                             handleInputChange(
                                                                 e,
                                                                 key
                                                             )
                                                         }
+                                                        // step="0.01" // Allow decimal input
+                                                        min={
+                                                            key !== "DATE"
+                                                                ? 0
+                                                                : undefined
+                                                        } // Prevent negative numbers for numeric fields
                                                         className="w-full text-center px-0 py-1 border rounded"
                                                     />
                                                 </div>
@@ -134,9 +179,14 @@ const EditableTable = ({
                                                     onClick={() =>
                                                         handleUpdateRow(row.$id)
                                                     }
+                                                    disabled={buttonLoading}
                                                     className="text-black hover:text-black mr-2"
                                                 >
-                                                    <FaSave />
+                                                    {buttonLoading ? (
+                                                        <LoadingSpinner className="w-4 h-4" />
+                                                    ) : (
+                                                        <FaSave />
+                                                    )}
                                                 </button>
                                             </td>
                                         )}
@@ -145,8 +195,8 @@ const EditableTable = ({
                                     <>
                                         {colIndex > 0 && (
                                             <td
-                                                key={colIndex}
-                                                className="pl-5 whitespace-nowrap text-sm font-semibold min-w-48"
+                                                key={`${row.$id}-${colIndex}`}
+                                                className="pl-5 whitespace-nowrap text-sm font-semibold"
                                             >
                                                 {row[key]}
                                             </td>
@@ -183,4 +233,4 @@ const EditableTable = ({
     );
 };
 
-export default EditableTable;
+export default BMITable;

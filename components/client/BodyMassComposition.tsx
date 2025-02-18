@@ -4,9 +4,17 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "@/context/ClientContext"; // Import the custom hook
 import axios from "axios";
 import { API_BASE_URL, BMC_COLUMNS } from "@/configs/constants";
-import EditableTable from "@/components/pure-components/EditableTable";
+import BMITable from "@/components/pure-components/BMITable";
 import { ID } from "appwrite";
 import Toast from "../Toast";
+import LoadingSpinner from "../LoadingSpinner";
+
+const calculateBMI = (weight: number, height: number) => {
+    if (height > 0) {
+        return (weight / (height * 0.02)).toFixed(2); // Calculate BMI
+    }
+    return 0; // Return 0 if height is 0 to avoid division by zero
+};
 
 const BodyMassComposition = ({ client_id }) => {
     const { userData } = useUser(); // Access the user data from Context
@@ -14,23 +22,12 @@ const BodyMassComposition = ({ client_id }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+    const [pageLoading, setPageLoading] = useState(true);
+    const [buttonLoading, setButtonLoading] = useState(false);
 
     const handleToastClose = () => {
         setShowToast(false);
     };
-
-    async function handleSaveBmc(bmcRecord) {
-        try {
-            const response = await axios.post(
-                `${API_BASE_URL}/mvmt/v1/client/bmc/${client_id}`,
-                { bmiRecord: bmcRecord },
-                { withCredentials: true }
-            );
-            // setBmiRecords([...bmiRecords, response.data]);
-        } catch (error) {
-            console.error("Error saving BMI record: ", error);
-        }
-    }
 
     useEffect(() => {
         async function fetchData() {
@@ -39,10 +36,18 @@ const BodyMassComposition = ({ client_id }) => {
                     `${API_BASE_URL}/mvmt/v1/client/bmc?client_id=${client_id}`,
                     { withCredentials: true }
                 );
-                setBmiRecords(response.data);
+
+                const recordsWithBMI = response.data.map((record) => ({
+                    ...record,
+                    BMI: calculateBMI(record.WEIGHT, record.HEIGHT), // Add BMI field
+                }));
+
+                setBmiRecords(recordsWithBMI);
             } catch (error) {
                 console.error(error);
             }
+
+            setPageLoading(false);
         }
 
         fetchData();
@@ -69,6 +74,7 @@ const BodyMassComposition = ({ client_id }) => {
                 KNEE: 0,
                 CALF: 0,
                 QUAD: 0,
+                BMI: 0,
             },
             ...bmiRecords,
         ]);
@@ -107,19 +113,22 @@ const BodyMassComposition = ({ client_id }) => {
     }
 
     async function addBmcToDB(bmcData) {
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/bmc/${client_id}`,
-            { bmiRecord: bmcData },
-            { withCredentials: true }
-        );
+        try {
+            setButtonLoading(true);
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/bmc/${client_id}`,
+                { bmiRecord: bmcData },
+                { withCredentials: true }
+            );
+        } catch (error) {
+            console.error(error);
+        }
+        setButtonLoading(false);
     }
 
     return (
         <div className="w-full">
             <div className="w-full flex flex-row items-center justify-between mb-4">
-                <h1 className="text-xl font-bold text-black ml-2 leading-tight">
-                    Body Mass Composition
-                </h1>
                 <button
                     onClick={() => {
                         addNewEmptyRecord();
@@ -129,14 +138,21 @@ const BodyMassComposition = ({ client_id }) => {
                     + Add New Record
                 </button>
             </div>
-            <EditableTable
-                setData={setBmiRecords}
-                data={bmiRecords}
-                emptyText="No BMI Records found"
-                headerColumns={BMC_COLUMNS}
-                handleSave={addBmcToDB}
-                handleDelete={handleDeleteBmc}
-            />
+            {pageLoading ? (
+                <LoadingSpinner />
+            ) : (
+                <BMITable
+                    setData={setBmiRecords}
+                    data={bmiRecords}
+                    emptyText="No BMI Records found"
+                    headerColumns={BMC_COLUMNS}
+                    handleSave={addBmcToDB}
+                    handleDelete={handleDeleteBmc}
+                    computeBMI={calculateBMI}
+                    buttonLoading={buttonLoading}
+                />
+            )}
+
             {showToast && (
                 <Toast
                     message={toastMessage}
