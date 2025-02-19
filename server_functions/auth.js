@@ -675,6 +675,17 @@ export async function addWorkout(state, formData) {
 
         const uid = ID.unique();
 
+        const hierarchyDoc = await database.listDocuments(
+            process.env.NEXT_PUBLIC_DATABASE_ID,
+            process.env.NEXT_PUBLIC_COLLECTION_EXERCISE_HIERARCHY,
+            [
+                Query.equal("targetArea", targetArea),
+                Query.equal("motion", Motion),
+            ]
+        );
+
+        const hierarchyId = hierarchyDoc.documents.$id;
+
         const createdDoc = await database.createDocument(
             process.env.NEXT_PUBLIC_DATABASE_ID,
             process.env.NEXT_PUBLIC_COLLECTION_EXERCISES,
@@ -685,6 +696,7 @@ export async function addWorkout(state, formData) {
                 fullName,
                 shortName,
                 approved: authorization.includes("Admins"),
+                exerciseHierarchy: hierarchyId,
             }
         );
     } catch (error) {

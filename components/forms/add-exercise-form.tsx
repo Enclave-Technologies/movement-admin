@@ -1,9 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
-import {
-    exerciseHierarchy,
-    getDescriptionFromMotion,
-} from "@/configs/constants";
+import { getDescriptionFromMotion } from "@/configs/constants";
+import { useGlobalContext } from "@/context/GlobalContextProvider";
 import Select, {
     ActionMeta,
     components,
@@ -14,6 +12,8 @@ import { useFormState } from "react-dom";
 import SubmitButton from "../ResponsiveButton";
 import Toast from "../Toast";
 import { addWorkout } from "@/server_functions/auth";
+import Link from "next/link";
+import axios from "axios";
 
 const Option = (props: OptionProps<any, false>) => {
     const { data } = props;
@@ -56,7 +56,8 @@ const customStyles: StylesConfig<any, false> = {
     }),
 };
 
-const AddExerciseForm = ({ fetchData, team }) => {
+const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
+    const { exerciseHierarchy } = useGlobalContext();
     const [selectedMotion, setSelectedMotion] = useState<{
         value: string;
         label: string;
@@ -64,22 +65,35 @@ const AddExerciseForm = ({ fetchData, team }) => {
     const [targetAreaOptions, setTargetAreaOptions] = useState<
         { value: string; label: string; description: string }[]
     >([]);
+    const [selectedTargetArea, setSelectedTargetArea] = useState<{
+        value: string;
+        label: string;
+        description: string;
+    } | null>(null);
     const [formState, formAction] = useFormState(addWorkout, undefined);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
     const ref = useRef<HTMLFormElement>(null);
 
-    const motionOptions = Object.keys(
-        exerciseHierarchy.reduce((acc, curr) => {
-            const key = Object.keys(curr)[0];
-            acc[key] = true;
-            return acc;
-        }, {})
-    ).map((option) => ({
-        value: option,
-        label: option,
-        description: getDescriptionFromMotion(option),
+    // const motionOptions = Object.keys(
+    //     exerciseHierarchy.reduce((acc, curr) => {
+    //         const key = Object.keys(curr)[0];
+    //         acc[key] = true;
+    //         return acc;
+    //     }, {})
+    // ).map((option) => ({
+    //     value: option,
+    //     label: option,
+    //     description: getDescriptionFromMotion(option),
+    // }));
+    // Extract unique exercise names from exerciseHierarchy object
+    const motionOptions = Object.entries(
+        exerciseHierarchy as ExerciseHierarchy
+    ).flatMap(([motion, key]) => ({
+        value: motion,
+        label: motion,
+        description: getDescriptionFromMotion(motion), // Function that gets description based on motion
     }));
 
     useEffect(() => {
@@ -105,17 +119,37 @@ const AddExerciseForm = ({ fetchData, team }) => {
         setSelectedMotion(option);
 
         if (option) {
-            const targetAreaOptions = exerciseHierarchy
-                .find((item) => Object.keys(item)[0] === option.value)
-                ?.[option.value].map((area) => ({
+            // TODO
+            // const targetAreaOptions = exerciseHierarchy
+            //     .find((item) => Object.keys(item)[0] === option.value)
+            //     ?.[option.value].map((area) => ({
+            //         value: area,
+            //         label: area,
+            //         description: area,
+            //     }));
+            const targetAreaOptions =
+                exerciseHierarchy[option.value]?.map((area) => ({
                     value: area,
                     label: area,
                     description: area,
-                }));
-            setTargetAreaOptions(targetAreaOptions || []);
+                })) || [];
+                
+            setTargetAreaOptions(targetAreaOptions);
+            setSelectedTargetArea(targetAreaOptions[0]);
         } else {
             setTargetAreaOptions([]);
         }
+    };
+
+    const handleTargetAreaChange = (
+        option: { value: string; label: string; description: string } | null,
+        actionMeta: ActionMeta<{
+            value: string;
+            label: string;
+            description: string;
+        }>
+    ) => {
+        setSelectedTargetArea(option);
     };
 
     const handleToastClose = () => {
@@ -136,21 +170,35 @@ const AddExerciseForm = ({ fetchData, team }) => {
             csvDropzone.classList.remove("dragover");
         };
 
-        const handleDrop = (event) => {
+        const handleDrop = async (event) => {
             event.preventDefault();
             if (isHandlingDrop) return;
             isHandlingDrop = true;
 
             csvDropzone.classList.remove("dragover");
-            const csvFile = event.dataTransfer.files[0];
-            if (
-                csvFile.type === "text/csv" ||
-                csvFile.type === "application/vnd.ms-excel"
-            ) {
-                alert("CSV file has been selected");
-                handleCsvFile(csvFile);
+            const files = event.dataTransfer.files;
+
+            if (files.length > 0) {
+                const csvFile = files[0];
+
+                if (
+                    csvFile.type === "text/csv" ||
+                    csvFile.type === "application/vnd.ms-excel"
+                ) {
+                    await handleCsvFile(csvFile);
+                    fetchData();
+                    setToastMessage("Exercises updated successfully");
+                    setToastType("success");
+                    setShowToast(true);
+                } else {
+                    setToastMessage("Please drop a valid CSV file.");
+                    setToastType("error"); // Example of another toast type for error
+                    setShowToast(true);
+                }
             } else {
-                alert("Please drop a CSV file.");
+                setToastMessage("No files were dropped.");
+                setToastType("error");
+                setShowToast(true);
             }
 
             setTimeout(() => {
@@ -168,11 +216,6 @@ const AddExerciseForm = ({ fetchData, team }) => {
             csvDropzone.removeEventListener("drop", handleDrop);
         };
     }, []);
-
-    function handleCsvFile(file) {
-        // check file headers
-        // Implement file handling logic here
-    }
 
     return (
         <div>
@@ -221,6 +264,8 @@ const AddExerciseForm = ({ fetchData, team }) => {
                         className="mt-1 block w-full"
                         classNamePrefix="react-select"
                         styles={customStyles}
+                        value={selectedTargetArea}
+                        onChange={handleTargetAreaChange}
                     />
                     {formState?.errors?.targetArea && (
                         <p className="text-red-500 text-xs italic">
@@ -249,26 +294,6 @@ const AddExerciseForm = ({ fetchData, team }) => {
                     )}
                 </div>
 
-                {/* <div>
-                    <label
-                        htmlFor="shortName"
-                        className="block text-sm font-medium text-gray-700"
-                    >
-                        Shortend Name
-                    </label>
-                    <input
-                        type="text"
-                        id="shortName"
-                        name="shortName"
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-                    />
-                    {formState?.errors?.shortName && (
-                        <p className="text-red-500 text-xs italic">
-                            {formState.errors.shortName}
-                        </p>
-                    )}
-                </div> */}
-
                 <div>
                     <input
                         type="text"
@@ -290,7 +315,7 @@ const AddExerciseForm = ({ fetchData, team }) => {
             <div className="flex flex-col gap-2 items-end">
                 <div id="csv-dropzone">Drop CSV file here</div>
                 <div className="flex flex-row">
-                    <p className="text-gray-500">
+                    {/* <p className="text-gray-500">
                         <span className="text-black">
                             While uploading CSV please make sure that:{" "}
                         </span>
@@ -301,14 +326,14 @@ const AddExerciseForm = ({ fetchData, team }) => {
                         quadriceps, gluteal, shoulders deltoids,
                         triceps-brachii, back-lower, back-upper,
                         back-latissimus-dorsi
-                    </p>
-                    <a
+                    </p> */}
+                    <Link
                         className="hover:underline cursor-pointer w-full text-right"
                         href="/files/exercises-sample.csv"
                         download="exercises-sample.csv"
                     >
                         Download Sample CSV
-                    </a>
+                    </Link>
                 </div>
             </div>
 

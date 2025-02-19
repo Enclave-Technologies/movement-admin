@@ -415,3 +415,7 @@ interface BMCRecord {
     QUAD: number; // Measurement for quadriceps
     BMI: number; // Body Mass Index, computed field
 }
+
+interface ExerciseHierarchy {
+    [key: string]: string[];
+}

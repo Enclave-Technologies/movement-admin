@@ -1,10 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import {
-    API_BASE_URL,
-    exerciseHierarchy,
-    getDescriptionFromMotion,
-} from "@/configs/constants";
+import { API_BASE_URL, getDescriptionFromMotion } from "@/configs/constants";
 import Select, {
     ActionMeta,
     components,
@@ -15,6 +11,7 @@ import SubmitButton from "../ResponsiveButton";
 import Toast from "../Toast";
 import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner";
+import { useGlobalContext } from "@/context/GlobalContextProvider";
 
 const Option = (props: OptionProps<any, false>) => {
     const { data } = props;
@@ -58,6 +55,7 @@ const customStyles: StylesConfig<any, false> = {
 };
 
 const EditExerciseForm = ({ refreshTable, team, rowData }) => {
+    const { exerciseHierarchy } = useGlobalContext();
     const [selectedMotion, setSelectedMotion] = useState<{
         value: string;
         label: string;
@@ -90,29 +88,26 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
         }
     }, [rowData]);
 
-    const motionOptions = Object.keys(
-        exerciseHierarchy.reduce((acc, curr) => {
-            const key = Object.keys(curr)[0];
-            acc[key] = true;
-            return acc;
-        }, {})
-    ).map((option) => ({
-        value: option,
-        label: option,
-        description: getDescriptionFromMotion(option),
+    // Extract unique exercise names from exerciseHierarchy object
+    const motionOptions = Object.entries(
+        exerciseHierarchy as ExerciseHierarchy
+    ).flatMap(([motion, key]) => ({
+        value: motion,
+        label: motion,
+        description: getDescriptionFromMotion(motion), // Function that gets description based on motion
     }));
 
     useEffect(() => {
         if (selectedMotion) {
-            const targetAreaOptions = exerciseHierarchy
-                .find((item) => Object.keys(item)[0] === selectedMotion.value)
-                ?.[selectedMotion.value].map((area) => ({
+            const targetAreaOptions =
+                exerciseHierarchy[selectedMotion.value]?.map((area) => ({
                     value: area,
                     label: area,
                     description: area,
-                }));
+                })) || [];
+
             setTargetAreaOptions(targetAreaOptions || []);
-            setTargetArea(targetAreaOptions[0] || null);
+            // setTargetArea(targetAreaOptions[0] || null);
         }
     }, [selectedMotion]);
 
@@ -127,35 +122,48 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
         setSelectedMotion(option);
 
         if (option) {
-            const targetAreaOptions = exerciseHierarchy
-                .find((item) => Object.keys(item)[0] === option.value)
-                ?.[option.value].map((area) => ({
+            const targetAreaOptions =
+                exerciseHierarchy[option.value]?.map((area) => ({
                     value: area,
                     label: area,
                     description: area,
-                }));
-            setTargetAreaOptions(targetAreaOptions || []);
+                })) || [];
+            setTargetAreaOptions(targetAreaOptions);
             setTargetArea(targetAreaOptions[0] || null);
         } else {
             setTargetAreaOptions([]);
         }
     };
 
+    const handleTargetAreaChange = (
+        option: { value: string; label: string; description: string } | null,
+        actionMeta: ActionMeta<{
+            value: string;
+            label: string;
+            description: string;
+        }>
+    ) => {
+        setTargetArea(option);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitted(true);
         const formData = new FormData(e.target);
+
         const data = Object.fromEntries(formData.entries());
+        console.log(data);
         // Verify the form data
         if (
             typeof data.Motion !== "string" ||
             typeof data.targetArea !== "string" ||
-            typeof data.fullName !== "string" ||
-            typeof data.shortName !== "string"
+            typeof data.fullName !== "string"
         ) {
             setToastMessage("Invalid form data");
             setToastType("error");
             setShowToast(true);
+
+            setSubmitted(false);
             return;
         }
 
@@ -239,6 +247,7 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
                         classNamePrefix="react-select"
                         styles={customStyles}
                         value={targetArea}
+                        onChange={handleTargetAreaChange}
                     />
                 </div>
 
