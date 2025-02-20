@@ -59,6 +59,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setToastMessage("Phase data successfully saved!");
+        setToastType("success");
+        setShowToast(true);
         setClientPhases(modifiedClientPhases);
         setPhaseAddingState(false);
     };
@@ -122,6 +125,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setToastMessage("Phase data copied successfully!");
+        setToastType("success");
+        setShowToast(true);
         setClientPhases(modifiedClientPhases);
         setPhaseAddingState(false);
         setSavingState(false);
@@ -152,6 +158,13 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        if (phaseState) {
+            setToastMessage("Phase activation successful!");
+        } else {
+            setToastMessage("Phase deactivation successful!");
+        }
+        setToastType("success");
+        setShowToast(true);
 
         fetchTrackedWorkouts();
         setPhaseActivation(false);
@@ -181,6 +194,9 @@ const WorkoutPlan = ({
                 },
                 { withCredentials: true }
             );
+            setToastMessage("Phase name changed!");
+            setToastType("success");
+            setShowToast(true);
             setClientPhases(updatedPhases);
         } catch (e) {
             console.error("Failed to update phase name:", e);
@@ -214,6 +230,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setToastMessage("Session added successfully!");
+        setToastType("success");
+        setShowToast(true);
     };
 
     const handleSessionNameChange = async (
@@ -234,6 +253,9 @@ const WorkoutPlan = ({
             sessionName: newSessionName,
         };
         await updateSession(client_id, data);
+        setToastMessage("Session name changed!");
+        setToastType("success");
+        setShowToast(true);
         setClientPhases(updatedPhases);
         setSavingState(false);
     };
@@ -247,6 +269,9 @@ const WorkoutPlan = ({
             sessionOrder: newSessionOrder,
         };
         await updateSession(client_id, data);
+        setToastMessage("Session re-ordered!");
+        setToastType("success");
+        setShowToast(true);
     };
 
     const handleSessionDelete = async (sessionId: string) => {
@@ -267,6 +292,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setToastMessage("Deleted session successfully!");
+        setToastType("success");
+        setShowToast(true);
     };
 
     const handleExerciseAdd = (phaseId: string, sessionId: string) => {
@@ -412,6 +440,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setToastMessage("Exercise saved successfully!");
+        setToastType("success");
+        setShowToast(true);
         setSavingState(false);
     }
 
@@ -482,6 +513,9 @@ const WorkoutPlan = ({
                 },
                 { withCredentials: true }
             );
+            setToastMessage("Deleted exercise successfully!");
+            setToastType("success");
+            setShowToast(true);
         } catch (error) {
             console.error("Error deleting exercise:", error);
             // Handle error (e.g., show a notification to the user)
@@ -533,6 +567,9 @@ const WorkoutPlan = ({
             },
             { withCredentials: true }
         );
+        setToastMessage("Deleted Phase successfully!");
+        setToastType("success");
+        setShowToast(true);
     };
 
     if (pageLoading) {

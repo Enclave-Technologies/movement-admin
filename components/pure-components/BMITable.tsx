@@ -8,74 +8,18 @@ import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 const BMITable = ({
     headerColumns,
     data,
-    setData,
     emptyText,
-    handleSave,
     handleDelete,
-    computeBMI,
     buttonLoading,
+    editingRowId,
+    editedData,
+    handleInputChange,
+    handleUpdateRow,
+    handleEditRow
 }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [rowToDelete, setRowToDelete] = useState(null); // New state variable
-    const [editingRowId, setEditingRowId] = useState(null);
-    const [editedData, setEditedData] = useState<BMCRecord | null>(null);
-
-    // When setting editedData for DATE field, format it properly
-    const formatDateToInput = (date) => {
-        const d = new Date(date);
-        return d.toISOString().split("T")[0]; // 'YYYY-MM-DD'
-    };
-
-    const handleEditRow = (rowId) => {
-        const row = data.find((row) => row.$id === rowId);
-        const formattedRow = { ...row, DATE: formatDateToInput(row.DATE) }; // Format DATE
-        setEditingRowId(rowId);
-        setEditedData(formattedRow);
-    };
-
-    const handleUpdateRow = async (rowId) => {
-        // Update the data array with the edited data
-        // setSaving(true);
-        const updatedData = data.map((row) =>
-            row.$id === rowId ? editedData : row
-        );
-        await handleSave(editedData);
-        setData(updatedData);
-        setEditingRowId(null);
-        setEditedData(null);
-        // setSaving(false);
-    };
-
-    const handleInputChange = (event, field) => {
-        const value = event.target.value;
-
-        // Remove leading zeros for numeric fields
-        const formattedValue =
-            field !== "DATE" ? value.replace(/^0+(?=\d)/, "") : value;
-
-        // Convert to number and fix to 2 decimal places if it's numeric
-        const isNumeric = !isNaN(formattedValue) && formattedValue !== "";
-        const newValue = isNumeric
-            ? parseFloat(formattedValue)
-            : formattedValue;
-
-        // Create a new edited data state based on the current one
-        const newEditedData = {
-            ...editedData,
-            [field]: newValue, // Update the specific field
-        };
-
-        // Check if we need to calculate BMI
-        if (field === "HEIGHT" || field === "WEIGHT") {
-            newEditedData.BMI = computeBMI(
-                newEditedData.WEIGHT,
-                newEditedData.HEIGHT
-            ); // Calculate BMI
-        }
-
-        // Set the new state with all updates
-        setEditedData(newEditedData);
-    };
+    
 
     const confirmDeletion = () => {
         handleDelete(rowToDelete); // Perform delete
