@@ -10,30 +10,9 @@ const StoreContext = createContext();
 
 // Create a provider component
 export const StoreProvider = ({ children }) => {
-    // const [users, setUsers] = useState([]); // State to hold user data
-    // const [exercises, setExercises] = useState([]);
     const [trainers, setTrainers] = useState([]);
-    // const [countDoc, setCountDoc] = useState(null);
+    const [exerciseHierarchy, setExerciseHierarchy] = useState(null);
     const [myDetails, setMyDetails] = useState(null);
-    // const fetchUsers = async () => {
-    //     const response = await axios.get(
-    //         `${API_BASE_URL}/mvmt/v1/trainer/clients?limit=${LIMIT}`,
-    //         {
-    //             withCredentials: true, // Include cookies in the request
-    //         }
-    //     );
-    //     setUsers(response.data.data);
-    // };
-
-    // const fetchExercises = async () => {
-    //     const response = await axios.get(
-    //         `${API_BASE_URL}/mvmt/v1/admin/exercises?limit=1000`,
-    //         {
-    //             withCredentials: true,
-    //         }
-    //     );
-    //     setExercises(response.data.data);
-    // };
 
     const fetchTrainers = async () => {
         const response = await axios.get(
@@ -45,15 +24,15 @@ export const StoreProvider = ({ children }) => {
         setTrainers(response.data.data);
     };
 
-    // const fetchCounts = async () => {
-    //     const response = await axios.get(
-    //         `${API_BASE_URL}/mvmt/v1/trainer/get-counts`,
-    //         {
-    //             withCredentials: true, // Include cookies in the request
-    //         }
-    //     );
-    //     setCountDoc(response.data);
-    // };
+    const getExerciseHierarchy = async () => {
+        const response = await axios.get(
+            `${API_BASE_URL}/mvmt/v1/trainer/exerciseHierarchy`,
+            {
+                withCredentials: true, // Include cookies in the request
+            }
+        );
+        setExerciseHierarchy(response.data);
+    };
 
     const fetchMyDetails = async () => {
         const currentUser = await fetchUserDetails();
@@ -62,9 +41,7 @@ export const StoreProvider = ({ children }) => {
 
     // Add a function to update the state
     const reloadData = () => {
-        // fetchCounts();
-        // fetchUsers();
-        // fetchExercises();
+        getExerciseHierarchy();
         fetchTrainers();
         fetchMyDetails();
     };
@@ -78,14 +55,9 @@ export const StoreProvider = ({ children }) => {
     return (
         <StoreContext.Provider
             value={{
-                // countDoc,
-                // users,
-                // exercises,
+                exerciseHierarchy,
                 trainers,
                 myDetails,
-                // setUsers,
-                // setExercises,
-                // setTrainers,
                 reloadData,
             }}
         >

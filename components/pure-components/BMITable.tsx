@@ -5,43 +5,21 @@ import Spinner from "../Spinner";
 import LoadingSpinner from "../LoadingSpinner";
 import DeleteConfirmationDialog from "../DeleteConfirmationDialog";
 
-const EditableTable = ({
+const BMITable = ({
     headerColumns,
     data,
-    setData,
     emptyText,
-    handleSave,
     handleDelete,
+    buttonLoading,
+    editingRowId,
+    editedData,
+    handleInputChange,
+    handleUpdateRow,
+    handleEditRow
 }) => {
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [rowToDelete, setRowToDelete] = useState(null); // New state variable
-    const [editingRowId, setEditingRowId] = useState(null);
-    const [editedData, setEditedData] = useState({});
-
-    const handleEditRow = (rowId) => {
-        setEditingRowId(rowId);
-        setEditedData(data.find((row) => row.$id === rowId));
-    };
-
-    const handleUpdateRow = async (rowId) => {
-        // Update the data array with the edited data
-        // setSaving(true);
-        const updatedData = data.map((row) =>
-            row.$id === rowId ? editedData : row
-        );
-        await handleSave(editedData);
-        setData(updatedData);
-        setEditingRowId(null);
-        setEditedData({});
-        // setSaving(false);
-    };
-
-    const handleInputChange = (event, field) => {
-        setEditedData({
-            ...editedData,
-            [field]: event.target.value,
-        });
-    };
+    
 
     const confirmDeletion = () => {
         handleDelete(rowToDelete); // Perform delete
@@ -84,7 +62,7 @@ const EditableTable = ({
                                 {column}
                             </th>
                         ))}
-                        <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs min-w-32 border-l-[1px] border-gray-500 flex justify-center">
+                        <th className="sticky right-0 bg-gray-200 z-20 px-2 py-2 text-xs border-l-[1px] border-gray-500 flex justify-center">
                             Actions
                         </th>
                     </tr>
@@ -109,19 +87,30 @@ const EditableTable = ({
                                     <>
                                         {colIndex > 0 && (
                                             <td
-                                                key={colIndex}
-                                                className="px-1 py-2 min-w-48"
+                                                key={`${row.$id}-${colIndex}`}
+                                                className="px-1 py-2"
                                             >
                                                 <div className="flex items-center text-center justify-center gap-1">
                                                     <input
-                                                        type="text"
+                                                        type={
+                                                            key === "DATE"
+                                                                ? "date"
+                                                                : "number"
+                                                        }
                                                         value={editedData[key]}
+                                                        readOnly={key === "BMI"}
                                                         onChange={(e) =>
                                                             handleInputChange(
                                                                 e,
                                                                 key
                                                             )
                                                         }
+                                                        // step="0.01" // Allow decimal input
+                                                        min={
+                                                            key !== "DATE"
+                                                                ? 0
+                                                                : undefined
+                                                        } // Prevent negative numbers for numeric fields
                                                         className="w-full text-center px-0 py-1 border rounded"
                                                     />
                                                 </div>
@@ -134,9 +123,14 @@ const EditableTable = ({
                                                     onClick={() =>
                                                         handleUpdateRow(row.$id)
                                                     }
+                                                    disabled={buttonLoading}
                                                     className="text-black hover:text-black mr-2"
                                                 >
-                                                    <FaSave />
+                                                    {buttonLoading ? (
+                                                        <LoadingSpinner className="w-4 h-4" />
+                                                    ) : (
+                                                        <FaSave />
+                                                    )}
                                                 </button>
                                             </td>
                                         )}
@@ -145,8 +139,8 @@ const EditableTable = ({
                                     <>
                                         {colIndex > 0 && (
                                             <td
-                                                key={colIndex}
-                                                className="pl-5 whitespace-nowrap text-sm font-semibold min-w-48"
+                                                key={`${row.$id}-${colIndex}`}
+                                                className="pl-5 whitespace-nowrap text-sm font-semibold"
                                             >
                                                 {row[key]}
                                             </td>
@@ -183,4 +177,4 @@ const EditableTable = ({
     );
 };
 
-export default EditableTable;
+export default BMITable;

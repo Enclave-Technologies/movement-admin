@@ -2,11 +2,11 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import SubmitButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
-import { register } from "@/server_functions/auth";
+import { registerCoach } from "@/server_functions/auth";
 import Toast from "../Toast";
 
 const RegisterTrainerForm = ({ fetchData }) => {
-    const [state, action] = useFormState(register, undefined);
+    const [state, action] = useFormState(registerCoach, undefined);
     const ref = useRef<HTMLFormElement>(null);
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");

@@ -77,6 +77,11 @@ const SessionComponent: FC<SessionProps> = ({
         setShowSessionDeleteConfirm(false); // Just close the dialog
     };
 
+    const onExerciseAdd = (phaseId, sessionId) => {
+        setIsCollapsed(false);
+        handleAddExercise(phaseId, sessionId);
+    };
+
     const handleStartSession = async () => {
         // e.preventDefault();
         try {
@@ -159,11 +164,7 @@ const SessionComponent: FC<SessionProps> = ({
                                     <span className="font-medium">
                                         {sessionName}
                                     </span>
-                                    {/* {nextSession?.$id === session.sessionId ? (
-                    <span className="text-xs text-gray-400">(RECOMMENDED)</span>
-                  ) : (
-                    ""
-                  )} */}
+
                                     {isEditing && (
                                         <TitleEditBox
                                             title="Session Title"
@@ -187,7 +188,7 @@ const SessionComponent: FC<SessionProps> = ({
                                             handleDeleteSession
                                         }
                                         handleCopySession={handleCopySession}
-                                        handleAddExercise={handleAddExercise}
+                                        handleAddExercise={onExerciseAdd}
                                     />
                                 </div>
                             </div>

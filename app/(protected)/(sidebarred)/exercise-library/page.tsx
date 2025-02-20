@@ -108,6 +108,27 @@ const ExercisePage = () => {
         }
     };
 
+    async function handleCsvFile(file: File) {
+        // check file headers
+        // Implement file handling logic here
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+            const response = await axios.post(
+                `${API_BASE_URL}/mvmt/v1/admin/exercises`,
+                formData,
+                {
+                    headers: {
+                        "Content-Type": "multipart/form-data", // Set the content type
+                    },
+                    withCredentials: true, // Include credentials if needed
+                }
+            );
+        } catch (error) {
+            console.error("Error uploading file:", error);
+        }
+    }
+
     const handleBatchApproval = async () => {
         setModalButtonLoadingState(true);
 
@@ -263,11 +284,11 @@ const ExercisePage = () => {
                     </div>
                 ),
             },
-            {
-                accessorKey: "shortName",
-                header: "Shortened Name",
-                size: 250,
-            },
+            // {
+            //    accessorKey: "shortName",
+            //    header: "Shortened Name",
+            //    size: 250,
+            // },
             // {
             //     accessorKey: "approved",
             //     header: "Approval Status",
@@ -383,6 +404,7 @@ const ExercisePage = () => {
                     fetchData={() => {
                         setAdded((prevAdded) => !prevAdded);
                     }}
+                    handleCsvFile={handleCsvFile}
                     team={trainerDetails?.team}
                 />
             </RightModal>

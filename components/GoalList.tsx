@@ -9,7 +9,15 @@ import EditGoalModal from "./EditGoalModal";
 import { API_BASE_URL } from "@/configs/constants";
 import { FaEdit, FaPlus } from "react-icons/fa";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
-const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
+const GoalList = ({
+    goals,
+    setGoals,
+    clientData,
+    pageLoading,
+    setShowToast,
+    setToastMessage,
+    setToastType,
+}) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isEditMode, setIsEditMode] = useState(false);
     const [editingGoal, setEditingGoal] = useState(null);
@@ -34,6 +42,14 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                     },
                     { withCredentials: true }
                 );
+                if (completed) {
+                    setToastMessage("Goal achieved!");
+                    setToastType("success");
+                } else {
+                    setToastMessage("Goal not achieved. Keep going!");
+                    setToastType("error");
+                }
+                setShowToast(true);
             } catch (error) {
                 console.error("Failed to update goal:", error);
                 throw error; // Re-throw the error to be handled in GoalTile
@@ -41,26 +57,6 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
         },
         []
     );
-
-    const deleteGoal = async (goalId, goalType) => {
-        if (window.confirm("Are you sure you want to delete this goal?")) {
-            try {
-                await axios.delete(
-                    `${API_BASE_URL}/mvmt/v1/client/goals/${goalId}`,
-                    {
-                        withCredentials: true,
-                    }
-                );
-                const updatedGoals = goals.map((category) => ({
-                    ...category,
-                    goals: category.goals.filter((goal) => goal.id !== goalId),
-                }));
-                setGoals(updatedGoals);
-            } catch (error) {
-                console.error("Failed to delete goal:", error);
-            }
-        }
-    };
 
     const handleDeleteGoal = async (goalId) => {
         setGoalToDelete(goalId);
@@ -84,6 +80,10 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                         withCredentials: true,
                     }
                 );
+
+                setToastMessage("Goal successfully deleted.");
+                setToastType("success");
+                setShowToast(true);
             } catch (error) {
                 console.error("Failed to delete goal:", error);
             }
@@ -107,6 +107,11 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 },
                 { withCredentials: true }
             );
+
+            setToastMessage("Goal successfully added.");
+            setToastType("success");
+            setShowToast(true);
+
             const data = response.data;
             let updatedGoals = goalTypes.map(({ value }) => ({
                 type: `${value}`.toLowerCase(),
@@ -159,6 +164,7 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
 
             setGoals(updatedGoals);
         }
+
         addGoalToDatabase();
     };
 
@@ -177,6 +183,10 @@ const GoalList = ({ goals, setGoals, clientData, pageLoading }) => {
                 },
                 { withCredentials: true }
             );
+
+            setToastMessage("Goal successfully saved.");
+            setToastType("success");
+            setShowToast(true);
 
             // Create a new array of categories
             const updatedGoals = goalTypes.map((goalType) => ({

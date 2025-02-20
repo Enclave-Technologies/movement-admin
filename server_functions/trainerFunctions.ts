@@ -8,7 +8,7 @@ import "server-only";
 import { Query } from "node-appwrite";
 
 export async function trainerDetails(id: string) {
-    const cookieStore = await cookies();
+    const cookieStore = cookies();
     const session = cookieStore.get(SESSION_COOKIE_NAME);
 
     const { database } = await createSessionClient(
