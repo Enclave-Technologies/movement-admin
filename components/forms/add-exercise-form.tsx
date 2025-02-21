@@ -16,6 +16,7 @@ import Link from "next/link";
 import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner";
 
+
 const Option = (props: OptionProps<any, false>) => {
     const { data } = props;
 
@@ -208,6 +209,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
                         setToastType("info");
                         setShowToast(true);
                     }
+
                 } else {
                     setToastMessage("Please drop a valid CSV file.");
                     setToastType("error"); // Example of another toast type for error
@@ -343,6 +345,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
             <div className="flex flex-col gap-2 items-end">
                 <div id="csv-dropzone">Drop CSV file here</div>
                 <div className="flex flex-row">
+
                     <Link
                         className="hover:underline cursor-pointer w-full text-right"
                         href="/files/exercises-sample.csv"
