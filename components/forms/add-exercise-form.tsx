@@ -14,6 +14,7 @@ import Toast from "../Toast";
 import { addWorkout } from "@/server_functions/auth";
 import Link from "next/link";
 import axios from "axios";
+import LoadingSpinner from "../LoadingSpinner";
 
 const Option = (props: OptionProps<any, false>) => {
     const { data } = props;
@@ -74,6 +75,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
+    const [uploadingState, setUploadingState] = useState(false);
     const ref = useRef<HTMLFormElement>(null);
 
     // const motionOptions = Object.keys(
@@ -133,7 +135,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
                     label: area,
                     description: area,
                 })) || [];
-                
+
             setTargetAreaOptions(targetAreaOptions);
             setSelectedTargetArea(targetAreaOptions[0]);
         } else {
@@ -172,7 +174,14 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
 
         const handleDrop = async (event) => {
             event.preventDefault();
-            if (isHandlingDrop) return;
+            setUploadingState(true);
+            if (isHandlingDrop) {
+                setToastMessage("Already updating");
+                setToastType("error");
+                setShowToast(true);
+                return;
+            }
+
             isHandlingDrop = true;
 
             csvDropzone.classList.remove("dragover");
@@ -185,11 +194,28 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
                     csvFile.type === "text/csv" ||
                     csvFile.type === "application/vnd.ms-excel"
                 ) {
-                    await handleCsvFile(csvFile);
-                    fetchData();
-                    setToastMessage("Exercises updated successfully");
-                    setToastType("success");
-                    setShowToast(true);
+                    const confirmed = confirm(
+                        "Do you want to upload this CSV file?"
+                    );
+                    if (confirmed) {
+                        setToastMessage("CSV File received");
+                        setToastType("success");
+                        setShowToast(true);
+                        try {
+                            await handleCsvFile(csvFile);
+                            await fetchData();
+                        } catch (error) {
+                            setToastMessage(
+                                "Error processing CSV file: " + error.message
+                            );
+                            setToastType("error");
+                            setShowToast(true);
+                        }
+                    } else {
+                        setToastMessage("CSV upload canceled.");
+                        setToastType("info");
+                        setShowToast(true);
+                    }
                 } else {
                     setToastMessage("Please drop a valid CSV file.");
                     setToastType("error"); // Example of another toast type for error
@@ -200,7 +226,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
                 setToastType("error");
                 setShowToast(true);
             }
-
+            setUploadingState(false);
             setTimeout(() => {
                 isHandlingDrop = false;
             }, 1000); // Reset the flag after 1 second
@@ -219,6 +245,16 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
 
     return (
         <div>
+            {uploadingState && (
+                <div className="fixed inset-0 bg-black opacity-80 z-30 flex items-center justify-center">
+                    <div className="text-white flex flex-col items-center">
+                        <LoadingSpinner />
+                        <span className="mt-2">
+                            Uploading and saving data in the database...
+                        </span>
+                    </div>
+                </div>
+            )}
             <form className="space-y-4" action={formAction} ref={ref}>
                 <div>
                     <label
@@ -315,18 +351,6 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
             <div className="flex flex-col gap-2 items-end">
                 <div id="csv-dropzone">Drop CSV file here</div>
                 <div className="flex flex-row">
-                    {/* <p className="text-gray-500">
-                        <span className="text-black">
-                            While uploading CSV please make sure that:{" "}
-                        </span>
-                        <br />
-                        targetArea field matches one of the following: chest,
-                        biceps-brachii, back-latissimus-dorsi, core, metabolic
-                        conditioning, adductors, hamstrings, rectus femoris,
-                        quadriceps, gluteal, shoulders deltoids,
-                        triceps-brachii, back-lower, back-upper,
-                        back-latissimus-dorsi
-                    </p> */}
                     <Link
                         className="hover:underline cursor-pointer w-full text-right"
                         href="/files/exercises-sample.csv"
