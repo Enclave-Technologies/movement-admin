@@ -414,6 +414,8 @@ interface BMCRecord {
     CALF: number; // Measurement for calf
     QUAD: number; // Measurement for quadriceps
     BMI: number; // Body Mass Index, computed field
+    BF: number; // Body Fat Percentage, computed field
+    MM: number; // Muscle Mass, computed field
 }
 
 interface ExerciseHierarchy {

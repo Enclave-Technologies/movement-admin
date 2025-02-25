@@ -98,7 +98,7 @@ const BMITable = ({
                                                                 : "number"
                                                         }
                                                         value={editedData[key]}
-                                                        readOnly={key === "BMI"}
+                                                        readOnly={key === "BMI" || key === "BF" || key === "MM"}
                                                         onChange={(e) =>
                                                             handleInputChange(
                                                                 e,
