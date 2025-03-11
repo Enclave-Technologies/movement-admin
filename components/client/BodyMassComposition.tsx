@@ -49,7 +49,7 @@ const BodyMassComposition = ({
   setToastType,
   setShowToast,
 }) => {
-  const { userData } = useUser(); // Access the user data from Context
+  const { userData } = useUser();
   const [bmiRecords, setBmiRecords] = useState([]);
   const [pageLoading, setPageLoading] = useState(true);
   const [buttonLoading, setButtonLoading] = useState(false);

@@ -24,6 +24,7 @@ const ClientDetails = ({ client_id }) => {
     const [clientPhases, setClientPhases] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [fetchingWorkouts, setFetchingWorkouts] = useState(true);
+    const [deletingSession, setDeletingSession] = useState(false);
     const [fetchingGoals, setFetchingGoals] = useState(true);
     const [nextSession, setNextSession] = useState(null);
     const [progressId, setProgressId] = useState("");
@@ -31,11 +32,7 @@ const ClientDetails = ({ client_id }) => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
-    useEffect(() => {
-        fetchTrackedWorkouts();
-        fetchWorkoutPlan();
-        fetchGoals();
-    }, []);
+
 
     async function fetchWorkoutPlan() {
         try {
@@ -79,9 +76,37 @@ const ClientDetails = ({ client_id }) => {
         setFetchingWorkouts(false);
     }
 
+
+    async function deleteSession(sessionId: string) {
+        setDeletingSession(true);
+        const response = await axios.delete(
+            `${API_BASE_URL}/mvmt/v1/client/tracked-workouts/${sessionId}`,
+            { withCredentials: true }
+        );
+
+        if (response.status === 200) {
+            fetchTrackedWorkouts();
+            setToastMessage("Session deleted successfully");
+            setToastType("success");
+            setShowToast(true);
+            setDeletingSession(false);
+        } else {
+            setToastMessage(response.data.message || "Failed to delete session");
+            setToastType("error");
+            setShowToast(true);
+            setDeletingSession(false);
+        }
+    }   
+
     const handleToastClose = () => {
         setShowToast(false);
     };
+
+    useEffect(() => {
+        fetchTrackedWorkouts();
+        fetchWorkoutPlan();
+        fetchGoals();
+    }, []);
 
     return (
         <TrainerProvider>
@@ -96,6 +121,8 @@ const ClientDetails = ({ client_id }) => {
                             dataLoading={fetchingWorkouts}
                             handleViewSession={null}
                             sessions={sessionLog}
+                            deleteSession={deleteSession}
+                            deletingSession={deletingSession}
                         />
                     )}
                     {selectedTab == "goals" && (
