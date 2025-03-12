@@ -163,7 +163,7 @@ export async function registerCoach(state, formData) {
             // User exists, check their team memberships
             const userTeams = await getUserTeams(users, existingUser.$id);
 
-            console.log("Is only client? ", isOnlyClientMember(userTeams));
+            // console.log("Is only client? ", isOnlyClientMember(userTeams));
 
             if (isOnlyClientMember(userTeams)) {
                 // User is only a client, add them as a trainer

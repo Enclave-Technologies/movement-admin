@@ -67,6 +67,8 @@ export const BMC_COLUMNS = [
     "Calf",
     "Quad",
     "BMI",
+    "BF (%)",
+    "MM",
 ];
 export const DEFAULT_WORKOUT_VALUES = {
     repsMin: 8,

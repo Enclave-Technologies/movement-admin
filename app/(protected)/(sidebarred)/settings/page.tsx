@@ -120,7 +120,7 @@ const SettingsPage = () => {
             // Reload the page on successful submission
             // window.location.reload(); // This will refresh the page
         } catch (error) {
-            console.log("Error saving settings:", error);
+            console.error("Error saving settings:", error);
             setPasswordSubmitState(false);
             // Handle success case
             setToastMessage(error.message);
