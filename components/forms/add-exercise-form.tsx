@@ -13,7 +13,6 @@ import SubmitButton from "../ResponsiveButton";
 import Toast from "../Toast";
 import { addWorkout } from "@/server_functions/auth";
 import Link from "next/link";
-import axios from "axios";
 import LoadingSpinner from "../LoadingSpinner";
 
 const Option = (props: OptionProps<any, false>) => {
@@ -77,26 +76,18 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
     const [toastType, setToastType] = useState("success");
     const [uploadingState, setUploadingState] = useState(false);
     const ref = useRef<HTMLFormElement>(null);
+    const motionOptionsRef = useRef([]);
 
-    // const motionOptions = Object.keys(
-    //     exerciseHierarchy.reduce((acc, curr) => {
-    //         const key = Object.keys(curr)[0];
-    //         acc[key] = true;
-    //         return acc;
-    //     }, {})
-    // ).map((option) => ({
-    //     value: option,
-    //     label: option,
-    //     description: getDescriptionFromMotion(option),
-    // }));
     // Extract unique exercise names from exerciseHierarchy object
-    const motionOptions = Object.entries(
-        exerciseHierarchy as ExerciseHierarchy
-    ).flatMap(([motion, key]) => ({
-        value: motion,
-        label: motion,
-        description: getDescriptionFromMotion(motion), // Function that gets description based on motion
-    }));
+    useEffect(() => {
+        motionOptionsRef.current = Object.entries(
+            exerciseHierarchy as ExerciseHierarchy
+        ).flatMap(([motion, _]) => ({
+            value: motion,
+            label: motion,
+            description: getDescriptionFromMotion(motion), // Function that gets description based on motion
+        }));
+    }, [exerciseHierarchy]);
 
     useEffect(() => {
         if (formState?.success) {
@@ -266,7 +257,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
                     <Select
                         id="Motion"
                         name="Motion"
-                        options={motionOptions}
+                        options={motionOptionsRef.current}
                         getOptionLabel={(option) => option.label}
                         getOptionValue={(option) => option.value}
                         components={{ Option }}

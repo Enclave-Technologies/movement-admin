@@ -152,7 +152,7 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
         const formData = new FormData(e.target);
 
         const data = Object.fromEntries(formData.entries());
-        console.log(data);
+
         // Verify the form data
         if (
             typeof data.Motion !== "string" ||

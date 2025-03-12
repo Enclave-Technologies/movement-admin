@@ -75,6 +75,7 @@ const ScrollTable = ({
     const totalFetched = flatData.length;
 
     //called on scroll and possibly on mount to fetch more data as the user scrolls and reaches bottom of table
+
     const fetchMoreOnBottomReached = useFetchMoreOnBottomReached(
         fetchNextPage,
         isFetching,
@@ -92,7 +93,7 @@ const ScrollTable = ({
     //a check on mount and after a fetch to see if the table is already scrolled to the bottom and immediately needs to fetch more data
     useEffect(() => {
         fetchMoreOnBottomReached(tableContainerRef.current);
-    }, [fetchMoreOnBottomReached]);
+    }, []);
 
     const table = useReactTable({
         data: flatData,
@@ -197,11 +198,11 @@ const ScrollTable = ({
     return (
         <div className="flex items-center justify-center">
             <div
-                className={`container overflow-auto relative rounded-sm h-[${tableHeight}] w-full max-w-[1200px]`}
+                className={`container overflow-auto relative rounded-sm h-[800px] w-full max-w-[1200px]`}
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
                 ref={tableContainerRef}
             >
-                <table className="w-full bg-white overflow-x-visible touch-action-auto">
+                <table className="w-full bg-white grid overflow-x-visible touch-action-auto">
                     <TableHeader table={table} />
                     <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
                 </table>
