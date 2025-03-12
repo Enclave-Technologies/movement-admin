@@ -11,7 +11,7 @@ const useInfiniteScroll = (
     const containerRef = useRef<HTMLDivElement | null>(null);
     const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
-    const handleScroll = () => {
+    const handleScroll = debounce(() => {
         if (containerRef.current) {
             const { scrollHeight, scrollTop, clientHeight } =
                 containerRef.current;
@@ -19,7 +19,7 @@ const useInfiniteScroll = (
                 scrollHeight - scrollTop - clientHeight < threshold;
             setIsScrolledToBottom(isNearBottom);
         }
-    };
+    }, 200);
 
     useEffect(() => {
         if (
@@ -38,6 +38,18 @@ const useInfiniteScroll = (
     ]);
 
     return containerRef;
+    
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
 };
 
 export default useInfiniteScroll;

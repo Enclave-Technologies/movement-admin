@@ -28,28 +28,6 @@ const EditModeTable: FC<EditableTableProps> = ({
         null
     ); // Store the exercise ID for deletion
 
-    // const lenShortOptions = [
-    //   { value: "lengthened", label: "Lengthened" },
-    //   { value: "shortened", label: "Shortened" },
-    //   { value: "variable", label: "Variable" },
-    //   { value: "midrange", label: "Midrange" },
-    //   { value: "none", label: "" },
-    // ];
-
-    // const gripOptions = [
-    //   { value: "neutral", label: "Neutral" },
-    //   { value: "underhand", label: "Underhand" },
-    //   { value: "overhand", label: "Overhand" },
-    //   { value: "none", label: "" },
-    // ];
-
-    // const angleOptions = [
-    //   { value: "flat", label: "Flat" },
-    //   { value: "incline", label: "Incline" },
-    //   { value: "decline", label: "Decline" },
-    //   { value: "none", label: "" },
-    // ];
-
     const handleDeleteExercise = async (exerciseId: string) => {
         setExerciseToDelete(exerciseId); // Set the ID of the exercise to delete
     };
@@ -65,10 +43,7 @@ const EditModeTable: FC<EditableTableProps> = ({
     };
 
     const filteredExercises = (exercise) => {
-        let results = workoutOptions.filter((option) => {
-            return option.workout.targetArea == exercise.targetArea;
-        });
-        return results;
+        return workoutOptions; // No filtering based on targetArea
     };
 
     const calculateTUT = ({ tempo, setsMax, repsMax }) => {
@@ -78,20 +53,6 @@ const EditModeTable: FC<EditableTableProps> = ({
         }
         return tempoSum * setsMax * repsMax;
     };
-
-    // function handleDragEnd(event) {
-    //   const { active, over } = event;
-
-    //   if (active.id !== over.id) {
-    //     const originalPos = exercises.findIndex((e) => e.id === active.id);
-    //     const newPos = exercises.findIndex((e) => e.id === over.id);
-    //     const newExercises = [...exercises];
-    //     newExercises.splice(originalPos, 1);
-    //     newExercises.splice(newPos, 0, exercises[originalPos]);
-    //     // onExerciseOrderChange(phaseId, sessionId, newExercises);
-
-    //   }
-    // }
 
     return (
         <div className="overflow-y-hidden pb-72">
@@ -218,7 +179,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     }}
                                                 />
                                             </td>
-                                            {/* <td className="w-2"></td> */}
                                             <td className="px-1 py-2 relative">
                                                 <Select
                                                     options={filteredExercises(
@@ -587,13 +547,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                             <FaEdit />
                                                         </button>
                                                         <button
-                                                            // onClick={() =>
-                                                            //     onExerciseDelete(
-                                                            //         phaseId,
-                                                            //         sessionId,
-                                                            //         exercise.id
-                                                            //     )
-                                                            // }
                                                             onClick={
                                                                 () =>
                                                                     handleDeleteExercise(
@@ -615,9 +568,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                             .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
                             .map((exercise) => (
                                 <tr key={exercise.id} className="border-b">
-                                    {/* <td className="px-1 py-2">
-                                        {exercise.exerciseOrder}
-                                    </td> */}
                                     {exerciseToDelete === exercise.id && ( // Show confirmation only for the selected exercise
                                         <DeleteConfirmationDialog
                                             title={`Exercise: ${exercise.fullName}`}
