@@ -64,6 +64,7 @@ const EditUserForm = ({
     const [email, setEmail] = useState("");
     const [gender, setGender] = useState("");
     const [trainer, setTrainer] = useState("");
+    const [idealWeight, setIdealWeight] = useState("");
     const [submitted, setSubmitted] = useState(false);
 
     const [showToast, setShowToast] = useState(false);
@@ -83,6 +84,7 @@ const EditUserForm = ({
                 trainers?.find((trnr) => trnr.uid === clientData.trainer_id) ||
                     null
             );
+            setIdealWeight(clientData.idealWeight);
         }
     }, [clientData]);
 
@@ -273,6 +275,22 @@ const EditUserForm = ({
                                     "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", // Add a box shadow to the dropdown menu
                             }),
                         }}
+                    />
+                </div>
+                <div>
+                    <label
+                        htmlFor="idealWeight"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Ideal weight
+                    </label>
+                    <input
+                        type="number"
+                        id="idealWeight"
+                        name="idealWeight"
+                        value={idealWeight}
+                        onChange={(e) => setIdealWeight(e.target.value)}
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                     />
                 </div>
                 <button

@@ -233,6 +233,7 @@ export async function registerClient(state, formData) {
         email: formData.get("email"),
         trainerId: formData.get("trainerId"),
         gender: formData.get("gender"),
+        idealWeight: formData.get("idealWeight"),
     });
 
     if (!validatedResult.success) {
@@ -242,8 +243,15 @@ export async function registerClient(state, formData) {
         };
     }
 
-    const { firstName, lastName, phone, email, trainerId, gender } =
-        validatedResult.data;
+    const {
+        firstName,
+        lastName,
+        phone,
+        email,
+        trainerId,
+        gender,
+        idealWeight,
+    } = validatedResult.data;
     const { account, database, users, teams } = await createAdminClient();
 
     try {
@@ -265,7 +273,8 @@ export async function registerClient(state, formData) {
                     lastName,
                     phone,
                     trainerId,
-                    gender
+                    gender,
+                    idealWeight
                 );
                 return {
                     success: true,
@@ -296,6 +305,7 @@ export async function registerClient(state, formData) {
             phone,
             trainerId,
             gender,
+            idealWeight,
             existingUser
         );
 
@@ -346,6 +356,7 @@ async function addExistingUserAsTrainer(
     jobTitle,
     phone,
     gender,
+
     role
 ) {
     // Add user to trainers collection
@@ -372,7 +383,8 @@ async function addExistingUserAsClient(
     lastName,
     phone,
     trainerId,
-    gender
+    gender,
+    idealWeight
 ) {
     // Add user to users collection
     await createUserDocument(
@@ -383,7 +395,8 @@ async function addExistingUserAsClient(
         user.email,
         phone,
         trainerId,
-        gender
+        gender,
+        idealWeight
     );
 
     // Add user to clients team
@@ -445,6 +458,7 @@ async function createNewClient(
     phone,
     trainerId,
     gender,
+    idealWeight,
     existingUser
 ) {
     if (!existingUser) {
@@ -469,7 +483,8 @@ async function createNewClient(
         email,
         phone,
         trainerId,
-        gender
+        gender,
+        idealWeight
     );
 }
 
@@ -531,7 +546,8 @@ async function createUserDocument(
     email,
     phone,
     trainerId,
-    gender
+    gender,
+    idealWeight
 ) {
     await database.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID,
@@ -547,6 +563,7 @@ async function createUserDocument(
             trainers: trainerId,
             imageUrl: null,
             gender,
+            idealWeight,
         }
     );
 }

@@ -230,6 +230,25 @@ const AddUserForm = ({
                         }}
                     />
                 </div>
+                <div>
+                    <label
+                        htmlFor="idealWeight"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Ideal weight
+                    </label>
+                    <input
+                        type="number"
+                        id="idealWeight"
+                        name="idealWeight"
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {clientState?.errors?.gender && (
+                        <p className="text-red-500 text-xs italic">
+                            {clientState.errors.gender}
+                        </p>
+                    )}
+                </div>
                 <SubmitButton label="Submit" />
             </form>
             {showToast && (

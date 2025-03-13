@@ -336,6 +336,7 @@ type UserTemplate = {
     trainer_name?: string;
     imageUrl?: string;
     gender?: string;
+    idealWeight?: number;
 };
 
 type ExerciseTemplate = {
@@ -413,6 +414,7 @@ interface BMCRecord {
     KNEE: number; // Measurement for knee
     CALF: number; // Measurement for calf
     QUAD: number; // Measurement for quadriceps
+    HAM: number; // Measurement for hamstrings
     BMI: number; // Body Mass Index, computed field
     BF: number; // Body Fat Percentage, computed field
     MM: number; // Muscle Mass, computed field

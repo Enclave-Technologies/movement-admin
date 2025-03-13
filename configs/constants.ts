@@ -66,6 +66,7 @@ export const BMC_COLUMNS = [
     "Knee",
     "Calf",
     "Quad",
+    "Ham",
     "BMI",
     "BF (%)",
     "MM",
