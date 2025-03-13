@@ -9,6 +9,18 @@ import { ID } from "appwrite";
 import Toast from "../Toast";
 import LoadingSpinner from "../LoadingSpinner";
 
+// Follow this calculation
+// BF% = (bc*100/ak) + bd
+// MM = (weight - (weight*bf%)/100)
+
+// bc=( 1 + (0.195 * ap) - (0.000240 * ap * ap)) * 0.01
+// ap = ( pec + subscap + midax + supra + umbil + ((triceps + calf + bb) * ai) )
+// bb = (max(quad, ham) + quad)/2
+// ai = max(pow(ideal/current, 2), 1)
+// ak=(1/(1 + aj))
+// aj = ((160 - height)/400)
+// bd=((age - 18)*0.8*bc*bc) + 0
+
 const calculateBMI = (weight: number, height: number) => {
     if (height > 0) {
         const heightM = height / 100; // Convert cm to meters
@@ -17,13 +29,37 @@ const calculateBMI = (weight: number, height: number) => {
     return 0; // Return 0 if height is 0 to avoid division by zero
 };
 
-const calculateBodyFat = (bmi: number, gender: number) => {
+const calculateBodyFat = (
+    PEC: number,
+    TRICEPS: number,
+    SUBSCAP: number,
+    MIDAX: number,
+    SUPRA: number,
+    UBMIL: number,
+    CALF: number,
+    QUAD: number,
+    HAM: number,
+    idealWeight: number,
+    height: number,
+    weight: number,
+    age: number
+) => {
     try {
-        if (!bmi || !gender) return 0;
+        const AI = Math.max(Math.pow(idealWeight / weight, 2), 1);
+        const BB = (Math.max(QUAD, HAM) + QUAD) / 2;
+        const AJ = (160 - height) / 400;
+        const AP =
+            PEC + SUBSCAP + MIDAX + SUPRA + UBMIL + (TRICEPS + CALF + BB) * AI;
+        const BC = (1 + 0.195 * AP - 0.00024 * AP * AP) * 0.01;
+        const BD = (age - 18) * 0.8 * BC * BC + 0;
+        const AK = 1 / (1 + AJ);
 
-        // Deurenberg formula with gender
-        const bodyFat = 1.2 * bmi - 10.8 * gender - 5.4;
-        return isNaN(bodyFat) ? 0 : Number(bodyFat.toFixed(2));
+        return Number(((BC * 100) / AK + BD).toFixed(2));
+
+        // if (!bmi || !gender) return 0;
+        // // Deurenberg formula with gender
+        // const bodyFat = 1.2 * bmi - 10.8 * gender - 5.4;
+        // return isNaN(bodyFat) ? 0 : Number(bodyFat.toFixed(2));
     } catch (error) {
         return 0;
     }
@@ -47,6 +83,27 @@ const calculateMuscleMass = (
     }
 };
 
+const calculateExactAge = (dob) => {
+    try {
+        const today = new Date();
+        const birthDate = new Date(dob);
+
+        if (isNaN(birthDate.getTime())) {
+            return 18;
+        }
+
+        // Calculate the difference in milliseconds
+        const ageInMilliseconds = today.getTime() - birthDate.getTime();
+
+        // Convert milliseconds to years, considering leap years by using 365.25 days per year
+        const age = ageInMilliseconds / (1000 * 60 * 60 * 24 * 365.25);
+
+        return age;
+    } catch (error) {
+        return 18;
+    }
+};
+
 const BodyMassComposition = ({
     client_id,
     setToastMessage,
@@ -58,6 +115,8 @@ const BodyMassComposition = ({
     const [pageLoading, setPageLoading] = useState(true);
     const [buttonLoading, setButtonLoading] = useState(false);
     const [editingRowId, setEditingRowId] = useState(null);
+    const [currentAge, setCurrentAge] = useState(18);
+    const [idealWeight, setIdealWeight] = useState(0);
     const [editedData, setEditedData] = useState<BMCRecord | null>(null);
 
     const handleToastClose = () => {
@@ -66,6 +125,12 @@ const BodyMassComposition = ({
 
     useEffect(() => {
         async function fetchData() {
+            if (userData.dob) {
+                setCurrentAge(calculateExactAge(userData.dob));
+            }
+
+            setIdealWeight(userData.idealWeight);
+
             try {
                 const response = await axios.get(
                     `${API_BASE_URL}/mvmt/v1/client/bmc?client_id=${client_id}`,
@@ -73,17 +138,17 @@ const BodyMassComposition = ({
                 );
 
                 const recordsWithCalculations = response.data.map((record) => {
-                    const bmi = calculateBMI(record.WEIGHT, record.HEIGHT);
-                    const gender = userData.gender === "m" ? 1 : 0;
+                    // const bmi = calculateBMI(record.WEIGHT, record.HEIGHT);
+                    // const gender = userData.gender === "m" ? 1 : 0;
                     return {
                         ...record,
-                        BMI: bmi,
-                        BF: calculateBodyFat(bmi, gender),
-                        MM: calculateMuscleMass(
-                            record.WEIGHT,
-                            calculateBodyFat(bmi, gender),
-                            gender
-                        ),
+                        // BMI: bmi,
+                        // BF: calculateBodyFat(bmi, gender),
+                        // MM: calculateMuscleMass(
+                        //     record.WEIGHT,
+                        //     calculateBodyFat(bmi, gender),
+                        //     gender
+                        // ),
                     };
                 });
 
@@ -229,10 +294,36 @@ const BodyMassComposition = ({
                 newEditedData.WEIGHT,
                 newEditedData.HEIGHT
             );
+        }
+        if (
+            field === "HEIGHT" ||
+            field === "WEIGHT" ||
+            field === "PEC" ||
+            field === "TRICEPS" ||
+            field === "SUBSCAP" ||
+            field === "MIDAX" ||
+            field === "SUPRA" ||
+            field === "UBMIL" ||
+            field === "CALF" ||
+            field === "QUAD" ||
+            field === "HAM"
+        ) {
             newEditedData.BF = calculateBodyFat(
-                newEditedData.BMI,
-                userData.gender === "m" ? 1 : 0
+                newEditedData.PEC || 0,
+                newEditedData.TRICEPS || 0,
+                newEditedData.SUBSCAP || 0,
+                newEditedData.MIDAX || 0,
+                newEditedData.SUPRA || 0,
+                newEditedData.UBMIL || 0,
+                newEditedData.CALF || 0,
+                newEditedData.QUAD || 0,
+                newEditedData.HAM || 0,
+                idealWeight || 50,
+                newEditedData.HEIGHT,
+                newEditedData.WEIGHT,
+                currentAge
             );
+
             newEditedData.MM = calculateMuscleMass(
                 newEditedData.WEIGHT,
                 newEditedData.BF,
