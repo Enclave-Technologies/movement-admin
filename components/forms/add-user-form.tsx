@@ -185,6 +185,25 @@ const AddUserForm = ({
                 </div>
                 <div>
                     <label
+                        htmlFor="dateOfBirth"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Date of Birth
+                    </label>
+                    <input
+                        type="date" // Changed to 'type="date"' for date input
+                        id="dateOfBirth"
+                        name="dateOfBirth"
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {clientState?.errors?.dateOfBirth && ( // Updated error handling for dateOfBirth
+                        <p className="text-red-500 text-xs italic">
+                            {clientState.errors.dateOfBirth}
+                        </p>
+                    )}
+                </div>
+                <div>
+                    <label
                         htmlFor="trainerId"
                         className="block text-sm font-medium text-gray-700"
                     >
@@ -229,6 +248,25 @@ const AddUserForm = ({
                             }),
                         }}
                     />
+                </div>
+                <div>
+                    <label
+                        htmlFor="idealWeight"
+                        className="block text-sm font-medium text-gray-700"
+                    >
+                        Ideal weight
+                    </label>
+                    <input
+                        type="number"
+                        id="idealWeight"
+                        name="idealWeight"
+                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    />
+                    {clientState?.errors?.idealWeight && (
+                        <p className="text-red-500 text-xs italic">
+                            {clientState.errors.idealWeight}
+                        </p>
+                    )}
                 </div>
                 <SubmitButton label="Submit" />
             </form>

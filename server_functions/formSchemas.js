@@ -9,6 +9,7 @@ export const RegisterFormSchema = z.object({
     jobTitle: z.string().min(2, "Job Title must be at least 2 letters"),
     role: z.enum(["admins", "trainers"]),
     gender: z.enum(["m", "f"]),
+    dob: z.optional(z.date()),
 });
 
 // Define a schema for the register form data
@@ -19,6 +20,13 @@ export const ClientFormSchema = z.object({
     email: z.string().email("Invalid email address"),
     trainerId: z.string().min(2, "Trainer ID cannot be empty"),
     gender: z.enum(["m", "f"]),
+    idealWeight: z
+        .optional(z.number())
+        .refine(
+            (weight) => weight >= 0,
+            "Ideal Weight must be a non-negative number"
+        ), // Ensure it's a non-negative number if provided
+    dob: z.optional(z.date()),
 });
 
 export const LoginFormSchema = z.object({

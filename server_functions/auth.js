@@ -133,6 +133,21 @@ export async function logout() {
 }
 
 export async function registerCoach(state, formData) {
+    let processedDateOfBirth;
+    if (formData.get("dateOfBirth")) {
+        // Try converting the value to a Date object
+        const dob = new Date(formData.get("dateOfBirth"));
+
+        if (!isNaN(dob.getTime())) {
+            // Check if it's a valid date
+            processedDateOfBirth = dob;
+        } else {
+            console.error(`Invalid dateOfBirth: ${dateOfBirthString}`);
+            processedDateOfBirth = undefined; // or handle as needed
+        }
+    } else {
+        processedDateOfBirth = undefined; // Optional field handling
+    }
     // 1. Validate fields
     const validatedResult = RegisterFormSchema.safeParse({
         firstName: formData.get("firstName"),
@@ -142,6 +157,7 @@ export async function registerCoach(state, formData) {
         jobTitle: formData.get("jobTitle"),
         role: formData.get("role"),
         gender: formData.get("gender"),
+        dob: processedDateOfBirth,
     });
 
     if (!validatedResult.success) {
@@ -151,7 +167,7 @@ export async function registerCoach(state, formData) {
         };
     }
 
-    const { firstName, lastName, phone, email, jobTitle, role, gender } =
+    const { firstName, lastName, phone, email, jobTitle, role, gender, dob } =
         validatedResult.data;
     const { account, database, users, teams } = await createAdminClient();
 
@@ -176,7 +192,8 @@ export async function registerCoach(state, formData) {
                     jobTitle,
                     phone,
                     gender,
-                    role
+                    role,
+                    dob
                 );
                 return {
                     success: true,
@@ -208,7 +225,8 @@ export async function registerCoach(state, formData) {
                 phone,
                 jobTitle,
                 gender,
-                role
+                role,
+                dob
             );
             return {
                 success: true,
@@ -226,6 +244,37 @@ export async function registerCoach(state, formData) {
 }
 
 export async function registerClient(state, formData) {
+    let processedIdealWeight;
+    let processedDateOfBirth;
+
+    if (formData.get("idealWeight")) {
+        // Try converting the value to a number
+        const weightNumber = Number(formData.get("idealWeight"));
+
+        if (!isNaN(weightNumber)) {
+            processedIdealWeight = weightNumber;
+        } else {
+            console.error(`Invalid idealWeight: ${idealWeight}`);
+            processedIdealWeight = undefined; // or handle as needed
+        }
+    } else {
+        processedIdealWeight = undefined; // Optional field handling
+    }
+    if (formData.get("dateOfBirth")) {
+        // Try converting the value to a Date object
+        const dob = new Date(formData.get("dateOfBirth"));
+
+        if (!isNaN(dob.getTime())) {
+            // Check if it's a valid date
+            processedDateOfBirth = dob;
+        } else {
+            console.error(`Invalid dateOfBirth: ${dateOfBirthString}`);
+            processedDateOfBirth = undefined; // or handle as needed
+        }
+    } else {
+        processedDateOfBirth = undefined; // Optional field handling
+    }
+
     const validatedResult = ClientFormSchema.safeParse({
         firstName: formData.get("firstName"),
         lastName: formData.get("lastName"),
@@ -233,6 +282,8 @@ export async function registerClient(state, formData) {
         email: formData.get("email"),
         trainerId: formData.get("trainerId"),
         gender: formData.get("gender"),
+        idealWeight: processedIdealWeight,
+        dob: processedDateOfBirth,
     });
 
     if (!validatedResult.success) {
@@ -242,8 +293,16 @@ export async function registerClient(state, formData) {
         };
     }
 
-    const { firstName, lastName, phone, email, trainerId, gender } =
-        validatedResult.data;
+    const {
+        firstName,
+        lastName,
+        phone,
+        email,
+        trainerId,
+        gender,
+        idealWeight,
+        dob,
+    } = validatedResult.data;
     const { account, database, users, teams } = await createAdminClient();
 
     try {
@@ -265,7 +324,9 @@ export async function registerClient(state, formData) {
                     lastName,
                     phone,
                     trainerId,
-                    gender
+                    gender,
+                    idealWeight,
+                    dob
                 );
                 return {
                     success: true,
@@ -296,7 +357,9 @@ export async function registerClient(state, formData) {
             phone,
             trainerId,
             gender,
-            existingUser
+            idealWeight,
+            existingUser,
+            dob
         );
 
         return {
@@ -346,7 +409,9 @@ async function addExistingUserAsTrainer(
     jobTitle,
     phone,
     gender,
-    role
+
+    role,
+    dob
 ) {
     // Add user to trainers collection
     await createTrainerDocument(
@@ -357,7 +422,8 @@ async function addExistingUserAsTrainer(
         jobTitle,
         phone,
         user.email,
-        gender
+        gender,
+        dob
     );
 
     // Add user to appropriate team based on role
@@ -372,7 +438,9 @@ async function addExistingUserAsClient(
     lastName,
     phone,
     trainerId,
-    gender
+    gender,
+    idealWeight,
+    dob
 ) {
     // Add user to users collection
     await createUserDocument(
@@ -383,7 +451,9 @@ async function addExistingUserAsClient(
         user.email,
         phone,
         trainerId,
-        gender
+        gender,
+        idealWeight,
+        dob
     );
 
     // Add user to clients team
@@ -401,7 +471,8 @@ async function createNewTrainer(
     phone,
     jobTitle,
     gender,
-    role
+    role,
+    dob
 ) {
     // Create user account
     await createUserAccount(account, uid, email, `${firstName} ${lastName}`);
@@ -420,7 +491,8 @@ async function createNewTrainer(
             jobTitle,
             phone,
             email,
-            gender
+            gender,
+            dob
         ),
         createUserDocument(
             database,
@@ -429,7 +501,10 @@ async function createNewTrainer(
             lastName,
             email,
             phone,
-            gender
+            uid,
+            gender,
+            0,
+            dob
         ),
     ]);
 }
@@ -445,7 +520,9 @@ async function createNewClient(
     phone,
     trainerId,
     gender,
-    existingUser
+    idealWeight,
+    existingUser,
+    dob
 ) {
     if (!existingUser) {
         // Create user account if it doesn't exist
@@ -469,7 +546,9 @@ async function createNewClient(
         email,
         phone,
         trainerId,
-        gender
+        gender,
+        idealWeight,
+        dob
     );
 }
 
@@ -505,7 +584,8 @@ async function createTrainerDocument(
     jobTitle,
     phone,
     email,
-    gender
+    gender,
+    dob
 ) {
     await database.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID,
@@ -519,6 +599,7 @@ async function createTrainerDocument(
             phone,
             email,
             gender,
+            dob,
         }
     );
 }
@@ -531,7 +612,9 @@ async function createUserDocument(
     email,
     phone,
     trainerId,
-    gender
+    gender,
+    idealWeight,
+    dob
 ) {
     await database.createDocument(
         process.env.NEXT_PUBLIC_DATABASE_ID,
@@ -547,6 +630,8 @@ async function createUserDocument(
             trainers: trainerId,
             imageUrl: null,
             gender,
+            idealWeight,
+            dob,
         }
     );
 }
