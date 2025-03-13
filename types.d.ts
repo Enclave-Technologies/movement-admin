@@ -337,6 +337,7 @@ type UserTemplate = {
     imageUrl?: string;
     gender?: string;
     idealWeight?: number;
+    dob: Date;
 };
 
 type ExerciseTemplate = {
@@ -381,6 +382,7 @@ interface CoachTemplate {
     jobTitle?: string;
     gender?: string;
     role: string;
+    dob: Date;
 }
 
 interface BatchConfirmationDialogProps {

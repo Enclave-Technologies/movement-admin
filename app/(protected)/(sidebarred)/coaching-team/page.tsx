@@ -240,6 +240,7 @@ const CoachingTeam = () => {
                                     gender: info.row.original.gender,
                                     jobTitle: info.row.original.jobTitle,
                                     role: info.row.original.role,
+                                    dob: info.row.original.dob,
                                 };
 
                                 handleTrainerEditClicked(coachData);

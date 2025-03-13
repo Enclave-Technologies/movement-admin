@@ -87,7 +87,7 @@ const BodyMassComposition = ({
                     };
                 });
 
-                console.log(recordsWithCalculations);
+                // console.log(recordsWithCalculations);
 
                 setBmiRecords(recordsWithCalculations);
             } catch (error) {
