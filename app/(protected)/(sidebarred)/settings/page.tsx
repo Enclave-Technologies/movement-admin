@@ -164,7 +164,7 @@ const SettingsPage = () => {
 
             // Reload the page on successful submission
             setProfileSubmitState(false);
-            setToastMessage("Settings saved successfully");
+            setToastMessage("Settings saved successfully. App will reload.");
             setToastType("success");
             setShowToast(true);
             window.location.reload(); // This will refresh the page
@@ -214,20 +214,20 @@ const SettingsPage = () => {
         }
     };
 
-    useEffect(() => {
-        const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-            if (dataModified) {
-                e.preventDefault();
-                // e.returnValue = "";
-            }
-        };
+    // useEffect(() => {
+    //     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+    //         if (dataModified) {
+    //             e.preventDefault();
+    //             // e.returnValue = "";
+    //         }
+    //     };
 
-        window.addEventListener("beforeunload", handleBeforeUnload);
+    //     window.addEventListener("beforeunload", handleBeforeUnload);
 
-        return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-        };
-    }, [dataModified]);
+    //     return () => {
+    //         window.removeEventListener("beforeunload", handleBeforeUnload);
+    //     };
+    // }, [dataModified]);
 
     return pageLoading ? (
         <PageLoading />
