@@ -79,6 +79,7 @@ const EditTrainerForm = ({ fetchData, clientData }) => {
                     gender: data.gender,
                     jobTitle: data.jobTitle,
                     role: data.role,
+                    dob: data.dateOfBirth,
                 },
                 {
                     withCredentials: true,
