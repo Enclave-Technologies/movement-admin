@@ -16,7 +16,6 @@ import DeleteConfirmationDialog from "@/components/DeleteConfirmationDialog";
 import Toast from "@/components/Toast";
 import EditTrainerForm from "@/components/forms/edit-trainer-form";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { TbEdit } from "react-icons/tb";
 
 const CoachingTeam = () => {

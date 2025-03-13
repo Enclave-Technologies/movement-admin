@@ -9,12 +9,6 @@ export const RegisterFormSchema = z.object({
     jobTitle: z.string().min(2, "Job Title must be at least 2 letters"),
     role: z.enum(["admins", "trainers"]),
     gender: z.enum(["m", "f"]),
-    idealWeight: z
-        .optional(z.number())
-        .refine(
-            (weight) => weight >= 0,
-            "Ideal Weight must be a non-negative number"
-        ),
 });
 
 // Define a schema for the register form data

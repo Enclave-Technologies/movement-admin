@@ -125,6 +125,7 @@ const EditUserForm = ({
                     trainer_id: data.trainerId,
                     trainers: data.trainerId,
                     gender: data.gender,
+                    idealWeight: Number(data.idealWeight),
                 },
                 {
                     withCredentials: true,

@@ -442,7 +442,9 @@ async function createNewTrainer(
             lastName,
             email,
             phone,
-            gender
+            uid,
+            gender,
+            0
         ),
     ]);
 }
