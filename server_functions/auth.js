@@ -70,6 +70,7 @@ export async function login(state, formData) {
             secure: true,
             expires: new Date(session.expire),
             path: "/",
+		domain: "enclave.live"
         });
     } catch (error) {
         console.error(error);
@@ -124,7 +125,7 @@ export async function logout() {
             sameSite: "None",
             secure: true,
             path: "/",
-            // domain: "enclave.live",
+            domain: "enclave.live",
         };
 
         cookies().delete(cookieOptions);
