@@ -2,7 +2,7 @@ import { MemoizedCell } from "./MemoizedTableComponents";
 import { Row } from "@tanstack/react-table";
 
 const TableBody = ({ rowVirtualizer, rows }) => {
-  console.log({ rowVirtualizer: rowVirtualizer.getVirtualItems().length });
+  
   return (
     <tbody
       style={{
@@ -11,9 +11,9 @@ const TableBody = ({ rowVirtualizer, rows }) => {
         position: "relative", //needed for absolute positioning of rows
       }}
     >
-      {rowVirtualizer.getVirtualItems().length == 0 ? (
+      {rowVirtualizer.getVirtualItems().length === 0 ? (
         <tr className={`bg-white h-12 items-center cursor-default`}>
-          <td>No Entries Found</td>
+          <td colSpan={rows[0]?.getVisibleCells().length || 1} className="text-center">No Entries Found</td>
         </tr>
       ) : (
         rowVirtualizer.getVirtualItems().map((virtualRow) => {
