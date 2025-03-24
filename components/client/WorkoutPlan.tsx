@@ -38,172 +38,23 @@ const WorkoutPlan = ({
     //     useState(false);
     // const [sessionButtonsState, setSessionButtonsState] = useState(false);
 
-const handleAddPhase = async () => {
-    setOpRunning(true);
-    try {
-        setPhaseAddingState(true);
-        // Logic to add a new phase
-        const newPhase: Phase = {
-            phaseId: ID.unique(),
-            phaseName: "Untitled Phase",
-            isActive: false,
-            sessions: [],
-        };
-
-        const modifiedClientPhases = [...clientPhases, newPhase];
-
-        const data: DataResponse = {
-            phases: modifiedClientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setToastMessage("Phase data successfully saved!");
-        setToastType("success");
-        setShowToast(true);
-        
-        setClientPhases(modifiedClientPhases);
-    } finally {
-        setPhaseAddingState(false);
-        setOpRunning(false);
-    }
-};
-
-const handleCopyPhase = async (phaseId: string) => {
-    setOpRunning(true);
-    try {
-        setPhaseAddingState(true);
-        setSavingState(true);
-        // Find the target phase to be copied
-        const targetPhase = clientPhases.find(
-            (phase) => phase.phaseId === phaseId
-        );
-        if (!targetPhase) return;
-
-        // Create a new phase with a unique ID
-        const newPhase: Phase = {
-            phaseId: ID.unique(),
-            phaseName: `${targetPhase.phaseName} (Copy)`,
-            isActive: false,
-            sessions: targetPhase.sessions.map((session) => ({
-                sessionId: ID.unique(),
-                sessionName: `${session.sessionName} (Copy)`,
-                exercises: session.exercises.map((exercise: Exercise) => ({
-                    id: ID.unique(),
-                    exerciseId: exercise.exerciseId,
-                    fullName: exercise.fullName,
-                    motion: exercise.motion,
-                    targetArea: exercise.targetArea,
-                    exerciseVideo: exercise.exerciseVideo || "",
-                    repsMin: exercise.repsMin,
-                    repsMax: exercise.repsMax,
-                    setsMin: exercise.setsMin,
-                    setsMax: exercise.setsMax,
-                    tempo: exercise.tempo,
-                    TUT: exercise.TUT,
-                    restMin: exercise.restMin,
-                    restMax: exercise.restMax,
-                    exerciseOrder: exercise.exerciseOrder,
-                    setOrderMarker: exercise.setOrderMarker,
-                    bias: exercise.bias,
-                    lenShort: exercise.lenShort,
-                    impliment: exercise.impliment,
-                    grip: exercise.grip,
-                    angle: exercise.angle,
-                    support: exercise.support,
-                    xtraInstructions: exercise.xtraInstructions,
-                })),
-                sessionTime: session.sessionTime,
-                sessionOrder: session.sessionOrder,
-            })),
-        };
-
-        const modifiedClientPhases = [...clientPhases, newPhase];
-        const data: DataResponse = {
-            phases: modifiedClientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setToastMessage("Phase data copied successfully!");
-        setToastType("success");
-        setShowToast(true);
-        setClientPhases(modifiedClientPhases);
-        setToastMessage("Phase data copied successfully!");
-        setToastType("success");
-        setShowToast(true);
-        setClientPhases(modifiedClientPhases);
-    } finally {
-        setPhaseAddingState(false);
-        setSavingState(false);
-        setOpRunning(false);
-    }
-};
-
-    const updateClientPhase = async (newPhase: any) => {
-        // setClientPhases(updatedPhases);
-    };
-
-    const handleActivatePhase = async (
-        phaseId: string,
-        phaseState: boolean
-    ) => {
-        setCurrentPhaseState(phaseState);
-        setPhaseActivation(true);
-        const modifiedPhases = clientPhases.map((phase) => ({
-            ...phase,
-            isActive: phase.phaseId === phaseId ? phaseState : false,
-        }));
-        setClientPhases(modifiedPhases);
-        const data: DataResponse = {
-            phases: modifiedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        if (phaseState) {
-            setToastMessage("Phase activation successful!");
-        } else {
-            setToastMessage("Phase deactivation successful!");
-        }
-        setToastType("success");
-        setShowToast(true);
-
-        fetchTrackedWorkouts();
-        setPhaseActivation(false);
-    };
-
-    const handlePhaseNameChange = async (
-        phaseId: string,
-        newPhaseName: string
-    ) => {
-        // if (!phaseButtonsState.includes(phaseId)) {
-        //     setPhaseButtonsState([...phaseButtonsState, phaseId]);
-        // }
-        setSavingState(true);
-        // Update the phase name in the original data
-        const updatedPhases = clientPhases.map((p) =>
-            p.phaseId === phaseId ? { ...p, phaseName: newPhaseName } : p
-        );
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
+    const handleAddPhase = async () => {
+        setOpRunning(true);
         try {
+            setPhaseAddingState(true);
+            // Logic to add a new phase
+            const newPhase: Phase = {
+                phaseId: ID.unique(),
+                phaseName: "Untitled Phase",
+                isActive: false,
+                sessions: [],
+            };
+
+            const modifiedClientPhases = [...clientPhases, newPhase];
+
+            const data: DataResponse = {
+                phases: modifiedClientPhases,
+            };
             await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/phases`,
                 {
@@ -212,164 +63,342 @@ const handleCopyPhase = async (phaseId: string) => {
                 },
                 { withCredentials: true }
             );
-            setToastMessage("Phase name changed!");
+            setToastMessage("Phase data successfully saved!");
+            setToastType("success");
+            setShowToast(true);
+
+            setClientPhases(modifiedClientPhases);
+        } finally {
+            setPhaseAddingState(false);
+            setOpRunning(false);
+        }
+    };
+
+    const handleCopyPhase = async (phaseId: string) => {
+        setOpRunning(true);
+        try {
+            setPhaseAddingState(true);
+            setSavingState(true);
+            // Find the target phase to be copied
+            const targetPhase = clientPhases.find(
+                (phase) => phase.phaseId === phaseId
+            );
+            if (!targetPhase) return;
+
+            // Create a new phase with a unique ID
+            const newPhase: Phase = {
+                phaseId: ID.unique(),
+                phaseName: `${targetPhase.phaseName} (Copy)`,
+                isActive: false,
+                sessions: targetPhase.sessions.map((session) => ({
+                    sessionId: ID.unique(),
+                    sessionName: `${session.sessionName} (Copy)`,
+                    exercises: session.exercises.map((exercise: Exercise) => ({
+                        id: ID.unique(),
+                        exerciseId: exercise.exerciseId,
+                        fullName: exercise.fullName,
+                        motion: exercise.motion,
+                        targetArea: exercise.targetArea,
+                        exerciseVideo: exercise.exerciseVideo || "",
+                        repsMin: exercise.repsMin,
+                        repsMax: exercise.repsMax,
+                        setsMin: exercise.setsMin,
+                        setsMax: exercise.setsMax,
+                        tempo: exercise.tempo,
+                        TUT: exercise.TUT,
+                        restMin: exercise.restMin,
+                        restMax: exercise.restMax,
+                        exerciseOrder: exercise.exerciseOrder,
+                        setOrderMarker: exercise.setOrderMarker,
+                        bias: exercise.bias,
+                        lenShort: exercise.lenShort,
+                        impliment: exercise.impliment,
+                        grip: exercise.grip,
+                        angle: exercise.angle,
+                        support: exercise.support,
+                        xtraInstructions: exercise.xtraInstructions,
+                    })),
+                    sessionTime: session.sessionTime,
+                    sessionOrder: session.sessionOrder,
+                })),
+            };
+
+            const modifiedClientPhases = [...clientPhases, newPhase];
+            const data: DataResponse = {
+                phases: modifiedClientPhases,
+            };
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/phases`,
+                {
+                    client_id: client_id,
+                    data,
+                },
+                { withCredentials: true }
+            );
+            setToastMessage("Phase data copied successfully!");
+            setToastType("success");
+            setShowToast(true);
+            setClientPhases(modifiedClientPhases);
+            // setToastMessage("Phase data copied successfully!");
+            // setToastType("success");
+            // setShowToast(true);
+            // setClientPhases(modifiedClientPhases);
+        } finally {
+            setPhaseAddingState(false);
+            setSavingState(false);
+            setOpRunning(false);
+        }
+    };
+
+    const handleActivatePhase = async (
+        phaseId: string,
+        phaseState: boolean
+    ) => {
+        setOpRunning(true);
+        try {
+            setCurrentPhaseState(phaseState);
+            setPhaseActivation(true);
+            const modifiedPhases = clientPhases.map((phase) => ({
+                ...phase,
+                isActive: phase.phaseId === phaseId ? phaseState : false,
+            }));
+            setClientPhases(modifiedPhases);
+            const data: DataResponse = {
+                phases: modifiedPhases,
+            };
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/phases`,
+                {
+                    client_id: client_id,
+                    data,
+                },
+                { withCredentials: true }
+            );
+            if (phaseState) {
+                setToastMessage("Phase activation successful!");
+            } else {
+                setToastMessage("Phase deactivation successful!");
+            }
+            setToastType("success");
+            setShowToast(true);
+
+            fetchTrackedWorkouts();
+        } finally {
+            setPhaseActivation(false);
+            setOpRunning(false);
+        }
+    };
+
+    const handlePhaseNameChange = async (
+        phaseId: string,
+        newPhaseName: string
+    ) => {
+        setOpRunning(true);
+        try {
+            // if (!phaseButtonsState.includes(phaseId)) {
+            //     setPhaseButtonsState([...phaseButtonsState, phaseId]);
+            // }
+            setSavingState(true);
+            // Update the phase name in the original data
+            const updatedPhases = clientPhases.map((p) =>
+                p.phaseId === phaseId ? { ...p, phaseName: newPhaseName } : p
+            );
+            const data: DataResponse = {
+                phases: updatedPhases,
+            };
+            try {
+                await axios.post(
+                    `${API_BASE_URL}/mvmt/v1/client/phases`,
+                    {
+                        client_id: client_id,
+                        data,
+                    },
+                    { withCredentials: true }
+                );
+                setToastMessage("Phase name changed!");
+                setToastType("success");
+                setShowToast(true);
+                setClientPhases(updatedPhases);
+            } catch (e) {
+                console.error("Failed to update phase name:", e);
+                return false;
+            }
+            // setPhaseButtonsState(phaseButtonsState.filter((id) => id !== phaseId));
+            return true;
+        } finally {
+            setSavingState(false);
+            setOpRunning(false);
+        }
+    };
+
+    const onAddSession = async (
+        phaseId: string,
+        newSession: MovementSession
+    ) => {
+        setOpRunning(true);
+        try {
+            setSavingState(true);
+            const updatedPhases = clientPhases.map((p) =>
+                p.phaseId === phaseId
+                    ? { ...p, sessions: [...p.sessions, newSession] }
+                    : p
+            );
+            const data: DataResponse = {
+                phases: updatedPhases,
+            };
+            setClientPhases(updatedPhases);
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/phases`,
+                {
+                    client_id: client_id,
+                    data,
+                },
+                { withCredentials: true }
+            );
+            setToastMessage("Session added successfully!");
             setToastType("success");
             setShowToast(true);
             setClientPhases(updatedPhases);
-        } catch (e) {
-            console.error("Failed to update phase name:", e);
-            return false;
+        } finally {
+            setSavingState(false);
+            setOpRunning(false);
         }
-        // setPhaseButtonsState(phaseButtonsState.filter((id) => id !== phaseId));
-        setSavingState(false);
-        return true;
-    };
-
-const onAddSession = async (
-    phaseId: string,
-    newSession: MovementSession
-) => {
-    setOpRunning(true);
-    try {
-        setSavingState(true);
-        const updatedPhases = clientPhases.map((p) =>
-            p.phaseId === phaseId
-                ? { ...p, sessions: [...p.sessions, newSession] }
-                : p
-        );
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        setClientPhases(updatedPhases);
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setToastMessage("Session added successfully!");
-        setToastType("success");
-        setShowToast(true);
-        setClientPhases(updatedPhases);
-    } finally {
-        setSavingState(false);
-        setOpRunning(false);
-    }
     };
 
     const handleSessionNameChange = async (
         sessionId: string,
         newSessionName: string
     ) => {
-        setSavingState(true);
-        const updatedPhases = clientPhases.map((phase) => ({
-            ...phase,
-            sessions: phase.sessions.map((s) =>
-                s.sessionId === sessionId
-                    ? { ...s, sessionName: newSessionName }
-                    : s
-            ),
-        }));
-        const data: any = {
-            sessionId: sessionId,
-            sessionName: newSessionName,
-        };
-        await updateSession(client_id, data);
-        setToastMessage("Session name changed!");
-        setToastType("success");
-        setShowToast(true);
-        setClientPhases(updatedPhases);
-        setSavingState(false);
+        setOpRunning(true);
+        try {
+            setSavingState(true);
+            const updatedPhases = clientPhases.map((phase) => ({
+                ...phase,
+                sessions: phase.sessions.map((s) =>
+                    s.sessionId === sessionId
+                        ? { ...s, sessionName: newSessionName }
+                        : s
+                ),
+            }));
+            const data: any = {
+                sessionId: sessionId,
+                sessionName: newSessionName,
+            };
+            await updateSession(client_id, data);
+            setToastMessage("Session name changed!");
+            setToastType("success");
+            setShowToast(true);
+            setClientPhases(updatedPhases);
+        } finally {
+            setSavingState(false);
+            setOpRunning(false);
+        }
     };
 
     const handleSessionOrderChange = async (
         sessionId: string,
         newSessionOrder: string
     ) => {
-        const data: any = {
-            sessionId: sessionId,
-            sessionOrder: newSessionOrder,
-        };
-        await updateSession(client_id, data);
-        setToastMessage("Session re-ordered!");
-        setToastType("success");
-        setShowToast(true);
+        setOpRunning(true);
+        try {
+            const data: any = {
+                sessionId: sessionId,
+                sessionOrder: newSessionOrder,
+            };
+            await updateSession(client_id, data);
+            setToastMessage("Session re-ordered!");
+            setToastType("success");
+            setShowToast(true);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const handleSessionDelete = async (sessionId: string) => {
-        // Remove the session from the original data
-        const updatedPhases = clientPhases.map((phase) => ({
-            ...phase,
-            sessions: phase.sessions.filter((s) => s.sessionId !== sessionId),
-        }));
-        setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setToastMessage("Deleted session successfully!");
-        setToastType("success");
-        setShowToast(true);
+        setOpRunning(true);
+        try {
+            // Remove the session from the original data
+            const updatedPhases = clientPhases.map((phase) => ({
+                ...phase,
+                sessions: phase.sessions.filter(
+                    (s) => s.sessionId !== sessionId
+                ),
+            }));
+            setClientPhases(updatedPhases);
+            const data: DataResponse = {
+                phases: updatedPhases,
+            };
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/phases`,
+                {
+                    client_id: client_id,
+                    data,
+                },
+                { withCredentials: true }
+            );
+            setToastMessage("Deleted session successfully!");
+            setToastType("success");
+            setShowToast(true);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const handleExerciseAdd = (phaseId: string, sessionId: string) => {
-        const newExerciseId = ID.unique();
+        setOpRunning(true);
+        try {
+            const newExerciseId = ID.unique();
 
-        // Update the original data with the new exercise
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
-                ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    exercises: [
-                                        ...session.exercises,
-                                        {
-                                            id: newExerciseId,
-                                            exerciseId: "",
-                                            fullName: "",
-                                            motion: "",
-                                            targetArea: "",
-                                            exerciseVideo: "",
-                                            repsMin: 0,
-                                            repsMax: 0,
-                                            setsMin: 0,
-                                            setsMax: 0,
-                                            tempo: "",
-                                            TUT: 0,
-                                            restMin: 0,
-                                            restMax: 0,
-                                            exerciseOrder:
-                                                session.exercises.length + 1, // Set the order to the current length + 1
-                                            setOrderMarker: "",
-                                            bias: "",
-                                            lenShort: "",
-                                            impliment: "",
-                                            grip: "",
-                                            angle: "",
-                                            support: "",
-                                            xtraInstructions: "",
-                                        },
-                                    ],
-                                }
-                              : session
-                      ),
-                  }
-                : phase
-        );
-        setClientPhases(updatedPhases);
-        setEditingExerciseId(newExerciseId);
+            // Update the original data with the new exercise
+            const updatedPhases = clientPhases.map((phase) =>
+                phase.phaseId === phaseId
+                    ? {
+                          ...phase,
+                          sessions: phase.sessions.map((session) =>
+                              session.sessionId === sessionId
+                                  ? {
+                                        ...session,
+                                        exercises: [
+                                            ...session.exercises,
+                                            {
+                                                id: newExerciseId,
+                                                exerciseId: "",
+                                                fullName: "",
+                                                motion: "",
+                                                targetArea: "",
+                                                exerciseVideo: "",
+                                                repsMin: 0,
+                                                repsMax: 0,
+                                                setsMin: 0,
+                                                setsMax: 0,
+                                                tempo: "",
+                                                TUT: 0,
+                                                restMin: 0,
+                                                restMax: 0,
+                                                exerciseOrder:
+                                                    session.exercises.length +
+                                                    1, // Set the order to the current length + 1
+                                                setOrderMarker: "",
+                                                bias: "",
+                                                lenShort: "",
+                                                impliment: "",
+                                                grip: "",
+                                                angle: "",
+                                                support: "",
+                                                xtraInstructions: "",
+                                            },
+                                        ],
+                                    }
+                                  : session
+                          ),
+                      }
+                    : phase
+            );
+            setClientPhases(updatedPhases);
+            setEditingExerciseId(newExerciseId);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const calculateSessionTime = (exercise: Exercise): number => {
@@ -401,134 +430,77 @@ const onAddSession = async (
         sessionId: string,
         updatedExercise: Exercise
     ) => {
-        const session = clientPhases.flatMap((phase) =>
-            phase.sessions.find((session) => session.sessionId === sessionId)
-        )[0];
+        setOpRunning(true);
+        try {
+            const session = clientPhases.flatMap((phase) =>
+                phase.sessions.find(
+                    (session) => session.sessionId === sessionId
+                )
+            )[0];
 
-        const exerciseTime = calculateSessionTime(updatedExercise);
+            const exerciseTime = calculateSessionTime(updatedExercise);
 
-        // Find the current exercise in the session to get its existing time
-        const existingExercise = session.exercises.find(
-            (e) => e.id === updatedExercise.id
-        );
-        const existingExerciseTime = existingExercise
-            ? calculateSessionTime(existingExercise)
-            : 0;
+            // Find the current exercise in the session to get its existing time
+            const existingExercise = session.exercises.find(
+                (e) => e.id === updatedExercise.id
+            );
+            const existingExerciseTime = existingExercise
+                ? calculateSessionTime(existingExercise)
+                : 0;
 
-        // Calculate the new sessionTime
-        const currentSessionTime = session.sessionTime ?? 0; // Default to 0 if null
-        const newSessionTime = Number(
-            (currentSessionTime - existingExerciseTime + exerciseTime).toFixed(
-                2
-            )
-        ); // Add exerciseTime to the sessionTime
+            // Calculate the new sessionTime
+            const currentSessionTime = session.sessionTime ?? 0; // Default to 0 if null
+            const newSessionTime = Number(
+                (
+                    currentSessionTime -
+                    existingExerciseTime +
+                    exerciseTime
+                ).toFixed(2)
+            ); // Add exerciseTime to the sessionTime
 
-        // Update the exercise in the specific session and phase
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
-                ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    sessionTime: newSessionTime.toString(), // Update sessionTime
-                                    exercises: session.exercises.map((e) =>
-                                        e.id === updatedExercise.id
-                                            ? updatedExercise
-                                            : e
-                                    ),
-                                }
-                              : session
-                      ),
-                  }
-                : phase
-        );
-        setClientPhases(updatedPhases);
+            // Update the exercise in the specific session and phase
+            const updatedPhases = clientPhases.map((phase) =>
+                phase.phaseId === phaseId
+                    ? {
+                          ...phase,
+                          sessions: phase.sessions.map((session) =>
+                              session.sessionId === sessionId
+                                  ? {
+                                        ...session,
+                                        sessionTime: newSessionTime.toString(), // Update sessionTime
+                                        exercises: session.exercises.map((e) =>
+                                            e.id === updatedExercise.id
+                                                ? updatedExercise
+                                                : e
+                                        ),
+                                    }
+                                  : session
+                          ),
+                      }
+                    : phase
+            );
+            setClientPhases(updatedPhases);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const handleEditExercise = (exerciseId) => {
-        setEditingExerciseId(exerciseId);
+        setOpRunning(true);
+        try {
+            setEditingExerciseId(exerciseId);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     async function handleExerciseSave() {
-        setSavingState(true);
-        const data: DataResponse = {
-            phases: clientPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setToastMessage("Exercise saved successfully!");
-        setToastType("success");
-        setShowToast(true);
-        setSavingState(false);
-    }
-
-    const handleCancelEdit = () => {
-        setEditingExerciseId(null);
-    };
-
-    const handleExerciseDelete = async (
-        phaseId: string,
-        sessionId: string,
-        exerciseId: string
-    ) => {
-        let existingExerciseTime = 0;
-        let existingSessionTime = 0;
-
-        const updatedPhases = clientPhases.map((phase) => {
-            if (phase.phaseId === phaseId) {
-                return {
-                    ...phase,
-                    sessions: phase.sessions.map((session) => {
-                        if (session.sessionId === sessionId) {
-                            // Get the existing session time directly from the session object
-                            existingSessionTime = Number(session.sessionTime);
-
-                            const exercises = session.exercises.filter((e) => {
-                                // Check if the exercise is the one to be deleted
-                                if (e.id === exerciseId) {
-                                    // Calculate existing exercise time
-                                    existingExerciseTime =
-                                        calculateSessionTime(e);
-                                    return false; // Filter it out
-                                }
-                                return true; // Keep other exercises
-                            });
-
-                            // Calculate the new session time based on existing
-                            const newSessionTime = parseFloat(
-                                Number(
-                                    existingSessionTime - existingExerciseTime
-                                ).toFixed(2)
-                            ).toString();
-
-                            return {
-                                ...session,
-                                exercises,
-                                sessionTime: newSessionTime, // Set the new session time
-                            };
-                        }
-                        return session; // Return session unchanged if it doesn't match
-                    }),
-                };
-            }
-            return phase; // Return phase unchanged
-        });
-
-        setClientPhases(updatedPhases);
-
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-
+        setOpRunning(true);
         try {
+            setSavingState(true);
+            const data: DataResponse = {
+                phases: clientPhases,
+            };
             await axios.post(
                 `${API_BASE_URL}/mvmt/v1/client/phases`,
                 {
@@ -537,12 +509,103 @@ const onAddSession = async (
                 },
                 { withCredentials: true }
             );
-            setToastMessage("Deleted exercise successfully!");
+            setToastMessage("Exercise saved successfully!");
             setToastType("success");
             setShowToast(true);
-        } catch (error) {
-            console.error("Error deleting exercise:", error);
-            // Handle error (e.g., show a notification to the user)
+        } finally {
+            setSavingState(false);
+            setOpRunning(false);
+        }
+    }
+
+    const handleCancelEdit = () => {
+        setOpRunning(true);
+        try {
+            setEditingExerciseId(null);
+        } finally {
+            setOpRunning(false);
+        }
+    };
+
+    const handleExerciseDelete = async (
+        phaseId: string,
+        sessionId: string,
+        exerciseId: string
+    ) => {
+        setOpRunning(true);
+        try {
+            let existingExerciseTime = 0;
+            let existingSessionTime = 0;
+
+            const updatedPhases = clientPhases.map((phase) => {
+                if (phase.phaseId === phaseId) {
+                    return {
+                        ...phase,
+                        sessions: phase.sessions.map((session) => {
+                            if (session.sessionId === sessionId) {
+                                // Get the existing session time directly from the session object
+                                existingSessionTime = Number(
+                                    session.sessionTime
+                                );
+
+                                const exercises = session.exercises.filter(
+                                    (e) => {
+                                        // Check if the exercise is the one to be deleted
+                                        if (e.id === exerciseId) {
+                                            // Calculate existing exercise time
+                                            existingExerciseTime =
+                                                calculateSessionTime(e);
+                                            return false; // Filter it out
+                                        }
+                                        return true; // Keep other exercises
+                                    }
+                                );
+
+                                // Calculate the new session time based on existing
+                                const newSessionTime = parseFloat(
+                                    Number(
+                                        existingSessionTime -
+                                            existingExerciseTime
+                                    ).toFixed(2)
+                                ).toString();
+
+                                return {
+                                    ...session,
+                                    exercises,
+                                    sessionTime: newSessionTime, // Set the new session time
+                                };
+                            }
+                            return session; // Return session unchanged if it doesn't match
+                        }),
+                    };
+                }
+                return phase; // Return phase unchanged
+            });
+
+            setClientPhases(updatedPhases);
+
+            const data: DataResponse = {
+                phases: updatedPhases,
+            };
+
+            try {
+                await axios.post(
+                    `${API_BASE_URL}/mvmt/v1/client/phases`,
+                    {
+                        client_id: client_id,
+                        data,
+                    },
+                    { withCredentials: true }
+                );
+                setToastMessage("Deleted exercise successfully!");
+                setToastType("success");
+                setShowToast(true);
+            } catch (error) {
+                console.error("Error deleting exercise:", error);
+                // Handle error (e.g., show a notification to the user)
+            }
+        } finally {
+            setOpRunning(false);
         }
     };
 
@@ -551,49 +614,59 @@ const onAddSession = async (
         sessionId: string,
         updatedExercises: Exercise[]
     ) => {
-        // Update the exercise order in the specific session and phase
-        const updatedPhases = clientPhases.map((phase) =>
-            phase.phaseId === phaseId
-                ? {
-                      ...phase,
-                      sessions: phase.sessions.map((session) =>
-                          session.sessionId === sessionId
-                              ? {
-                                    ...session,
-                                    exercises: updatedExercises.map(
-                                        (exercise, index) => ({
-                                            ...exercise,
-                                            exerciseOrder: index + 1, // Update exerciseOrder to be 1-based index
-                                        })
-                                    ),
-                                }
-                              : session
-                      ),
-                  }
-                : phase
-        );
-        setClientPhases(updatedPhases);
+        setOpRunning(true);
+        try {
+            // Update the exercise order in the specific session and phase
+            const updatedPhases = clientPhases.map((phase) =>
+                phase.phaseId === phaseId
+                    ? {
+                          ...phase,
+                          sessions: phase.sessions.map((session) =>
+                              session.sessionId === sessionId
+                                  ? {
+                                        ...session,
+                                        exercises: updatedExercises.map(
+                                            (exercise, index) => ({
+                                                ...exercise,
+                                                exerciseOrder: index + 1, // Update exerciseOrder to be 1-based index
+                                            })
+                                        ),
+                                    }
+                                  : session
+                          ),
+                      }
+                    : phase
+            );
+            setClientPhases(updatedPhases);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const handlePhaseDelete = async (phaseId: string) => {
-        const updatedPhases = clientPhases.filter(
-            (phase) => phase.phaseId !== phaseId
-        );
-        setClientPhases(updatedPhases);
-        const data: DataResponse = {
-            phases: updatedPhases,
-        };
-        await axios.post(
-            `${API_BASE_URL}/mvmt/v1/client/phases`,
-            {
-                client_id: client_id,
-                data,
-            },
-            { withCredentials: true }
-        );
-        setToastMessage("Deleted Phase successfully!");
-        setToastType("success");
-        setShowToast(true);
+        setOpRunning(true);
+        try {
+            const updatedPhases = clientPhases.filter(
+                (phase) => phase.phaseId !== phaseId
+            );
+            setClientPhases(updatedPhases);
+            const data: DataResponse = {
+                phases: updatedPhases,
+            };
+            await axios.post(
+                `${API_BASE_URL}/mvmt/v1/client/phases`,
+                {
+                    client_id: client_id,
+                    data,
+                },
+                { withCredentials: true }
+            );
+            setToastMessage("Deleted Phase successfully!");
+            setToastType("success");
+            setShowToast(true);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     if (pageLoading) {
@@ -618,7 +691,7 @@ const onAddSession = async (
                 </div>
             )}
             <div className="flex justify-between">
-                {phaseAddingState ? (
+                {opRunning || phaseAddingState ? (
                     <div className="text-sm flex items-center justify-center px-4 secondary-btn capitalize gap-2 bg-gray-300 text-black cursor-not-allowed">
                         <LoadingSpinner className="text-black w-4 h-4" />{" "}
                         <span>Adding Phase</span>
@@ -683,6 +756,8 @@ const onAddSession = async (
                                 setToastMessage={setToastMessage}
                                 setToastType={setToastType}
                                 savingState={savingState}
+                                opRunning={opRunning}
+                                setOpRunning={setOpRunning}
                             />
                         ))
                     )}

@@ -306,7 +306,6 @@ const Page = () => {
     if (!myDetails) {
         return (
             <div>
-                <pre>{JSON.stringify(myDetails, null, 2)}</pre>
                 <ScrollTableSkeleton
                     columnCount={columns.length}
                     rowCount={10}
