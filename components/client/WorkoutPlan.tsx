@@ -32,12 +32,15 @@ const WorkoutPlan = ({
     const [phaseActivation, setPhaseActivation] = useState(false);
     const [currentPhaseState, setCurrentPhaseState] = useState(false);
     const [phaseAddingState, setPhaseAddingState] = useState(false);
+    const [opRunning, setOpRunning] = useState(false);
     const [savingState, setSavingState] = useState(false);
     // const [sessionAddingButtonState, setSessionAddingButtonState] =
     //     useState(false);
     // const [sessionButtonsState, setSessionButtonsState] = useState(false);
 
-    const handleAddPhase = async () => {
+const handleAddPhase = async () => {
+    setOpRunning(true);
+    try {
         setPhaseAddingState(true);
         // Logic to add a new phase
         const newPhase: Phase = {
@@ -63,11 +66,17 @@ const WorkoutPlan = ({
         setToastMessage("Phase data successfully saved!");
         setToastType("success");
         setShowToast(true);
+        
         setClientPhases(modifiedClientPhases);
+    } finally {
         setPhaseAddingState(false);
-    };
+        setOpRunning(false);
+    }
+};
 
-    const handleCopyPhase = async (phaseId: string) => {
+const handleCopyPhase = async (phaseId: string) => {
+    setOpRunning(true);
+    try {
         setPhaseAddingState(true);
         setSavingState(true);
         // Find the target phase to be copied
@@ -130,9 +139,16 @@ const WorkoutPlan = ({
         setToastType("success");
         setShowToast(true);
         setClientPhases(modifiedClientPhases);
+        setToastMessage("Phase data copied successfully!");
+        setToastType("success");
+        setShowToast(true);
+        setClientPhases(modifiedClientPhases);
+    } finally {
         setPhaseAddingState(false);
         setSavingState(false);
-    };
+        setOpRunning(false);
+    }
+};
 
     const updateClientPhase = async (newPhase: any) => {
         // setClientPhases(updatedPhases);
@@ -209,10 +225,12 @@ const WorkoutPlan = ({
         return true;
     };
 
-    const onAddSession = async (
-        phaseId: string,
-        newSession: MovementSession
-    ) => {
+const onAddSession = async (
+    phaseId: string,
+    newSession: MovementSession
+) => {
+    setOpRunning(true);
+    try {
         setSavingState(true);
         const updatedPhases = clientPhases.map((p) =>
             p.phaseId === phaseId
@@ -223,8 +241,7 @@ const WorkoutPlan = ({
             phases: updatedPhases,
         };
         setClientPhases(updatedPhases);
-        setSavingState(false);
-        axios.post(
+        await axios.post(
             `${API_BASE_URL}/mvmt/v1/client/phases`,
             {
                 client_id: client_id,
@@ -235,6 +252,11 @@ const WorkoutPlan = ({
         setToastMessage("Session added successfully!");
         setToastType("success");
         setShowToast(true);
+        setClientPhases(updatedPhases);
+    } finally {
+        setSavingState(false);
+        setOpRunning(false);
+    }
     };
 
     const handleSessionNameChange = async (
