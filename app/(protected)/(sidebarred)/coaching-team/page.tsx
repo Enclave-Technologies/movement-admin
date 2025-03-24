@@ -362,9 +362,9 @@ const CoachingTeam = () => {
                 {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
-                        title="batch of coaches? 
+                        title={`batch of coaches (${selectedRows.length} coaches)? 
                         This will remove them from users. 
-                        Are you sure you want to delete them?"
+                        Are you sure you want to delete them?`}
                         confirmDelete={handleBatchDelete}
                         cancelDelete={handleDeleteCancel}
                         isLoading={modalButtonLoadingState}

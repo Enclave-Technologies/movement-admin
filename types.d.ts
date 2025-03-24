@@ -215,6 +215,8 @@ interface PhaseProps {
     setToastType;
     savingState: boolean;
     handleSessionOrderChange;
+    opRunning: boolean;
+    setOpRunning: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface SessionProps {
@@ -241,6 +243,8 @@ interface SessionProps {
     setToastType;
     savingState;
     isPhaseActive;
+    opRunning;
+    setOpRunning;
 }
 
 interface SessionExerciseProps {

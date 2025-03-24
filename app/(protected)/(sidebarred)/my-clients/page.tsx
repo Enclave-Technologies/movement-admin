@@ -306,7 +306,6 @@ const Page = () => {
     if (!myDetails) {
         return (
             <div>
-                <pre>{JSON.stringify(myDetails, null, 2)}</pre>
                 <ScrollTableSkeleton
                     columnCount={columns.length}
                     rowCount={10}
@@ -358,9 +357,9 @@ const Page = () => {
                 {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
-                        title="batch of users? 
+                        title={`batch of users (${selectedRows.length} users)? 
                         This will remove them permanently. 
-                        Are you sure you want to delete them?"
+                        Are you sure you want to delete them?`}
                         confirmDelete={handleBatchDelete}
                         cancelDelete={handleDeleteCancel}
                         isLoading={modalButtonLoadingState}

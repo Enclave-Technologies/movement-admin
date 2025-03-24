@@ -36,6 +36,8 @@ const SessionComponent: FC<SessionProps> = ({
     setToastType,
     savingState,
     isPhaseActive,
+    opRunning,
+    setOpRunning,
 }) => {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
@@ -69,8 +71,13 @@ const SessionComponent: FC<SessionProps> = ({
     };
 
     const confirmSessionDelete = () => {
-        onSessionDelete(session.sessionId); // Perform delete
-        setShowSessionDeleteConfirm(false); // Close dialog
+        setOpRunning(true);
+        try {
+            onSessionDelete(session.sessionId); // Perform delete
+            setShowSessionDeleteConfirm(false); // Close dialog
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const cancelSessionDelete = () => {
@@ -189,6 +196,8 @@ const SessionComponent: FC<SessionProps> = ({
                                         }
                                         handleCopySession={handleCopySession}
                                         handleAddExercise={onExerciseAdd}
+                                        handleSaveExercise={handleExerciseSave}
+                                        opRunning={opRunning}
                                     />
                                 </div>
                             </div>

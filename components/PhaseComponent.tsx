@@ -48,6 +48,8 @@ const PhaseComponent: FC<PhaseProps> = ({
     setToastType,
     savingState,
     handleSessionOrderChange,
+    opRunning,
+    setOpRunning,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -71,70 +73,94 @@ const PhaseComponent: FC<PhaseProps> = ({
         setPhaseName(e.target.value);
     };
 
-    const handlePhaseNameSubmit = () => {
-        onPhaseNameChange(phase.phaseId, phaseName).then((res) => {
+    const handlePhaseNameSubmit = async () => {
+        setOpRunning(true);
+        try {
+            await onPhaseNameChange(phase.phaseId, phaseName);
             setIsEditing(false);
-        });
+        } finally {
+            setOpRunning(false);
+        }
     };
 
-    const handleActivatePhase = () => {
-        onActivatePhase(phase.phaseId, !phase.isActive);
+    const handleActivatePhase = async () => {
+        setOpRunning(true);
+        try {
+            await onActivatePhase(phase.phaseId, !phase.isActive);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
-    const handleAddSession = () => {
-        const newSession: MovementSession = {
-            sessionId: ID.unique(),
-            sessionName: "Untitled Session",
-            exercises: [],
-            sessionOrder: phase.sessions.length + 1,
-            sessionTime: "0",
-        };
-        onAddSession(phase.phaseId, newSession);
-        setIsCollapsed(false);
+    const handleAddSession = async () => {
+        setOpRunning(true);
+        try {
+            const newSession: MovementSession = {
+                sessionId: ID.unique(),
+                sessionName: "Untitled Session",
+                exercises: [],
+                sessionOrder: phase.sessions.length + 1,
+                sessionTime: "0",
+            };
+            await onAddSession(phase.phaseId, newSession);
+            setIsCollapsed(false);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
-    const handleCopySession = (session) => {
-        const newSession: MovementSession = {
-            sessionId: ID.unique(),
-            sessionName: `${session.sessionName} (Copy)`,
-            exercises: session.exercises.map((exercise: Exercise) => ({
-                id: ID.unique(),
-                exerciseId: exercise.exerciseId,
-                fullName: exercise.fullName,
-                motion: exercise.motion,
-                targetArea: exercise.targetArea,
-                exerciseVideo: exercise.exerciseVideo || "",
-                repsMin: exercise.repsMin,
-                repsMax: exercise.repsMax,
-                setsMin: exercise.setsMin,
-                setsMax: exercise.setsMax,
-                tempo: exercise.tempo,
-                TUT: exercise.TUT,
-                restMin: exercise.restMin,
-                restMax: exercise.restMax,
-                exerciseOrder: exercise.exerciseOrder,
-                setOrderMarker: exercise.setOrderMarker,
-                bias: exercise.bias,
-                lenShort: exercise.lenShort,
-                impliment: exercise.impliment,
-                grip: exercise.grip,
-                angle: exercise.angle,
-                support: exercise.support,
-                xtraInstructions: exercise.xtraInstructions,
-            })),
-            sessionOrder: phase.sessions.length + 1,
-            sessionTime: "0",
-        };
-        onAddSession(phase.phaseId, newSession);
+    const handleCopySession = async (session) => {
+        setOpRunning(true);
+        try {
+            const newSession: MovementSession = {
+                sessionId: ID.unique(),
+                sessionName: `${session.sessionName} (Copy)`,
+                exercises: session.exercises.map((exercise: Exercise) => ({
+                    id: ID.unique(),
+                    exerciseId: exercise.exerciseId,
+                    fullName: exercise.fullName,
+                    motion: exercise.motion,
+                    targetArea: exercise.targetArea,
+                    exerciseVideo: exercise.exerciseVideo || "",
+                    repsMin: exercise.repsMin,
+                    repsMax: exercise.repsMax,
+                    setsMin: exercise.setsMin,
+                    setsMax: exercise.setsMax,
+                    tempo: exercise.tempo,
+                    TUT: exercise.TUT,
+                    restMin: exercise.restMin,
+                    restMax: exercise.restMax,
+                    exerciseOrder: exercise.exerciseOrder,
+                    setOrderMarker: exercise.setOrderMarker,
+                    bias: exercise.bias,
+                    lenShort: exercise.lenShort,
+                    impliment: exercise.impliment,
+                    grip: exercise.grip,
+                    angle: exercise.angle,
+                    support: exercise.support,
+                    xtraInstructions: exercise.xtraInstructions,
+                })),
+                sessionOrder: phase.sessions.length + 1,
+                sessionTime: "0",
+            };
+            await onAddSession(phase.phaseId, newSession);
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const handleDeletePhase = () => {
         setShowPhaseDeleteConfirm(true); // Show confirmation dialog
     };
 
-    const confirmDeletePhase = () => {
-        onPhaseDelete(phase.phaseId); // Perform delete
-        setShowPhaseDeleteConfirm(false); // Close dialog
+    const confirmDeletePhase = async () => {
+        setOpRunning(true);
+        try {
+            await onPhaseDelete(phase.phaseId); // Perform delete
+            setShowPhaseDeleteConfirm(false); // Close dialog
+        } finally {
+            setOpRunning(false);
+        }
     };
 
     const cancelDeletePhase = () => {
@@ -149,30 +175,47 @@ const PhaseComponent: FC<PhaseProps> = ({
     );
 
     async function handleDragEnd(event) {
-        const { active, over } = event;
-        if (active.id !== over.id) {
-            const oldIndex = items.indexOf(active.id);
-            const newIndex = items.indexOf(over.id);
-            let newItems = [];
-            setItems((items) => {
-                newItems = arrayMove(items, oldIndex, newIndex);
-                return newItems;
-            });
-            newItems.forEach((sessionId, index) => {
-                handleSessionOrderChange(sessionId, index + 1);
-            });
-            let newPhase = {
-                ...phase,
-                sessions: newItems.map((sessionId, index) => {
-                    let session = phase.sessions.find(
-                        (s) => s.sessionId === sessionId
-                    );
-                    return { ...session, sessionOrder: index + 1 };
-                }),
-            };
-            setClientPhases((phases) =>
-                phases.map((p) => (p.phaseId === phase.phaseId ? newPhase : p))
-            );
+        setOpRunning(true);
+        try {
+            const { active, over } = event;
+            if (active.id !== over.id) {
+                const oldIndex = items.indexOf(active.id);
+                const newIndex = items.indexOf(over.id);
+                let newItems = [];
+                setItems((items) => {
+                    newItems = arrayMove(items, oldIndex, newIndex);
+                    return newItems;
+                });
+
+                // Process each session reordering
+                // for (let i = 0; i < newItems.length; i++) {
+                //     const sessionId = newItems[i];
+                //     await handleSessionOrderChange(sessionId, i + 1);
+                // }
+                // Process all session reorderings in parallel
+                await Promise.all(
+                    newItems.map((sessionId, index) =>
+                        handleSessionOrderChange(sessionId, index + 1)
+                    )
+                );
+
+                let newPhase = {
+                    ...phase,
+                    sessions: newItems.map((sessionId, index) => {
+                        let session = phase.sessions.find(
+                            (s) => s.sessionId === sessionId
+                        );
+                        return { ...session, sessionOrder: index + 1 };
+                    }),
+                };
+                setClientPhases((phases) =>
+                    phases.map((p) =>
+                        p.phaseId === phase.phaseId ? newPhase : p
+                    )
+                );
+            }
+        } finally {
+            setOpRunning(false);
         }
     }
 
@@ -214,7 +257,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                                 handleValueSubmit={handlePhaseNameSubmit}
                                 inputRef={inputRef}
                                 setIsEditingTitle={setIsEditing}
-                                savingState={savingState}
+                                savingState={opRunning || savingState}
                             />
                         )}
                         <PhaseActions
@@ -224,6 +267,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                             handleDeletePhase={handleDeletePhase}
                             handleCopyPhase={handleCopyPhase}
                             handleAddSession={handleAddSession}
+                            opRunning={opRunning}
                         />
                     </div>
                     {showPhaseDeleteConfirm && (
@@ -326,6 +370,8 @@ const PhaseComponent: FC<PhaseProps> = ({
                                         setToastType={setToastType}
                                         savingState={savingState}
                                         isPhaseActive={phase.isActive}
+                                        opRunning={opRunning}
+                                        setOpRunning={setOpRunning}
                                     />
                                 );
                             })}
