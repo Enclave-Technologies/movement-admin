@@ -15,28 +15,41 @@ export const StoreProvider = ({ children }) => {
     const [myDetails, setMyDetails] = useState(null);
 
     const fetchTrainers = async () => {
-        const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=5000`,
-            {
-                withCredentials: true, // Include cookies in the request
-            }
-        );
-        setTrainers(response.data.data);
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=5000`,
+                {
+                    withCredentials: true, // Include cookies in the request
+                }
+            );
+            setTrainers(response.data.data);
+        } catch (error) {
+            console.error("Error fetching trainers:", error);
+        }
     };
 
     const getExerciseHierarchy = async () => {
-        const response = await axios.get(
-            `${API_BASE_URL}/mvmt/v1/trainer/exerciseHierarchy`,
-            {
-                withCredentials: true, // Include cookies in the request
-            }
-        );
-        setExerciseHierarchy(response.data);
+        try {
+            const response = await axios.get(
+                `${API_BASE_URL}/mvmt/v1/trainer/exerciseHierarchy`,
+                {
+                    withCredentials: true, // Include cookies in the request
+                }
+            );
+            setExerciseHierarchy(response.data);
+        } catch (error) {
+            console.error("Error fetching exercise hierarchy:", error);
+        }
     };
 
     const fetchMyDetails = async () => {
-        const currentUser = await fetchUserDetails();
-        setMyDetails(currentUser);
+        try {
+            const currentUser = await fetchUserDetails();
+            console.log("Fetched user details:", currentUser); // Debugging
+            setMyDetails(currentUser);
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+        }
     };
 
     // Add a function to update the state

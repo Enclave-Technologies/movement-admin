@@ -30,6 +30,7 @@ const WorkoutPlan = ({
     const { userData } = useUser();
     const [editingExerciseId, setEditingExerciseId] = useState(null);
     const [phaseActivation, setPhaseActivation] = useState(false);
+    const [currentPhaseState, setCurrentPhaseState] = useState(false);
     const [phaseAddingState, setPhaseAddingState] = useState(false);
     const [savingState, setSavingState] = useState(false);
     // const [sessionAddingButtonState, setSessionAddingButtonState] =
@@ -141,6 +142,7 @@ const WorkoutPlan = ({
         phaseId: string,
         phaseState: boolean
     ) => {
+        setCurrentPhaseState(phaseState);
         setPhaseActivation(true);
         const modifiedPhases = clientPhases.map((phase) => ({
             ...phase,
@@ -587,7 +589,8 @@ const WorkoutPlan = ({
                     <div className="bg-white p-8 rounded-lg shadow-lg flex items-center justify-between gap-2">
                         <LoadingSpinner />
                         <span>
-                            Activating / Deactivating Phase, Please wait.
+                            {currentPhaseState ? "Activating" : "Deactivating"}{" "}
+                            Phase, Please wait.
                         </span>
                     </div>
                 </div>
