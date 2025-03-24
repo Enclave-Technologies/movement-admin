@@ -49,6 +49,13 @@ const ExercisePage = () => {
         // Implement your logic here, e.g., update the approval status in the database
 
         try {
+            setRows((prevRows) =>
+                prevRows.map((row) =>
+                    row.id === rowData.id
+                        ? { ...row, approved: newApprovalStatus }
+                        : row
+                )
+            );
             const response = await axios.put(
                 `${API_BASE_URL}/mvmt/v1/admin/exercises`,
                 {
@@ -163,15 +170,20 @@ const ExercisePage = () => {
     };
 
     const openBatchApproveConfirmation = (approving: boolean = false) => {
+        const approxTime = (selectedRows.length / 50) * 2.5;
         if (approving) {
             setApproving(true);
             setBatchOpTitle(
-                "Are you sure you want to approve this batch of exercises?"
+                `Are you sure you want to approve this batch of exercises ( ${
+                    selectedRows.length
+                } exercises affected ~ ${approxTime.toFixed(2)} minutes )?`
             );
         } else {
             setApproving(false);
             setBatchOpTitle(
-                "Are you sure you want to unapprove this batch of exercises?"
+                `Are you sure you want to unapprove this batch of exercises ( ${
+                    selectedRows.length
+                } exercises affected ~ ${approxTime.toFixed(2)} minutes )?`
             );
         }
         setBatchApprovalPressed(true);
@@ -499,9 +511,9 @@ const ExercisePage = () => {
                 {rightEditModal()}
                 {deletePressed && (
                     <DeleteConfirmationDialog
-                        title="batch of exercises? 
-                        They might be associated with existing programs. 
-                        Are you sure you want to delete them?"
+                        title={`batch of exercises (${selectedRows.length} exercises)? 
+                            They might be associated with existing programs. 
+                            Are you sure you want to delete them?`}
                         confirmDelete={handleBatchDelete}
                         cancelDelete={handleDeleteCancel}
                         isLoading={modalButtonLoadingState}
