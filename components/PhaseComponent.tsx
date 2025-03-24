@@ -188,10 +188,16 @@ const PhaseComponent: FC<PhaseProps> = ({
                 });
 
                 // Process each session reordering
-                for (let i = 0; i < newItems.length; i++) {
-                    const sessionId = newItems[i];
-                    await handleSessionOrderChange(sessionId, i + 1);
-                }
+                // for (let i = 0; i < newItems.length; i++) {
+                //     const sessionId = newItems[i];
+                //     await handleSessionOrderChange(sessionId, i + 1);
+                // }
+                // Process all session reorderings in parallel
+                await Promise.all(
+                    newItems.map((sessionId, index) =>
+                        handleSessionOrderChange(sessionId, index + 1)
+                    )
+                );
 
                 let newPhase = {
                     ...phase,

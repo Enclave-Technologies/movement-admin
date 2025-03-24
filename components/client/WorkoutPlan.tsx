@@ -139,10 +139,6 @@ const WorkoutPlan = ({
             setToastType("success");
             setShowToast(true);
             setClientPhases(modifiedClientPhases);
-            // setToastMessage("Phase data copied successfully!");
-            // setToastType("success");
-            // setShowToast(true);
-            // setClientPhases(modifiedClientPhases);
         } finally {
             setPhaseAddingState(false);
             setSavingState(false);
