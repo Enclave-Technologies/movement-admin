@@ -2,13 +2,26 @@ import { MemoizedCell } from "./MemoizedTableComponents";
 import { Row } from "@tanstack/react-table";
 
 const TableBody = ({ rowVirtualizer, rows }) => {
+    const rowHeight = 48; // h-12 = 3rem = 48px per row
+    
+    let finalHeight;
+    
+    if (rows.length <= 15) {
+        finalHeight = `${rows.length * rowHeight}px`;
+    } else {
+        finalHeight = `${rowVirtualizer.getTotalSize()}px`;
+    }
+    
     return (
         <tbody
             style={{
                 display: "grid",
-                height: `${rowVirtualizer.getTotalSize() + 20}px`, //tells scrollbar how big the table is
+                height: finalHeight,
                 position: "relative", //needed for absolute positioning of rows
+                marginTop: 0,
+                paddingTop: 0
             }}
+            className="w-full"
         >
             {rowVirtualizer.getVirtualItems().length === 0 ? (
                 <tr className={`bg-white h-12 items-center cursor-default`}>
@@ -37,6 +50,7 @@ const TableBody = ({ rowVirtualizer, rows }) => {
                                 position: "absolute",
                                 transform: `translateY(${virtualRow.start}px)`, //this should always be a `style` as it changes on scroll
                                 width: "100%",
+                                top: 0,
                             }}
                         >
                             {row.getVisibleCells().map((cell) => (

@@ -195,11 +195,11 @@ const ScrollTable = ({
   return (
     <div className="flex items-center justify-center">
       <div
-        className={`container overflow-auto relative rounded-sm h-full w-full max-w-[1200px]`}
+        className={`container overflow-auto relative rounded-sm h-[calc(100vh-170px)] w-full max-w-[1200px]`}
         onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
         ref={tableContainerRef}
       >
-        <table className="w-full bg-white grid overflow-x-visible touch-action-auto h-[calc(100vh-170px)]">
+        <table className="w-full grid grid-rows-[auto_1fr] overflow-x-visible touch-action-auto h-full">
           <TableHeader table={table} />
           <TableBody rowVirtualizer={rowVirtualizer} rows={rows} />
         </table>

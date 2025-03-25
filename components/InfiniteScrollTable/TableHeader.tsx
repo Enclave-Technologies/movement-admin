@@ -7,7 +7,11 @@ const TableHeader = ({ table }) => {
                 <tr
                     key={headerGroup.id}
                     className="bg-gray-200 text-black"
-                    style={{ display: "flex", width: "100%" }}
+                    style={{ 
+                        display: "flex", 
+                        width: "100%",
+                        marginBottom: 0
+                    }}
                 >
                     {headerGroup.headers.map((header) => (
                         <th
