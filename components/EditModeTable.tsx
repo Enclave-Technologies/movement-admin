@@ -1,4 +1,4 @@
-import React, { FC, useState, useEffect, useCallback } from "react";
+import React, { FC, useState, useEffect } from "react";
 import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
 import Select from "react-select";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
@@ -9,9 +9,8 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import DraggableRow from "./DraggableRow";
-import { useRouter } from "next/navigation";
 import UnsavedChangesModal from "./UnsavedChangesModal";
-import useUnsavedChangesWarning from "@/hooks/useUnsavedChangesWarning";
+import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 
 const EditModeTable: FC<EditableTableProps> = ({
     phaseId,
@@ -26,38 +25,64 @@ const EditModeTable: FC<EditableTableProps> = ({
     onExerciseUpdate,
     onExerciseDelete,
     savingState,
+    onDirtyStateChange,
 }) => {
     const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
-    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
     
-    const router = useRouter();
-
-    // Use our simplified hook
+    // Use our simplified unsaved changes hook
     const {
-        showWarningModal,
-        handleNavigationAttempt,
-        handleLeaveWithoutSaving,
-        handleContinueEditing
-    } = useUnsavedChangesWarning(hasUnsavedChanges);
+        showModal,
+        blockNavigation,
+        continueEditing,
+        discardChanges
+    } = useUnsavedChanges(isDirty);
 
     // Track unsaved changes when editing begins or ends
     useEffect(() => {
         if (editingExerciseId) {
-            setHasUnsavedChanges(true);
+            setIsDirty(true);
+        } else {
+            setIsDirty(false);
         }
-    }, [editingExerciseId]);
+        
+        // Notify parent component about dirty state if callback provided
+        if (onDirtyStateChange) {
+            onDirtyStateChange(!!editingExerciseId);
+        }
+    }, [editingExerciseId, onDirtyStateChange]);
 
     // Modified update handler to track changes
     const handleExerciseUpdate = (phaseId, sessionId, updatedExercise) => {
-        setHasUnsavedChanges(true);
+        setIsDirty(true);
+        if (onDirtyStateChange) {
+            onDirtyStateChange(true);
+        }
         onExerciseUpdate(phaseId, sessionId, updatedExercise);
     };
     
     // Save changes handler
     const handleSaveChanges = () => {
         handleExerciseSave();
-        setHasUnsavedChanges(false);
+        setIsDirty(false);
+        if (onDirtyStateChange) {
+            onDirtyStateChange(false);
+        }
         onEditExercise(null);
+    };
+
+    const handleExitEditMode = () => {
+        if (isDirty) {
+            blockNavigation(() => {
+                onEditExercise(null);
+                setIsDirty(false);
+                if (onDirtyStateChange) {
+                    onDirtyStateChange(false);
+                }
+            });
+        } else {
+            onEditExercise(null);
+        }
     };
 
     const handleDeleteExercise = async (exerciseId: string) => {
@@ -89,14 +114,14 @@ const EditModeTable: FC<EditableTableProps> = ({
 
     return (
         <div className="overflow-y-hidden pb-72">
-            {/* Unsaved Changes Warning Modal - simple version */}
+            {/* Unsaved Changes Warning Modal */}
             <UnsavedChangesModal 
-                isOpen={showWarningModal}
-                onLeave={handleLeaveWithoutSaving}
-                onCancel={handleContinueEditing}
+                isOpen={showModal}
+                onContinue={continueEditing}
+                onDiscard={discardChanges}
             />
 
-            {/* Delete Confirmation Modal */}
+            {/* Delete Confirmation Dialog */}
             {exerciseToDelete && (
                 <DeleteConfirmationDialog
                     title={`Exercise: ${exercises.find(e => e.id === exerciseToDelete)?.fullName || ''}`}

@@ -1,37 +1,36 @@
 import React from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 interface LinkWithUnsavedCheckProps {
   href: string;
   children: React.ReactNode;
   className?: string;
   hasUnsavedChanges: boolean;
-  onNavigationAttempt: (destination: string) => void;
+  onNavigate: () => void;
 }
 
+/**
+ * A Link component that checks for unsaved changes before navigation
+ */
 const LinkWithUnsavedCheck: React.FC<LinkWithUnsavedCheckProps> = ({
   href,
   children,
   className,
   hasUnsavedChanges,
-  onNavigationAttempt
+  onNavigate,
 }) => {
   const router = useRouter();
-  
-  const handleClick = (e: React.MouseEvent) => {
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     if (hasUnsavedChanges) {
       e.preventDefault();
-      onNavigationAttempt(href);
+      onNavigate();
     }
   };
-  
+
   return (
-    <Link 
-      href={href} 
-      className={className}
-      onClick={handleClick}
-    >
+    <Link href={href} className={className} onClick={handleClick}>
       {children}
     </Link>
   );

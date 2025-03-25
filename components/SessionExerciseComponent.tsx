@@ -1,7 +1,7 @@
-import React, { FC, useMemo, useState, useEffect, useCallback } from "react";
+import React, { FC, useMemo, useState, useEffect } from "react";
 import EditModeTable from "./EditModeTable";
 import UnsavedChangesModal from "./UnsavedChangesModal";
-import useUnsavedChangesWarning from "@/hooks/useUnsavedChangesWarning";
+import useUnsavedChanges from "@/hooks/useUnsavedChanges";
 
 // Define interface with added navigation block functions
 interface SessionExerciseProps {
@@ -34,37 +34,27 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
     onUnsavedChangesUpdate,
 }) => {
     const [selTargetArea, setSelTargetArea] = useState("");
-    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [isDirty, setIsDirty] = useState(false);
     
-    // Use our hooks for unsaved changes
+    // Use the unsaved changes hook
     const {
-        showWarningModal,
-        handleNavigationAttempt,
-        handleLeaveWithoutSaving,
-        handleContinueEditing
-    } = useUnsavedChangesWarning(hasUnsavedChanges);
-
-    // Track unsaved changes when editing begins or ends
-    useEffect(() => {
-        if (editingExerciseId) {
-            setHasUnsavedChanges(true);
-        } else {
-            setHasUnsavedChanges(false);
-        }
-    }, [editingExerciseId]);
-
-    // Track changes during exercise updates
-    const handleExerciseUpdateWithTracking = useCallback((phaseId, sessionId, updatedExercise) => {
-        setHasUnsavedChanges(true);
-        onExerciseUpdate(phaseId, sessionId, updatedExercise);
-    }, [onExerciseUpdate]);
+        showModal,
+        blockNavigation,
+        continueEditing,
+        discardChanges
+    } = useUnsavedChanges(isDirty);
 
     // Notify parent component about unsaved changes
     useEffect(() => {
         if (onUnsavedChangesUpdate) {
-            onUnsavedChangesUpdate(hasUnsavedChanges);
+            onUnsavedChangesUpdate(isDirty);
         }
-    }, [hasUnsavedChanges, onUnsavedChangesUpdate]);
+    }, [isDirty, onUnsavedChangesUpdate]);
+
+    // Handle dirty state change from EditModeTable
+    const handleDirtyStateChange = (newDirtyState: boolean) => {
+        setIsDirty(newDirtyState);
+    };
 
     const targetAreas = workouts.reduce((acc, workout) => {
         const { targetArea } = workout;
@@ -99,11 +89,11 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
 
     return (
         <div className="mt-4 overflow-x-auto touch-action-none">
-            {/* Unsaved Changes Warning Modal */}
+            {/* Unsaved Changes Modal */}
             <UnsavedChangesModal 
-                isOpen={showWarningModal}
-                onLeave={handleLeaveWithoutSaving}
-                onCancel={handleContinueEditing}
+                isOpen={showModal}
+                onContinue={continueEditing}
+                onDiscard={discardChanges}
             />
             
             <EditModeTable
@@ -117,9 +107,10 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
                 onEditExercise={onEditExercise}
                 onExerciseDelete={onExerciseDelete}
                 handleExerciseSave={handleExerciseSave}
-                onExerciseUpdate={handleExerciseUpdateWithTracking}
+                onExerciseUpdate={onExerciseUpdate}
                 onCancelEdit={onCancelEdit}
                 savingState={savingState}
+                onDirtyStateChange={handleDirtyStateChange}
             />
         </div>
     );

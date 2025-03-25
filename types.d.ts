@@ -301,6 +301,7 @@ interface EditableTableProps {
         exerciseId: string
     ) => void;
     savingState: boolean;
+    onDirtyStateChange?: (isDirty: boolean) => void;
 }
 
 interface AddClientFormProps {

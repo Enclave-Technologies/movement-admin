@@ -1,37 +1,40 @@
 import React from "react";
 
-interface UnsavedChangesModalProps {
+type UnsavedChangesModalProps = {
   isOpen: boolean;
-  onLeave: () => void;
-  onCancel: () => void;
-}
+  onContinue: () => void;
+  onDiscard: () => void;
+};
 
+/**
+ * A simple modal that warns users about unsaved changes
+ */
 const UnsavedChangesModal: React.FC<UnsavedChangesModalProps> = ({
   isOpen,
-  onLeave,
-  onCancel
+  onContinue,
+  onDiscard,
 }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white p-6 rounded-lg shadow-md w-[500px] max-w-[90%]">
-        <h2 className="text-xl font-semibold mb-2">Unsaved Changes</h2>
-        <p className="text-gray-600 mb-6">
-          You have unsaved changes. What would you like to do?
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm">
+      <div className="w-full max-w-md p-6 bg-white rounded-lg shadow-xl border-2 border-red-500">
+        <h2 className="text-xl font-semibold text-gray-800">Unsaved Changes</h2>
+        <p className="mt-2 text-gray-600">
+          You have unsaved changes that will be lost if you leave this page.
         </p>
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 mt-6">
           <button
-            onClick={onCancel}
-            className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg transition-transform active:scale-95 hover:bg-gray-200"
+            onClick={onContinue}
+            className="px-4 py-2 font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
           >
             Continue Editing
           </button>
           <button
-            onClick={onLeave}
-            className="bg-red-100 text-red-700 px-4 py-2 rounded-lg transition-transform active:scale-95 hover:bg-red-200"
+            onClick={onDiscard}
+            className="px-4 py-2 font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
           >
-            Leave Without Saving
+            Discard Changes
           </button>
         </div>
       </div>
