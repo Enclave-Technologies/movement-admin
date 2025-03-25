@@ -11,6 +11,7 @@ import { useTrainer } from "@/context/TrainerContext";
 import Image from "next/image";
 import { FaUsers, FaUsersLine } from "react-icons/fa6";
 import { LiaDumbbellSolid } from "react-icons/lia";
+import { useUnsavedChanges } from "@/context/UnsavedChangesContext";
 
 const sidebarItems = [
   {
@@ -48,6 +49,22 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onLogoutClick }) => {
     trainerLoading: loading,
     trainerError: error,
   } = useTrainer();
+
+  // Use unsaved changes context to check before logout
+  const { hasUnsavedChanges, handleActionAttempt } = useUnsavedChanges();
+
+  // Safely handle logout with unsaved changes check
+  const handleLogoutClick = () => {
+    // Only use handleActionAttempt if we have both onLogoutClick and unsaved changes
+    if (onLogoutClick) {
+      if (hasUnsavedChanges) {
+        handleActionAttempt(onLogoutClick);
+      } else {
+        // If no unsaved changes, just run the action directly
+        onLogoutClick();
+      }
+    }
+  };
 
   return (
     <div
@@ -134,7 +151,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onLogoutClick }) => {
                                 bg-green-500 hover:bg-green-900
                                 focus:outline-none focus:ring-2 focus:ring-offset-2
                                 transition duration-3000 ease-in-out transform"
-            onClick={onLogoutClick}
+            onClick={handleLogoutClick}
           >
             <div className="flex items-center justify-center select-none gap-2">
               <IoLogOutOutline className="w-6 h-6 stroke-2" />

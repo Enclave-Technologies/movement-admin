@@ -14,6 +14,7 @@ import { IoIosBody } from "react-icons/io";
 import BodyMassComposition from "./BodyMassComposition";
 import Toast from "../Toast";
 import { Tabs } from "./Tabs";
+import { useUnsavedChanges } from "@/context/UnsavedChangesContext";
 
 const ClientDetails = ({ client_id }) => {
     const { userData } = useUser();
@@ -32,7 +33,16 @@ const ClientDetails = ({ client_id }) => {
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
 
-
+    // Get the unsaved changes context
+    const { hasUnsavedChanges, handleActionAttempt } = useUnsavedChanges();
+    
+    // Wrapper for safe tab switching that checks for unsaved changes
+    const handleTabChange = (tabName) => {
+        // Use the handleActionAttempt to safely handle tab changes
+        handleActionAttempt(() => {
+            setSelectedTab(tabName);
+        });
+    };
 
     async function fetchWorkoutPlan() {
         try {
@@ -113,7 +123,9 @@ const ClientDetails = ({ client_id }) => {
             <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-visible shadow-md border border-gray-200">
                 <Tabs
                     selectedTab={selectedTab}
-                    setSelectedTab={setSelectedTab}
+                    setSelectedTab={handleTabChange}
+                    hasUnsavedChanges={hasUnsavedChanges}
+                    onTabChangeAttempt={handleTabChange}
                 />
                 <div className="p-8 bg-white w-full rounded-b-xl">
                     {selectedTab == "workout-history" && (

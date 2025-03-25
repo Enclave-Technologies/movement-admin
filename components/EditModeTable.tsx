@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect, useCallback } from "react";
 import { FaEdit, FaSave, FaTrash } from "react-icons/fa";
 import Select from "react-select";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
@@ -9,6 +9,9 @@ import {
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import DraggableRow from "./DraggableRow";
+import { useRouter } from "next/navigation";
+import UnsavedChangesModal from "./UnsavedChangesModal";
+import useUnsavedChangesWarning from "@/hooks/useUnsavedChangesWarning";
 
 const EditModeTable: FC<EditableTableProps> = ({
     phaseId,
@@ -24,26 +27,56 @@ const EditModeTable: FC<EditableTableProps> = ({
     onExerciseDelete,
     savingState,
 }) => {
-    const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(
-        null
-    ); // Store the exercise ID for deletion
+    const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    
+    const router = useRouter();
+
+    // Use our simplified hook
+    const {
+        showWarningModal,
+        handleNavigationAttempt,
+        handleLeaveWithoutSaving,
+        handleContinueEditing
+    } = useUnsavedChangesWarning(hasUnsavedChanges);
+
+    // Track unsaved changes when editing begins or ends
+    useEffect(() => {
+        if (editingExerciseId) {
+            setHasUnsavedChanges(true);
+        }
+    }, [editingExerciseId]);
+
+    // Modified update handler to track changes
+    const handleExerciseUpdate = (phaseId, sessionId, updatedExercise) => {
+        setHasUnsavedChanges(true);
+        onExerciseUpdate(phaseId, sessionId, updatedExercise);
+    };
+    
+    // Save changes handler
+    const handleSaveChanges = () => {
+        handleExerciseSave();
+        setHasUnsavedChanges(false);
+        onEditExercise(null);
+    };
 
     const handleDeleteExercise = async (exerciseId: string) => {
-        setExerciseToDelete(exerciseId); // Set the ID of the exercise to delete
+        setExerciseToDelete(exerciseId); 
     };
+    
     const confirmExerciseDelete = () => {
         if (exerciseToDelete) {
-            onExerciseDelete(phaseId, sessionId, exerciseToDelete); // Perform delete
-            setExerciseToDelete(null); // Reset the state after confirmation
+            onExerciseDelete(phaseId, sessionId, exerciseToDelete);
+            setExerciseToDelete(null);
         }
     };
 
     const cancelExerciseDelete = () => {
-        setExerciseToDelete(null); // Close dialog
+        setExerciseToDelete(null);
     };
 
     const filteredExercises = (exercise) => {
-        return workoutOptions; // No filtering based on targetArea
+        return workoutOptions;
     };
 
     const calculateTUT = ({ tempo, setsMax, repsMax }) => {
@@ -56,6 +89,22 @@ const EditModeTable: FC<EditableTableProps> = ({
 
     return (
         <div className="overflow-y-hidden pb-72">
+            {/* Unsaved Changes Warning Modal - simple version */}
+            <UnsavedChangesModal 
+                isOpen={showWarningModal}
+                onLeave={handleLeaveWithoutSaving}
+                onCancel={handleContinueEditing}
+            />
+
+            {/* Delete Confirmation Modal */}
+            {exerciseToDelete && (
+                <DeleteConfirmationDialog
+                    title={`Exercise: ${exercises.find(e => e.id === exerciseToDelete)?.fullName || ''}`}
+                    confirmDelete={confirmExerciseDelete}
+                    cancelDelete={cancelExerciseDelete}
+                />
+            )}
+
             {exercises.length === 0 ? (
                 <div className="text-center py-4 px-6 bg-gray-100 rounded-md shadow-sm">
                     <p className="text-gray-500 text-sm font-medium capitalize">
@@ -121,7 +170,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                         ""
                                                     }
                                                     onChange={(e) =>
-                                                        onExerciseUpdate(
+                                                        handleExerciseUpdate(
                                                             phaseId,
                                                             sessionId,
                                                             {
@@ -140,7 +189,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     disabled
                                                     value={exercise.motion}
                                                     onChange={(e) =>
-                                                        onExerciseUpdate(
+                                                        handleExerciseUpdate(
                                                             phaseId,
                                                             sessionId,
                                                             {
@@ -163,7 +212,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     onChange={(
                                                         selectedOption
                                                     ) => {
-                                                        onExerciseUpdate(
+                                                        handleExerciseUpdate(
                                                             phaseId,
                                                             sessionId,
                                                             {
@@ -195,7 +244,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                         if (selectedOption) {
                                                             const { workout } =
                                                                 selectedOption;
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -247,7 +296,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     : parseInt(
                                                                           value
                                                                       ); // Handle empty input
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -278,7 +327,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     : parseInt(
                                                                           value
                                                                       ); // Handle empty input
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -309,7 +358,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     : parseInt(
                                                                           value
                                                                       ); // Handle empty input
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -340,7 +389,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     : parseInt(
                                                                           value
                                                                       ); // Handle empty input
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -366,7 +415,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     })}
                                                     disabled
                                                     onChange={(e) =>
-                                                        onExerciseUpdate(
+                                                        handleExerciseUpdate(
                                                             phaseId,
                                                             sessionId,
                                                             {
@@ -385,7 +434,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     className="w-full px-0 text-center py-1 border rounded"
                                                     value={exercise.tempo || ""}
                                                     onChange={(e) =>
-                                                        onExerciseUpdate(
+                                                        handleExerciseUpdate(
                                                             phaseId,
                                                             sessionId,
                                                             {
@@ -415,7 +464,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     : parseInt(
                                                                           value
                                                                       ); // Handle empty input
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -446,7 +495,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                     : parseInt(
                                                                           value
                                                                       ); // Handle empty input
-                                                            onExerciseUpdate(
+                                                            handleExerciseUpdate(
                                                                 phaseId,
                                                                 sessionId,
                                                                 {
@@ -467,7 +516,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                         ""
                                                     }
                                                     onChange={(e) =>
-                                                        onExerciseUpdate(
+                                                        handleExerciseUpdate(
                                                             phaseId,
                                                             sessionId,
                                                             {
@@ -487,13 +536,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                     </div>
                                                 ) : (
                                                     <button
-                                                        onClick={() => {
-                                                            // DONE: Saving to DB
-                                                            onEditExercise(
-                                                                null
-                                                            );
-                                                            handleExerciseSave();
-                                                        }}
+                                                        onClick={handleSaveChanges}
                                                         className="text-black hover:text-black"
                                                     >
                                                         <FaSave className="text-lg" />
@@ -551,7 +594,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                                                                 () =>
                                                                     handleDeleteExercise(
                                                                         exercise.id
-                                                                    ) // Pass the exercise ID here
+                                                                    )
                                                             }
                                                             className="text-red-500 hover:text-red-700 mr-2"
                                                         >
@@ -563,21 +606,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                         </tr>
                                     )}
                                 </React.Fragment>
-                            ))}
-                        {exercises
-                            .sort((a, b) => a.exerciseOrder - b.exerciseOrder)
-                            .map((exercise) => (
-                                <tr key={exercise.id} className="border-b">
-                                    {exerciseToDelete === exercise.id && ( // Show confirmation only for the selected exercise
-                                        <DeleteConfirmationDialog
-                                            title={`Exercise: ${exercise.fullName}`}
-                                            confirmDelete={
-                                                confirmExerciseDelete
-                                            }
-                                            cancelDelete={cancelExerciseDelete}
-                                        />
-                                    )}
-                                </tr>
                             ))}
                     </tbody>
                 </table>

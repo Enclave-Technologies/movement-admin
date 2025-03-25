@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState, useCallback } from "react";
 import { FaChevronRight, FaChevronUp } from "react-icons/fa";
 import SessionExerciseComponent from "./SessionExerciseComponent";
 import DeleteConfirmationDialog from "./DeleteConfirmationDialog";
@@ -11,6 +11,7 @@ import SessionActions from "./session/SessionActions";
 import { RxDragHandleDots1 } from "react-icons/rx";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import useUnsavedChangesWarning from "@/hooks/useUnsavedChangesWarning";
 
 const SessionComponent: FC<SessionProps> = ({
     index,
@@ -47,6 +48,7 @@ const SessionComponent: FC<SessionProps> = ({
         useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [hasSessionExerciseChanges, setHasSessionExerciseChanges] = useState(false);
 
     useEffect(() => {
         if (isEditing && inputRef.current) {
@@ -131,6 +133,22 @@ const SessionComponent: FC<SessionProps> = ({
         transition,
     };
 
+    const { handleNavigationAttempt } = useUnsavedChangesWarning(hasSessionExerciseChanges);
+
+    const handleUnsavedChangesUpdate = useCallback((hasChanges: boolean) => {
+        setHasSessionExerciseChanges(hasChanges);
+    }, []);
+
+    const toggleCollapse = useCallback(() => {
+        if (hasSessionExerciseChanges && !isCollapsed) {
+            handleNavigationAttempt(() => {
+                setIsCollapsed(true);
+            });
+        } else {
+            setIsCollapsed(!isCollapsed);
+        }
+    }, [hasSessionExerciseChanges, isCollapsed, handleNavigationAttempt]);
+
     return (
         <div
             className="bg-white flex flex-col gap-4"
@@ -155,7 +173,7 @@ const SessionComponent: FC<SessionProps> = ({
                             <div className="flex flex-row items-center justify-start gap-2">
                                 <button
                                     className="flex items-center gap-1 p-1 text-gray-400 hover:text-gray-600 transition-all duration-200"
-                                    onClick={() => setIsCollapsed(!isCollapsed)}
+                                    onClick={toggleCollapse}
                                 >
                                     {isCollapsed ? (
                                         <>
@@ -241,6 +259,7 @@ const SessionComponent: FC<SessionProps> = ({
                     onEditExercise={onEditExercise}
                     onCancelEdit={onCancelEdit}
                     savingState={savingState}
+                    onUnsavedChangesUpdate={handleUnsavedChangesUpdate}
                 />
             )}
         </div>
