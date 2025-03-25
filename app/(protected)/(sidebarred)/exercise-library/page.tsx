@@ -450,7 +450,7 @@ const ExercisePage = () => {
     }
 
     return (
-        <main className="flex flex-col bg-transparent text-black">
+        <main className="flex flex-col bg-transparent text-black h-[calc(100vh-88px)] overflow-hidden">
             <div className="w-full flex flex-col gap-4 h-full">
                 <div className="w-full flex flex-row items-center justify-between py-2 border-b-[1px] border-gray-200">
                     <div className="flex flex-row gap-2 items-center">

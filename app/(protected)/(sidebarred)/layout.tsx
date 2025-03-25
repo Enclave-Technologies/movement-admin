@@ -70,7 +70,7 @@ export default function RootLayout({
                                         Cancel
                                     </button>
                                     <button
-                                        className="bg-green-500 text-white px-4 py-2 rounded-lg transition-transform active:scale-95"
+                                        className="bg-red-500 text-white px-4 py-2 rounded-lg transition-transform active:scale-95"
                                         onClick={handleLogout}
                                         disabled={loadingLogout}
                                     >
