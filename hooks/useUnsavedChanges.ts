@@ -13,6 +13,7 @@ export default function useUnsavedChanges(isDirty: boolean) {
   const router = useRouter();
   const pathname = usePathname();
   const previousPathnameRef = useRef(pathname);
+  const pendingNavigationRef = useRef<string | null>(null);
 
   // Intercept navigation events
   useEffect(() => {
@@ -32,6 +33,27 @@ export default function useUnsavedChanges(isDirty: boolean) {
   useEffect(() => {
     previousPathnameRef.current = pathname;
   }, [pathname]);
+
+  // Listen for custom navigation events from our NavigationEvents component
+  useEffect(() => {
+    const handleNavigation = (event: CustomEvent) => {
+      const { pathname: newPathname } = event.detail;
+      
+      if (isDirty && newPathname !== pathname) {
+        // Store the destination for later use
+        pendingNavigationRef.current = newPathname;
+        // Show warning modal
+        setShowModal(true);
+      }
+    };
+
+    // Add event listener with type assertion
+    window.addEventListener('navigationChanged', handleNavigation as EventListener);
+    
+    return () => {
+      window.removeEventListener('navigationChanged', handleNavigation as EventListener);
+    };
+  }, [isDirty, pathname]);
 
   // Set up warning when user tries to close tab or refresh
   useEffect(() => {
@@ -73,16 +95,23 @@ export default function useUnsavedChanges(isDirty: boolean) {
   const handleContinueEditing = useCallback(() => {
     setShowModal(false);
     setPendingAction(null);
+    pendingNavigationRef.current = null;
   }, []);
 
   // Function when user chooses to discard changes
   const handleDiscardChanges = useCallback(() => {
     if (pendingAction) {
       pendingAction();
+    } 
+    // If we have a stored navigation destination, use it
+    else if (pendingNavigationRef.current) {
+      router.push(pendingNavigationRef.current);
+      pendingNavigationRef.current = null;
     }
+    
     setShowModal(false);
     setPendingAction(null);
-  }, [pendingAction]);
+  }, [pendingAction, router]);
 
   return {
     showModal,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 
 interface ButtonWithUnsavedCheckProps {
   onClick: () => void;
@@ -22,14 +22,26 @@ const ButtonWithUnsavedCheck: React.FC<ButtonWithUnsavedCheckProps> = ({
   disabled = false,
   type = 'button'
 }) => {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  // Handle clicks with unsaved changes check
+  const handleClick = useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    // Prevent default button behavior
+    e.preventDefault();
+    
     if (hasUnsavedChanges) {
-      e.preventDefault();
+      // If dirty, trigger warning via callback
       onNavigateAttempt();
+      console.log('ButtonWithUnsavedCheck: Showing warning due to unsaved changes');
     } else {
+      // If not dirty, proceed with action
+      console.log('ButtonWithUnsavedCheck: Executing action immediately');
       onClick();
     }
-  };
+  }, [hasUnsavedChanges, onClick, onNavigateAttempt]);
+
+  // For debugging
+  useEffect(() => {
+    console.log('ButtonWithUnsavedCheck rendering, isDirty:', hasUnsavedChanges);
+  }, [hasUnsavedChanges]);
 
   return (
     <button
