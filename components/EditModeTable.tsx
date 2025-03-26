@@ -23,7 +23,6 @@ const EditModeTable: FC<EditableTableProps> = ({
   onExerciseUpdate,
   onExerciseDelete,
   savingState,
-  setHasUnsavedChanges,
 }) => {
   const [exerciseToDelete, setExerciseToDelete] = useState<string | null>(null); // Store the exercise ID for deletion
 
@@ -107,7 +106,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                               ...exercise,
                               setOrderMarker: e.target.value,
                             });
-                            setHasUnsavedChanges(true);
                           }}
                         />
                       </td>
@@ -121,7 +119,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                               ...exercise,
                               motion: e.target.value,
                             });
-                            setHasUnsavedChanges(true);
                           }}
                         />
                       </td>
@@ -184,7 +181,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                 ...exercise,
                                 setsMin: newValue,
                               });
-                              setHasUnsavedChanges(true);
                             }}
                           />
                           <span className="text-xs"> - </span>
@@ -200,7 +196,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                 ...exercise,
                                 setsMax: newValue,
                               });
-                              setHasUnsavedChanges(true);
                             }}
                           />
                         </div>
@@ -219,7 +214,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                 ...exercise,
                                 repsMin: newValue,
                               });
-                              setHasUnsavedChanges(true);
                             }}
                           />
                           <span className="text-xs"> - </span>
@@ -235,7 +229,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                 ...exercise,
                                 repsMax: newValue,
                               });
-                              setHasUnsavedChanges(true);
                             }}
                           />
                         </div>
@@ -255,7 +248,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                               ...exercise,
                               TUT: Number(e.target.value),
                             });
-                            setHasUnsavedChanges(true);
                           }}
                         />
                       </td>
@@ -268,8 +260,7 @@ const EditModeTable: FC<EditableTableProps> = ({
                               ...exercise,
                               tempo: e.target.value,
                             });
-                            setHasUnsavedChanges(true);
-                            }}
+                          }}
                         />
                       </td>
                       <td className="px-1 py-2">
@@ -286,7 +277,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                 ...exercise,
                                 restMin: newValue,
                               });
-                              setHasUnsavedChanges(true);
                             }}
                           />
                           <span className="text-xs"> - </span>
@@ -302,7 +292,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                                 ...exercise,
                                 restMax: newValue,
                               });
-                              setHasUnsavedChanges(true);
                             }}
                           />
                         </div>
@@ -316,7 +305,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                               ...exercise,
                               xtraInstructions: e.target.value,
                             });
-                            setHasUnsavedChanges(true);
                           }}
                         />
                       </td>
@@ -331,7 +319,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                               // DONE: Saving to DB
                               onEditExercise(null);
                               handleExerciseSave();
-                              setHasUnsavedChanges(false);
                             }}
                             className="text-black hover:text-black"
                           >
@@ -378,7 +365,6 @@ const EditModeTable: FC<EditableTableProps> = ({
                             <button
                               onClick={() => {
                                 onEditExercise(exercise.id);
-                                setHasUnsavedChanges(true);
                               }}
                               className="text-black hover:text-black mr-2"
                             >

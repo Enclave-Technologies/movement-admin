@@ -38,7 +38,6 @@ const SessionComponent: FC<SessionProps> = ({
     isPhaseActive,
     opRunning,
     setOpRunning,
-    setHasUnsavedChanges,
 }) => {
     const router = useRouter();
     const [isEditing, setIsEditing] = useState(false);
@@ -242,7 +241,6 @@ const SessionComponent: FC<SessionProps> = ({
                     onEditExercise={onEditExercise}
                     onCancelEdit={onCancelEdit}
                     savingState={savingState}
-                    setHasUnsavedChanges={setHasUnsavedChanges}
                 />
             )}
         </div>

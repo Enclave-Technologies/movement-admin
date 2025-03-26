@@ -12,7 +12,6 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
     onEditExercise,
     onCancelEdit,
     savingState,
-    setHasUnsavedChanges,
 }) => {
     // const [mode, setMode] = useState<"edit" | "draggable">("draggable");
     const [selTargetArea, setSelTargetArea] = useState("");
@@ -64,7 +63,6 @@ const SessionExerciseComponent: FC<SessionExerciseProps> = ({
                 onExerciseUpdate={onExerciseUpdate}
                 onCancelEdit={onCancelEdit}
                 savingState={savingState}
-                setHasUnsavedChanges={setHasUnsavedChanges}
             />
         </div>
     );
