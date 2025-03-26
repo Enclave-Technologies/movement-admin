@@ -22,6 +22,7 @@ export default function RootLayout({
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [showUnsavedChangeModal, setShowUnsavedChangeModal] = useState(false);
   const [selectedTabName, setSelectedTabName] = useState("");
+  const [initialLoad, setInitialLoad] = useState(false);
 
   const handleLogout = async () => {
     setLoadingLogout(true);
@@ -38,14 +39,19 @@ export default function RootLayout({
     setIsCollapsed(!isCollapsed);
   };
 
-  useEffect(() => {
-    // Clear unsaved changes flag on initial page load
-    localStorage.removeItem("workout-plan");
-  }, []);
+//   useEffect(() => {
+//     if (!initialLoad) {
+//       localStorage.setItem("workout-plan", "false");
+//     }
+
+//     setTimeout(() => {
+//       setInitialLoad(true);
+//     }, 100);
+//   }, []);
 
   useEffect(() => {
     setHasUnsavedChanges(localStorage.getItem("workout-plan") === "true");
-  }, []);
+  }, [initialLoad]);
 
   return (
     <StoreProvider>
