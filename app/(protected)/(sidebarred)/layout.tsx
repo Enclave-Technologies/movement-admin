@@ -39,6 +39,11 @@ export default function RootLayout({
   };
 
   useEffect(() => {
+    // Clear unsaved changes flag on initial page load
+    localStorage.removeItem("workout-plan");
+  }, []);
+
+  useEffect(() => {
     setHasUnsavedChanges(localStorage.getItem("workout-plan") === "true");
   }, []);
 
