@@ -50,6 +50,7 @@ const PhaseComponent: FC<PhaseProps> = ({
     handleSessionOrderChange,
     opRunning,
     setOpRunning,
+    setHasUnsavedChanges,
 }) => {
     const [isEditing, setIsEditing] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
@@ -372,6 +373,7 @@ const PhaseComponent: FC<PhaseProps> = ({
                                         isPhaseActive={phase.isActive}
                                         opRunning={opRunning}
                                         setOpRunning={setOpRunning}
+                                        setHasUnsavedChanges={setHasUnsavedChanges}
                                     />
                                 );
                             })}

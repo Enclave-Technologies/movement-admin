@@ -14,6 +14,7 @@ import { IoIosBody } from "react-icons/io";
 import BodyMassComposition from "./BodyMassComposition";
 import Toast from "../Toast";
 import { Tabs } from "./Tabs";
+import UnsavedChangesModal from "../UnsavedChangesModal";
 
 const ClientDetails = ({ client_id }) => {
     const { userData } = useUser();
@@ -31,7 +32,9 @@ const ClientDetails = ({ client_id }) => {
     const [showToast, setShowToast] = useState(false);
     const [toastMessage, setToastMessage] = useState("");
     const [toastType, setToastType] = useState("success");
-
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+    const [showUnsavedChangeModal, setShowUnsavedChangeModal] = useState(false);
+    const [selectedTabName, setSelectedTabName] = useState("");
 
 
     async function fetchWorkoutPlan() {
@@ -113,7 +116,14 @@ const ClientDetails = ({ client_id }) => {
             <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-visible shadow-md border border-gray-200">
                 <Tabs
                     selectedTab={selectedTab}
-                    setSelectedTab={setSelectedTab}
+                    setSelectedTab={(tabName: string) => {
+                        if (hasUnsavedChanges) {
+                            setSelectedTabName(tabName);
+                            setShowUnsavedChangeModal(true);
+                        } else {
+                            setSelectedTab(tabName);
+                        }
+                    }}
                 />
                 <div className="p-8 bg-white w-full rounded-b-xl">
                     {selectedTab == "workout-history" && (
@@ -150,6 +160,7 @@ const ClientDetails = ({ client_id }) => {
                             setShowToast={setShowToast}
                             setToastMessage={setToastMessage}
                             setToastType={setToastType}
+                            setHasUnsavedChanges={setHasUnsavedChanges}
                         />
                     )}
                     {selectedTab == "body-mass-composition" && (
@@ -165,6 +176,20 @@ const ClientDetails = ({ client_id }) => {
                             message={toastMessage}
                             onClose={handleToastClose}
                             type={toastType}
+                        />
+                    )}
+
+                    {showUnsavedChangeModal && (
+                        <UnsavedChangesModal
+                            isOpen={showUnsavedChangeModal}
+                            onStay={() => {
+                                setShowUnsavedChangeModal(false);
+                            }}
+                            onLeave={() => {
+                                setSelectedTab(selectedTabName);
+                                setHasUnsavedChanges(false);
+                                setShowUnsavedChangeModal(false);
+                            }}
                         />
                     )}
                 </div>

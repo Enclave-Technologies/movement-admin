@@ -25,6 +25,7 @@ const WorkoutPlan = ({
     setShowToast,
     setToastMessage,
     setToastType,
+    setHasUnsavedChanges,
 }) => {
     // TODO: Autosave every 2 minutes on this page. Keep a track of what was sent to the backend for saving, and the clientPhases
     const { userData } = useUser();
@@ -754,6 +755,7 @@ const WorkoutPlan = ({
                                 savingState={savingState}
                                 opRunning={opRunning}
                                 setOpRunning={setOpRunning}
+                                setHasUnsavedChanges={setHasUnsavedChanges}
                             />
                         ))
                     )}

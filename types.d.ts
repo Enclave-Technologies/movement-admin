@@ -217,6 +217,7 @@ interface PhaseProps {
     handleSessionOrderChange;
     opRunning: boolean;
     setOpRunning: React.Dispatch<React.SetStateAction<boolean>>;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 interface SessionProps {
@@ -245,6 +246,7 @@ interface SessionProps {
     isPhaseActive;
     opRunning;
     setOpRunning;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 interface SessionExerciseProps {
@@ -273,6 +275,7 @@ interface SessionExerciseProps {
     onEditExercise: (exerciseId: string) => void;
     onCancelEdit: () => void;
     savingState: boolean;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 interface DataResponse {
@@ -301,6 +304,7 @@ interface EditableTableProps {
         exerciseId: string
     ) => void;
     savingState: boolean;
+    setHasUnsavedChanges: (hasUnsavedChanges: boolean) => void;
 }
 
 interface AddClientFormProps {
