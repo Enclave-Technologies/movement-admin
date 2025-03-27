@@ -8,7 +8,6 @@ import ClientDetails from "@/components/client/ClientDetails";
 import { MdEdit } from "react-icons/md";
 import RightModal from "@/components/pure-components/RightModal";
 import EditUserForm from "@/components/forms/edit-user-form";
-import Toast from "@/components/Toast";
 
 const Page = ({ params }: { params: { id: string } }) => {
     const { userData, userLoading, userError, reloadData } = useUser(); // Use the context to set user data

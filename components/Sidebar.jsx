@@ -1,16 +1,17 @@
 "use client";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { LuUsers2 } from "react-icons/lu";
 import { FiSettings } from "react-icons/fi";
 import { IoLogOutOutline } from "react-icons/io5";
 import { AiOutlineMenu } from "react-icons/ai";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import TrainerInfo from "./TrainerInfo";
 import { useTrainer } from "@/context/TrainerContext";
 import Image from "next/image";
 import { FaUsers, FaUsersLine } from "react-icons/fa6";
 import { LiaDumbbellSolid } from "react-icons/lia";
+import UnsavedChangesModal from "./UnsavedChangesModal";
 
 const sidebarItems = [
   {
@@ -41,8 +42,17 @@ const sidebarItems = [
   },
 ];
 
-const Sidebar = ({ isCollapsed, toggleSidebar, onLogoutClick }) => {
+const Sidebar = ({
+  isCollapsed,
+  toggleSidebar,
+  onLogoutClick,
+  hasUnsavedChanges,
+  setShowUnsavedChangeModal,
+  setSelectedTabName,
+}) => {
   const pathname = usePathname();
+  const router = useRouter();
+
   const {
     trainerData,
     trainerLoading: loading,
@@ -91,7 +101,17 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onLogoutClick }) => {
 
               // Render other sidebar items regardless of the team
               return (
-                <Link href={item.href} key={item.label}>
+                <div
+                  onClick={() => {
+                    if (hasUnsavedChanges) {
+                      setSelectedTabName(item.href);
+                      setShowUnsavedChangeModal(true);
+                    } else {
+                      router.push(item.href);
+                    }
+                  }}
+                  key={item.label}
+                >
                   <div
                     className={`flex items-center whitespace-nowrap ${
                       isCollapsed ? "justify-center p-2" : "justify-start p-2"
@@ -108,7 +128,7 @@ const Sidebar = ({ isCollapsed, toggleSidebar, onLogoutClick }) => {
                       <span className="ml-2">{loading ? "" : item.label}</span>
                     )}
                   </div>
-                </Link>
+                </div>
               );
             })}
           </nav>
