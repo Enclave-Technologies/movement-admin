@@ -1,8 +1,7 @@
 "use client";
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
-import { API_BASE_URL, LIMIT } from "@/configs/constants";
-import { set } from "zod";
+import { API_BASE_URL } from "@/configs/constants";
 import { fetchUserDetails } from "@/server_functions/auth";
 
 // Create the User Context
@@ -45,7 +44,6 @@ export const StoreProvider = ({ children }) => {
     const fetchMyDetails = async () => {
         try {
             const currentUser = await fetchUserDetails();
-            console.log("Fetched user details:", currentUser); // Debugging
             setMyDetails(currentUser);
         } catch (error) {
             console.error("Error fetching user details:", error);
