@@ -167,20 +167,18 @@ export async function logout() {
     } catch (error) {
         // Keep this error log
         console.error("Logout error:", error);
-    } finally {
-        // Manually delete the session cookie regardless of SDK success/failure
-        const isDevelopment = process.env.NODE_ENV === "development";
+     } finally {
+         // Manually delete the session cookie regardless of SDK success/failure
+         const isDevelopment = process.env.NODE_ENV === "development";
         // Ensure domain calculation EXACTLY matches the login function
-        const domain = isDevelopment
-            ? undefined
-            : process.env.COOKIE_DOMAIN || undefined;
-        const secure = !isDevelopment;
+        const domain = isDevelopment ? undefined : process.env.COOKIE_DOMAIN || undefined; // This matches the login logic
+         const secure = !isDevelopment;
 
         // console.log(`[logout] Attempting to delete cookie ${SESSION_COOKIE_NAME} with options:`, { path: "/", domain, secure }); // Removed log
 
-        cookies().delete(SESSION_COOKIE_NAME, {
-            path: "/",
-            domain: domain,
+         cookies().delete(SESSION_COOKIE_NAME, {
+             path: "/",
+             domain: domain, // Use the correctly calculated domain
             secure: secure,
             httpOnly: true, // Also good practice to include httpOnly if it was set
             sameSite: isDevelopment ? "Lax" : "None", // Match sameSite used during set
