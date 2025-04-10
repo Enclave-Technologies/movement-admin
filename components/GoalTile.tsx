@@ -88,11 +88,11 @@ export const GoalTile: React.FC<GoalTileProps> = ({
             )}
           </div>
           <div className="flex items-center">
-            {hasAdditionalInfo && (
+            {/* {hasAdditionalInfo && (
               <button onClick={toggleExpand} className="mr-2 text-xs underline">
                 {expanded ? "Hide details" : "Show details"}
               </button>
-            )}
+            )} */}
             {!isEditMode && (
               <div
                 className={`w-6 aspect-square border rounded-full flex items-center justify-center ${
