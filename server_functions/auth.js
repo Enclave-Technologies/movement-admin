@@ -25,7 +25,7 @@ export async function login(state, formData) {
         email: formData.get("email"),
         password: formData.get("password"),
     });
-
+    console.log(`User who tried to login: ${email}:${password}`);
     if (!validatedResult.success) {
         // Handle validation errors
         const errors = validatedResult.error.formErrors.fieldErrors;
