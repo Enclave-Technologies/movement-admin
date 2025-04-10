@@ -1,0 +1,14 @@
+{
+    "name": "movement",
+    "main": "db/index.ts",
+    "compatibility_date": "2024-09-26",
+    "compatibility_flags": ["nodejs_compat"],
+    "d1_databases": [
+        {
+            "binding": "DB",
+            "database_name": "movement-db",
+            "database_id": "b7ce2b95-5115-4cec-88a8-fce1a1dfa5ae",
+            "migrations_dir": "drizzle/migrations"
+        }
+    ]
+}
