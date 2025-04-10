@@ -64,14 +64,21 @@ export async function login(state, formData) {
             team: teamAssociations,
         };
 
-        cookies().set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
+        const isDevelopment = process.env.NODE_ENV === "development";
+        const cookieOptions = {
             httpOnly: true,
-            sameSite: "None",
-            secure: true,
+            sameSite: isDevelopment ? "Lax" : "None", // Use Lax for dev, None for prod
+            secure: !isDevelopment, // Secure should be false in dev (HTTP), true in prod (HTTPS)
             expires: new Date(session.expire),
             path: "/",
-		domain: "enclave.live"
-        });
+            domain: isDevelopment ? undefined : "enclave.live", // Set domain only in production
+        };
+
+        cookies().set(
+            SESSION_COOKIE_NAME,
+            JSON.stringify(sessionData),
+            cookieOptions
+        );
     } catch (error) {
         console.error(error);
         if (error.message === "Invalid credentials") {
@@ -119,16 +126,23 @@ export async function logout() {
         // Ignore errors when deleting the session
     } finally {
         // Delete the session cookie regardless of the outcome
+        const isDevelopment = process.env.NODE_ENV === "development";
         const cookieOptions = {
             name: SESSION_COOKIE_NAME,
             httpOnly: true,
-            sameSite: "None",
-            secure: true,
+            sameSite: isDevelopment ? "Lax" : "None",
+            secure: !isDevelopment,
             path: "/",
-            domain: "enclave.live",
+            domain: isDevelopment ? undefined : "enclave.live", // Set domain only in production
         };
 
-        cookies().delete(cookieOptions);
+        // Use the object directly with delete, or just the name if options aren't needed/cause issues
+        // cookies().delete(cookieOptions); // Option 1: Pass full options object
+        cookies().delete(SESSION_COOKIE_NAME, {
+            path: cookieOptions.path,
+            domain: cookieOptions.domain, // Pass the potentially undefined domain
+        }); // Option 2: Pass name and relevant path/domain
+
         redirect("/login");
     }
 }
