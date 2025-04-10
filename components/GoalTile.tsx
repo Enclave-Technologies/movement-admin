@@ -74,7 +74,7 @@ export const GoalTile: React.FC<GoalTileProps> = ({
         <button
           className={`flex flex-row justify-between items-center p-4 border border-black rounded-md text-left flex-grow ${
             done ? "bg-primary text-white" : ""
-          } ${hasAdditionalInfo ? "rounded-b-none" : ""}`}
+          } `}
           onClick={handleClick}
           disabled={isEditMode}
         >
