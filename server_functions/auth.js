@@ -31,13 +31,13 @@ export async function login(state, formData) {
         return { success: false, errors };
     }
     const { email, password } = validatedResult.data;
-    console.log(`[login] Attempting login for user: ${email}`);
+    console.log(`[login] Attempting login for user: ${email}`); // Removed log
 
     try {
         // 2. Try logging in
-        console.log("[login] Creating admin client...");
+        // console.log("[login] Creating admin client..."); // Removed log
         const { account } = await createAdminClient();
-        console.log("[login] Calling createEmailPasswordSession...");
+        // console.log("[login] Calling createEmailPasswordSession..."); // Removed log
         const session = await account.createEmailPasswordSession(
             email,
             password
@@ -45,7 +45,7 @@ export async function login(state, formData) {
         // Appwrite SDK automatically handles setting the session cookie upon successful session creation.
         // We still need to verify the user belongs to the correct team.
 
-        console.log("[login] Session created successfully:", session.$id);
+        // console.log("[login] Session created successfully:", session.$id); // Removed log
 
         // Team check logic removed from here. Middleware handles redirection.
         // Protected routes will verify session validity via getCurrentUser on load.
@@ -62,30 +62,37 @@ export async function login(state, formData) {
         const { users: adminUsers } = await createAdminClient(); // Use admin client to find user ID
         const userList = await adminUsers.list([Query.equal("email", [email])]);
         if (userList.total === 0) {
-             console.error(`[login] Could not find user ${email} right after creating session. This should not happen.`);
-             // Delete the session we just created as something is wrong
-             const { account: tempAccount } = await createSessionClient(); // Create client with the new (but not yet set in headers) secret
-             tempAccount.client.setSession(session.secret); // Manually set session for deletion
-             await tempAccount.deleteSession('current');
-             throw new Error("User inconsistency after session creation.");
+            // Keep this error log
+            console.error(
+                `[login] Could not find user ${email} right after creating session. This should not happen.`
+            );
+            // Delete the session we just created as something is wrong
+            const { account: tempAccount } = await createSessionClient(); // Create client with the new (but not yet set in headers) secret
+            tempAccount.client.setSession(session.secret); // Manually set session for deletion
+            await tempAccount.deleteSession("current");
+            throw new Error("User inconsistency after session creation.");
         }
         const user = userList.users[0];
         const userMemberships = await adminUsers.listMemberships(user.$id);
-        const teamNames = userMemberships.memberships.map(m => m.teamName);
+        const teamNames = userMemberships.memberships.map((m) => m.teamName);
 
-         // Check teams using admin client results BEFORE setting cookie
-         if (!teamNames.some(name => name === "Admins" || name === "Trainers")) {
-             console.warn(`[login] User ${email} not in required teams (Admins/Trainers) based on admin check. Aborting login.`);
-             // Delete the session we just created
-             const { account: tempAccount } = await createSessionClient(); // Create client
-             tempAccount.client.setSession(session.secret); // Manually set session for deletion
-             await tempAccount.deleteSession('current');
-             throw new Error("Invalid credentials");
-         }
-         console.log("[login] User team check passed (admin check).");
+        // Check teams using admin client results BEFORE setting cookie
+        if (
+            !teamNames.some((name) => name === "Admins" || name === "Trainers")
+        ) {
+            // Keep this warning
+            console.warn(
+                `[login] User ${email} not in required teams (Admins/Trainers) based on admin check. Aborting login.`
+            );
+            // Delete the session we just created
+            const { account: tempAccount } = await createSessionClient(); // Create client
+            tempAccount.client.setSession(session.secret); // Manually set session for deletion
+            await tempAccount.deleteSession("current");
+            throw new Error("Invalid credentials");
+        }
+        // console.log("[login] User team check passed (admin check)."); // Removed log
 
-
-        console.log("[login] Account details fetched via admin:", user.$id);
+        // console.log("[login] Account details fetched via admin:", user.$id); // Removed log
         const sessionData = {
             session: session.secret, // The crucial part for auth
             $id: user.$id,
@@ -104,17 +111,18 @@ export async function login(state, formData) {
             // Set domain only in production for cross-subdomain compatibility if needed
             domain: isDevelopment
                 ? undefined
-                 : process.env.COOKIE_DOMAIN || undefined, // Use an env var for domain
+                : process.env.COOKIE_DOMAIN || undefined, // Use an env var for domain
         };
-        console.log("[login] Cookie options:", cookieOptions); // Log the options
+        // console.log("[login] Cookie options:", cookieOptions); // Removed log
 
         cookies().set(
             SESSION_COOKIE_NAME,
             JSON.stringify(sessionData),
             cookieOptions
         );
-        console.log("[login] Session cookie set successfully.");
+        // console.log("[login] Session cookie set successfully."); // Removed log
     } catch (error) {
+        // Keep this error log
         console.error("[login] Login failed:", error);
         // Ensure consistent error message for invalid credentials/permissions
         if (
@@ -157,17 +165,27 @@ export async function logout() {
         await account.deleteSession("current");
         // Appwrite SDK should handle cookie deletion on successful session deletion.
     } catch (error) {
-        // Log error but proceed to delete cookie and redirect
+        // Keep this error log
         console.error("Logout error:", error);
     } finally {
         // Manually delete the session cookie regardless of SDK success/failure
         const isDevelopment = process.env.NODE_ENV === "development";
+        // Ensure domain calculation EXACTLY matches the login function
+        const domain = isDevelopment
+            ? undefined
+            : process.env.COOKIE_DOMAIN || undefined;
+        const secure = !isDevelopment;
+
+        // console.log(`[logout] Attempting to delete cookie ${SESSION_COOKIE_NAME} with options:`, { path: "/", domain, secure }); // Removed log
+
         cookies().delete(SESSION_COOKIE_NAME, {
             path: "/",
-            domain: isDevelopment
-                ? undefined
-                : process.env.COOKIE_DOMAIN || undefined, // Use an env var for domain
+            domain: domain,
+            secure: secure,
+            httpOnly: true, // Also good practice to include httpOnly if it was set
+            sameSite: isDevelopment ? "Lax" : "None", // Match sameSite used during set
         });
+        // console.log(`[logout] Cookie delete call executed for ${SESSION_COOKIE_NAME}.`); // Removed log
 
         // Redirect to login page after attempting logout and deleting cookie
         redirect("/login");
@@ -689,26 +707,27 @@ async function createClientTeamAssociation(teams, email, uid) {
 }
 
 export async function getCurrentUser() {
-    console.log("[getCurrentUser] Attempting to get current user...");
+    // console.log("[getCurrentUser] Attempting to get current user..."); // Removed log
     try {
         // Create a session client. createSessionClient reads the cookie internally.
-        console.log("[getCurrentUser] Creating session client...");
+        // console.log("[getCurrentUser] Creating session client..."); // Removed log
         const { account } = await createSessionClient(); // Call without arguments
-        console.log("[getCurrentUser] Calling account.get()...");
+        // console.log("[getCurrentUser] Calling account.get()..."); // Removed log
         const user = await account.get();
-        console.log("[getCurrentUser] User found:", user.$id);
+        // console.log("[getCurrentUser] User found:", user.$id); // Removed log
         return user;
     } catch (error) {
-        console.log("[getCurrentUser] Failed to get user.");
+        // console.log("[getCurrentUser] Failed to get user."); // Removed log
         // If account.get() fails (e.g., invalid session), return null.
         // AppwriteException typically means no valid session.
         if (error instanceof AppwriteException) {
+            // Keep detailed error log for AppwriteExceptions
             // Log more details from the AppwriteException
             console.log(
                 `[getCurrentUser] AppwriteException: Code: ${error.code}, Type: ${error.type}, Message: ${error.message}`
             );
         } else {
-            // Log the full error object for unexpected errors
+            // Keep detailed error log for unexpected errors
             console.error("[getCurrentUser] Unexpected error:", error);
         }
         return null;
@@ -719,16 +738,16 @@ export async function fetchUserDetails() {
     // No need to check cookies().has() here, createSessionClient handles it
     try {
         // createSessionClient now reads the cookie internally
-        console.log("[fetchUserDetails] Creating session client...");
+        // console.log("[fetchUserDetails] Creating session client..."); // Removed log
         const {
             account,
             database,
             teams: sessTeam,
         } = await createSessionClient(); // Call without arguments
-        console.log("[fetchUserDetails] Verifying session with account.get()...");
+        // console.log("[fetchUserDetails] Verifying session with account.get()..."); // Removed log
         // Check if account.get() succeeds (verifies session)
         const accDetails = await account.get();
-        console.log("[fetchUserDetails] Session verified for user:", accDetails.$id);
+        // console.log("[fetchUserDetails] Session verified for user:", accDetails.$id); // Removed log
 
         // If account.get() succeeded, proceed to fetch other details
         const { teams } = await sessTeam.list();
@@ -746,13 +765,21 @@ export async function fetchUserDetails() {
             team: teamAssociations,
             ...fullDetails,
         };
-        console.log("[fetchUserDetails] Successfully fetched user details for:", accDetails.$id);
+        // console.log("[fetchUserDetails] Successfully fetched user details for:", accDetails.$id); // Removed log
         return mergedObject;
     } catch (error) {
-        console.error("[fetchUserDetails] Failed to fetch user details:", error);
-         if (error instanceof AppwriteException) {
+        // Keep this error log
+        console.error(
+            "[fetchUserDetails] Failed to fetch user details:",
+            error
+        );
+        if (error instanceof AppwriteException) {
+            // Keep this specific log
             console.log(
-                "[fetchUserDetails] AppwriteException: Likely invalid/expired session. Code:", error.code, "Type:", error.type
+                "[fetchUserDetails] AppwriteException: Likely invalid/expired session. Code:",
+                error.code,
+                "Type:",
+                error.type
             );
         }
         return null;
@@ -818,17 +845,21 @@ export async function addWorkout(state, formData) {
 
         // This function relies on being called within a request context where
         // createSessionClient() can successfully read the session cookie set previously.
-        console.log("[addWorkout] Attempting to add workout...");
+        // console.log("[addWorkout] Attempting to add workout..."); // Removed log
         const { database, account } = await createSessionClient(); // Corrected: No arguments
 
         // Verify session is still valid before proceeding
         try {
-             await account.get(); // Throws error if session is invalid
-             console.log("[addWorkout] Session verified.");
-        } catch(sessionError) {
-             console.error("[addWorkout] Invalid session:", sessionError);
-             // Handle invalid session, maybe return an error state
-             return { success: false, errors: { motion: ["Invalid session. Please log in again."] } };
+            await account.get(); // Throws error if session is invalid
+            // console.log("[addWorkout] Session verified."); // Removed log
+        } catch (sessionError) {
+            // Keep this error log
+            console.error("[addWorkout] Invalid session:", sessionError);
+            // Handle invalid session, maybe return an error state
+            return {
+                success: false,
+                errors: { motion: ["Invalid session. Please log in again."] },
+            };
         }
 
         const uid = ID.unique();
