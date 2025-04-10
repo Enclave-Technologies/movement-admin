@@ -91,7 +91,6 @@ const EditGoalModal = ({
 
       onClose();
     } catch (error) {
-      console.error("Error saving goal:", error);
       setError(error.message || "Failed to save goal. Please try again.");
 
       // Show error toast if toast functions are provided

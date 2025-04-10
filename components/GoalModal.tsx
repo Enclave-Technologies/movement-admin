@@ -85,7 +85,6 @@ export default function GoalModal({
         setShowToast(true);
       }
     } catch (error) {
-      console.error("Error adding goal:", error);
       setError(error.message || "Failed to add goal. Please try again.");
 
       // Show error toast if toast functions are provided

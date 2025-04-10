@@ -48,7 +48,6 @@ const GoalList = ({
         }
         setShowToast(true);
       } catch (error) {
-        console.error("Failed to update goal:", error);
         throw error; // Re-throw the error to be handled in GoalTile
       }
     },

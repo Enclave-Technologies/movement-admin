@@ -36,7 +36,6 @@ export const GoalTile: React.FC<GoalTileProps> = ({
       try {
         await onUpdateGoal(goal.id, newState);
       } catch (error) {
-        console.error("Failed to update goal:", error);
         setDone(!newState); // Revert the state if the update fails
       }
     }, 500),
