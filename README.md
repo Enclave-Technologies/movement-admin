@@ -1,5 +1,5 @@
 -   [x] Theme
--   [] Deployment
+-   [x] Deployment (Sevalla)
 -   [] DB connect
 -   [] Auth
 -   [] my-clients
