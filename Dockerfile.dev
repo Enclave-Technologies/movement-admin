@@ -1,0 +1,17 @@
+FROM node:20-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install dependencies only when needed
+COPY package.json package-lock.json ./
+RUN npm ci
+
+# Set development environment
+ENV NODE_ENV=development
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Start the application in development mode
+CMD ["npm", "run", "dev"]
