@@ -90,7 +90,7 @@ const EditExerciseForm = ({ refreshTable, team, rowData }) => {
 
     // Extract unique exercise names from exerciseHierarchy object
     const motionOptions = Object.entries(
-        exerciseHierarchy as ExerciseHierarchy
+        (exerciseHierarchy || {}) as ExerciseHierarchy
     ).flatMap(([motion, key]) => ({
         value: motion,
         label: motion,

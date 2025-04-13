@@ -81,7 +81,7 @@ const AddExerciseForm = ({ fetchData, team, handleCsvFile }) => {
     // Extract unique exercise names from exerciseHierarchy object
     useEffect(() => {
         motionOptionsRef.current = Object.entries(
-            exerciseHierarchy as ExerciseHierarchy
+            (exerciseHierarchy || {}) as ExerciseHierarchy
         ).flatMap(([motion, _]) => ({
             value: motion,
             label: motion,
