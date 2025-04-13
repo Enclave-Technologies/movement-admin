@@ -1,5 +1,5 @@
 "use server";
-import { createAdminClient } from "@/appwrite/config";
+import { createAdminClient, createSessionClient } from "@/appwrite/config";
 import { LoginFormSchema } from "@/form-validators/auth-forms";
 import { MOVEMENT_SESSION_NAME } from "@/lib/constants";
 import { cookies } from "next/headers";
@@ -51,4 +51,20 @@ export async function login(formData: unknown) {
     }
 
     redirect("/my-clients");
+}
+
+export async function logout() {
+    const session = (await cookies()).get(MOVEMENT_SESSION_NAME);
+    if (session) {
+        const { account } = await createSessionClient(session.value);
+        try {
+            await account.deleteSession("current");
+        } catch (error) {
+            console.error("Error logging out:", error);
+        }
+        (await cookies()).delete(MOVEMENT_SESSION_NAME);
+        redirect("/login");
+    } else {
+        redirect("/login");
+    }
 }

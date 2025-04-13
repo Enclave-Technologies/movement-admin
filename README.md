@@ -7,7 +7,8 @@
 -   [x] DB connect
 -   [] DB migrate
 -   [x] Dockerize
--   [] Auth
+-   [x] Auth
+-   [] Registration
 -   [] my-clients
     -   [] client add
     -   [] client management
