@@ -1,3 +1,4 @@
+"use client";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,11 +12,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { login } from "@/actions/auth_actions";
+import { useActionState } from "react";
+import { LoaderCircle } from "lucide-react";
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+    const [state, action, loading] = useActionState(login, "");
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card>
@@ -26,7 +31,7 @@ export function LoginForm({
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <form action={login}>
+                    <form action={action}>
                         <div className="flex flex-col gap-6">
                             <div className="grid gap-2">
                                 <Label htmlFor="email">Email</Label>
@@ -41,12 +46,6 @@ export function LoginForm({
                             <div className="grid gap-2">
                                 <div className="flex items-center">
                                     <Label htmlFor="password">Password</Label>
-                                    <Link
-                                        href="#"
-                                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                                    >
-                                        Forgot your password?
-                                    </Link>
                                 </div>
                                 <Input
                                     id="password"
@@ -55,17 +54,38 @@ export function LoginForm({
                                     required
                                 />
                             </div>
-                            <Button type="submit" className="w-full">
-                                Login
+                            <div>
+                                {state && (
+                                    <p className="text-sm text-red-500">
+                                        {state}
+                                    </p>
+                                )}
+                            </div>
+                            <Button
+                                type="submit"
+                                className="w-full"
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <p className="flex items-center gap-2">
+                                        <LoaderCircle className="animate-spin" />{" "}
+                                        Loading
+                                    </p>
+                                ) : (
+                                    "Login"
+                                )}
                             </Button>
-                            {/* <Button variant="outline" className="w-full">
-                                Login with Google
-                            </Button> */}
+                            <Link
+                                href="#"
+                                className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                            >
+                                Forgot your password?
+                            </Link>
                         </div>
                         <div className="mt-4 text-center text-sm">
                             Don&apos;t have an account?{" "}
                             <Link
-                                href="#"
+                                href="/sign-up"
                                 className="underline underline-offset-4"
                             >
                                 Sign up
