@@ -13,7 +13,7 @@ import { relations, sql } from "drizzle-orm"; // Import sql from drizzle-orm
 
 // -- Users Table --
 export const Users = pgTable("Users", {
-    userId: uuid("user_id")
+    userId: text("user_id")
         .primaryKey()
         .default(sql`uuid_generate_v4()`),
     appwrite_id: text("appwrite_id").unique().notNull(),
@@ -44,9 +44,9 @@ export const UserRoles = pgTable(
         userRoleId: uuid("user_role_id")
             .primaryKey()
             .default(sql`uuid_generate_v4()`),
-        userId: uuid("user_id") // Changed to uuid
+        userId: text("user_id") // Changed to text
             .notNull()
-            .references(() => Users.userId),
+            .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
         roleId: uuid("role_id") // Changed to uuid
             .notNull()
             .references(() => Roles.roleId),
@@ -65,9 +65,9 @@ export const Exercises = pgTable("Exercises", {
         .default(sql`uuid_generate_v4()`),
     exerciseName: text("exercise_name").notNull(),
     description: text("description"),
-    uploadedByUserId: uuid("uploaded_by_user_id") // Changed to uuid
+    uploadedByUserId: text("uploaded_by_user_id") // Changed to text
         .notNull()
-        .references(() => Users.userId),
+        .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
     uploadDate: timestamp("upload_date").defaultNow().notNull(),
     approvedByAdmin: boolean("approved_by_admin"), // Nullable
     videoUrl: text("videoUrl"),
@@ -82,12 +82,12 @@ export const ExercisePlans = pgTable("ExercisePlans", {
         .primaryKey()
         .default(sql`uuid_generate_v4()`),
     planName: text("plan_name").notNull(),
-    createdByUserId: uuid("created_by_user_id") // Changed to uuid
+    createdByUserId: text("created_by_user_id") // Changed to text
         .notNull()
-        .references(() => Users.userId),
+        .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
     createdDate: timestamp("created_date").defaultNow().notNull(),
-    assignedToUserId: uuid("assigned_to_user_id") // Changed to uuid
-        .references(() => Users.userId), // Nullable
+    assignedToUserId: text("assigned_to_user_id") // Changed to text
+        .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }), // Nullable
     isActive: boolean("is_active").default(false),
 });
 
@@ -176,9 +176,9 @@ export const BMCMeasurements = pgTable(
         measurementId: uuid("measurement_id") // Changed to uuid
             .primaryKey()
             .default(sql`uuid_generate_v4()`),
-        userId: uuid("user_id") // Changed to uuid
+        userId: text("user_id") // Changed to text
             .notNull()
-            .references(() => Users.userId),
+            .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
         date: timestamp("date").notNull(),
         height: real("height"),
         weight: real("weight"),
@@ -224,9 +224,9 @@ export const Goals = pgTable("Goals", {
     goalId: uuid("goal_id") // Changed to uuid
         .primaryKey()
         .default(sql`uuid_generate_v4()`),
-    userId: uuid("user_id") // Changed to uuid
+    userId: text("user_id") // Changed to text
         .notNull()
-        .references(() => Users.userId),
+        .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
     goalDescription: text("goal_description").notNull(),
     goalStatus: goalStatusEnum("goal_status").default("in-progress").notNull(), // Use enum
     goalType: goalTypeEnum("goal_type").notNull(), // Use enum
@@ -243,9 +243,9 @@ export const WorkoutSessionsLog = pgTable("WorkoutSessionsLog", {
     workoutSessionLogId: uuid("workout_session_log_id") // Changed to uuid
         .primaryKey()
         .default(sql`uuid_generate_v4()`),
-    userId: uuid("user_id") // Changed to uuid
+    userId: text("user_id") // Changed to text
         .notNull()
-        .references(() => Users.userId),
+        .references(() => Users.userId, { onDelete: 'cascade', onUpdate: 'cascade' }),
     // sessionId: uuid("session_id").notNull(), // Removed as per user request
     sessionName: text("session_name").notNull(),
     startTime: timestamp("start_time").defaultNow().notNull(),
