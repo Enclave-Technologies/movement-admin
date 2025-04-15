@@ -68,7 +68,7 @@ export async function login(previousState: string, formData: unknown) {
         return "Invalid credentials";
     }
 
-    redirect("/my-clients");
+    redirect("/awaiting-approval");
 }
 
 export async function logout() {
