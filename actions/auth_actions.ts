@@ -52,12 +52,11 @@ export async function login(previousState: string, formData: unknown) {
     console.log("[LOGIN] Creating admin client");
     const { account } = await createAdminClient();
 
+    let session;
+
     try {
         console.log("[LOGIN] Attempting to create email/password session");
-        const session = await account.createEmailPasswordSession(
-            email,
-            password
-        );
+        session = await account.createEmailPasswordSession(email, password);
         console.log("[LOGIN] Session created successfully:", session);
 
         const cookieOptions = {
@@ -96,11 +95,15 @@ export async function login(previousState: string, formData: unknown) {
     }
 
     console.log("[LOGIN] Getting user account details");
+    let redirectPath = "/awaiting-approval"; // Default path
+    
     try {
-        const current_user = await account.get();
-        console.log("[LOGIN] User account retrieved:", current_user);
+        const { account: clientAccount } = await createSessionClient(
+            session.secret
+        );
+        const user = await clientAccount.get();
 
-        console.log("[LOGIN] Fetching user role information");
+        console.log("[LOGIN] Fetching user role information >>", user.$id);
         const userRoleData = await db
             .select({
                 roleName: Roles.roleName,
@@ -108,22 +111,28 @@ export async function login(previousState: string, formData: unknown) {
             })
             .from(UserRoles)
             .innerJoin(Roles, eq(UserRoles.roleId, Roles.roleId))
-            .where(eq(UserRoles.userId, current_user.$id));
+            .where(eq(UserRoles.userId, user.$id));
 
         console.log("[LOGIN] User role data:", userRoleData);
 
         if (userRoleData.length > 0) {
-            const { roleName, approvedByAdmin } = userRoleData[0];
-            console.log(
-                `[LOGIN] User role: ${roleName}, Approved: ${approvedByAdmin}`
-            );
+            console.log("[LOGIN] User roles:", userRoleData);
 
-            if (roleName === "Guest" && !approvedByAdmin) {
-                console.log("[LOGIN] Redirecting to awaiting-approval");
-                redirect("/awaiting-approval");
+            // Check if user has only Client role
+            const isOnlyClient = userRoleData.length === 1 && 
+                               userRoleData[0].roleName === "Client";
+            if (isOnlyClient) {
+                const logoutRedirect = await logout();
+                redirectPath = `${logoutRedirect}?error=only_coach_allowed`;
             } else {
-                console.log("[LOGIN] Redirecting to my-clients");
-                redirect("/my-clients");
+                // Check if any role is Guest and not approved
+                const isGuestNotApproved = userRoleData.some(
+                    role => role.roleName === "Guest" && !role.approvedByAdmin
+                );
+
+                if (!isGuestNotApproved) {
+                    redirectPath = "/my-clients";
+                }
             }
         } else {
             console.log("[LOGIN] No role data found for user");
@@ -132,8 +141,8 @@ export async function login(previousState: string, formData: unknown) {
         console.error("[LOGIN] Error fetching user role:", error);
     }
 
-    console.log("[LOGIN] Default redirect to awaiting-approval");
-    redirect("/awaiting-approval");
+    console.log(`[LOGIN] Redirecting to ${redirectPath}`);
+    redirect(redirectPath);
 }
 
 export async function logout() {
@@ -146,10 +155,8 @@ export async function logout() {
             console.error("Error logging out:", error);
         }
         (await cookies()).delete(MOVEMENT_SESSION_NAME);
-        redirect("/login");
-    } else {
-        redirect("/login");
     }
+    return "/login";
 }
 
 export async function register(previousState: string, formData: unknown) {

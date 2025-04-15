@@ -1,19 +1,19 @@
 "use client";
 
 import {
-    BadgeCheck,
-    Bell,
+    // BadgeCheck,
+    // Bell,
     ChevronsUpDown,
-    CreditCard,
-    LogOut,
-    Sparkles,
+    // CreditCard,
+    // LogOut,
+    // Sparkles,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuGroup,
+    // DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuLabel,
     DropdownMenuSeparator,
@@ -25,6 +25,7 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar";
+import { LogoutButton } from "../auth/logout-button";
 
 export function NavUser({
     user,
@@ -94,7 +95,7 @@ export function NavUser({
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuGroup>
+                        {/* <DropdownMenuGroup>
                             <DropdownMenuItem>
                                 <Sparkles />
                                 Upgrade to Pro
@@ -115,10 +116,9 @@ export function NavUser({
                                 Notifications
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>
-                            <LogOut />
-                            Log out
+                        <DropdownMenuSeparator /> */}
+                        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                            <LogoutButton className="w-full cursor-pointer" />
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
