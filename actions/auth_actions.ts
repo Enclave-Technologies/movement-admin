@@ -63,11 +63,47 @@ export async function login(previousState: string, formData: unknown) {
         });
     } catch (error) {
         console.error("Error logging in:", error);
-        // throw error; // Re-throw for upstream handling
-        // redirect("/login");
+
+        // Handle specific error cases
+        if (error instanceof AppwriteException) {
+            if (error.code === 401) {
+                return "Invalid email or password";
+            } else if (error.code === 429) {
+                return "Too many login attempts. Please try again later.";
+            }
+        }
+
         return "Invalid credentials";
     }
 
+    // Get user role to determine where to redirect
+    try {
+        const user = await account.get();
+
+        // Get user role information
+        const userRoleData = await db
+            .select({
+                roleName: Roles.roleName,
+                approvedByAdmin: UserRoles.approvedByAdmin,
+            })
+            .from(UserRoles)
+            .innerJoin(Roles, eq(UserRoles.roleId, Roles.roleId))
+            .where(eq(UserRoles.userId, user.$id));
+
+        if (userRoleData.length > 0) {
+            const { roleName, approvedByAdmin } = userRoleData[0];
+
+            if (roleName === "Guest" && !approvedByAdmin) {
+                redirect("/awaiting-approval");
+            } else {
+                redirect("/my-clients");
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching user role:", error);
+    }
+
+    // Default redirect if role check fails
     redirect("/awaiting-approval");
 }
 

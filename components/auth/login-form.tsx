@@ -14,6 +14,7 @@ import Link from "next/link";
 import { login } from "@/actions/auth_actions";
 import { useActionState } from "react";
 import { LoaderCircle } from "lucide-react";
+import { toast } from "sonner";
 
 export function LoginForm({
     className,
@@ -76,8 +77,15 @@ export function LoginForm({
                                 )}
                             </Button>
                             <Link
-                                href="#"
+                                href="/reset-password"
                                 className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    toast.info("Password Reset", {
+                                        description:
+                                            "This feature will be available soon. Please contact support if you need to reset your password.",
+                                    });
+                                }}
                             >
                                 Forgot your password?
                             </Link>

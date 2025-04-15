@@ -14,25 +14,30 @@ import { register } from "@/actions/auth_actions";
 import { LoaderCircle } from "lucide-react";
 import { useActionState, useEffect } from "react";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export function RegisterForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
     const [state, action, loading] = useActionState(register, "");
+    const router = useRouter();
 
-    // Show toast notification if state is success
+    // Show toast notification if state is success and redirect to login
     useEffect(() => {
         if (state === "success") {
             toast("Registration Successful", {
                 description: "You can now login to your account",
-                // action: {
-                //     label: "Undo",
-                //     onClick: () => console.log("Undo"),
-                // },
             });
+            
+            // Redirect to login page after a short delay
+            const redirectTimer = setTimeout(() => {
+                router.push("/login");
+            }, 2000); // 2 second delay to allow the toast to be seen
+            
+            return () => clearTimeout(redirectTimer);
         }
-    }, [state]);
+    }, [state, router]);
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>

@@ -1,4 +1,5 @@
 import { get_user_if_logged_in } from "@/actions/appwrite_actions";
+import { get_logged_in_user } from "@/actions/logged_in_user_actions";
 import { LoginForm } from "@/components/auth/login-form";
 import SearchParamError from "@/components/auth/search-param-error";
 import { MOVEMENT_SESSION_NAME } from "@/lib/constants";
@@ -11,7 +12,20 @@ export default async function Page() {
     const result = await get_user_if_logged_in(session);
 
     if (result) {
-        redirect("/awaiting-approval");
+        try {
+            // Get user with role information
+            const user = await get_logged_in_user();
+            
+            // Check if user is a Guest and not approved
+            if (user.role === "Guest" && !user.approvedByAdmin) {
+                redirect("/awaiting-approval");
+            } else {
+                redirect("/my-clients");
+            }
+        } catch {
+            // If there's an error getting the user, redirect to awaiting-approval as fallback
+            redirect("/awaiting-approval");
+        }
     }
 
     return (
