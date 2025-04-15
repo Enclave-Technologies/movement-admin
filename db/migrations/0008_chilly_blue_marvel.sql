@@ -1,0 +1,1 @@
+ALTER TABLE "Sessions" ADD COLUMN "session_time" real;
