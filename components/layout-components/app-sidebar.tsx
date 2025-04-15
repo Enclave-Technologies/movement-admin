@@ -2,21 +2,25 @@
 
 import * as React from "react";
 import {
-    BookOpen,
-    Bot,
-    Command,
-    Frame,
-    LifeBuoy,
-    Map,
-    PieChart,
-    Send,
+    // BookOpen,
+    // Bot,
+    Dumbbell,
+    // Command,
+    // Frame,
+    // LifeBuoy,
+    // Map,
+    MountainIcon,
+    // PieChart,
+    // Send,
     Settings2,
-    SquareTerminal,
+    // SquareTerminal,
+    UserCircle,
+    Users,
 } from "lucide-react";
 
 import { NavMain } from "@/components/layout-components/nav-main";
-import { NavProjects } from "@/components/layout-components/nav-projects";
-import { NavSecondary } from "@/components/layout-components/nav-secondary";
+// import { NavProjects } from "@/components/layout-components/nav-projects";
+// import { NavSecondary } from "@/components/layout-components/nav-secondary";
 import { NavUser } from "@/components/layout-components/nav-user";
 import {
     Sidebar,
@@ -28,73 +32,73 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
-const data = {
-    user: {
-        name: "shadcn",
-        email: "m@example.com",
-        avatar: "/avatars/shadcn.jpg",
-    },
-    navMain: [
-        {
-            title: "Playground",
+// Define the user data structure based on NavUser component
+export interface UserData {
+    name: string;
+    email: string;
+    avatar: string;
+}
+
+// Define props interface including the user data
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  user: UserData;
+}
+
+// Keep navMain static for now, or make it a prop too if needed
+// Removed user from here
+const navMain = [
+    {
+        title: "Clients",
             url: "#",
-            icon: SquareTerminal,
+            icon: Users, // Consider an icon representing multiple users
             isActive: true,
             items: [
                 {
-                    title: "History",
+                    title: "My Clients",
                     url: "#",
                 },
                 {
-                    title: "Starred",
+                    title: "All Clients",
                     url: "#",
                 },
                 {
-                    title: "Settings",
+                    title: "Add/Onboard Users",
                     url: "#",
                 },
             ],
         },
         {
-            title: "Models",
+            title: "Coaches",
             url: "#",
-            icon: Bot,
+            icon: UserCircle,
             items: [
                 {
-                    title: "Genesis",
-                    url: "#",
-                },
-                {
-                    title: "Explorer",
-                    url: "#",
-                },
-                {
-                    title: "Quantum",
+                    title: "All Coaches",
                     url: "#",
                 },
             ],
         },
         {
-            title: "Documentation",
+            title: "Library",
             url: "#",
-            icon: BookOpen,
+            icon: Dumbbell,
             items: [
                 {
-                    title: "Introduction",
+                    title: "Exercises",
                     url: "#",
                 },
-                {
-                    title: "Get Started",
-                    url: "#",
-                },
-                {
-                    title: "Tutorials",
-                    url: "#",
-                },
-                {
-                    title: "Changelog",
-                    url: "#",
-                },
+                // {
+                //     title: "Get Started",
+                //     url: "#",
+                // },
+                // {
+                //     title: "Tutorials",
+                //     url: "#",
+                // },
+                // {
+                //     title: "Changelog",
+                //     url: "#",
+                // },
             ],
         },
         {
@@ -120,39 +124,40 @@ const data = {
                 },
             ],
         },
-    ],
-    navSecondary: [
-        {
-            title: "Support",
-            url: "#",
-            icon: LifeBuoy,
-        },
-        {
-            title: "Feedback",
-            url: "#",
-            icon: Send,
-        },
-    ],
-    projects: [
-        {
-            name: "Design Engineering",
-            url: "#",
-            icon: Frame,
-        },
-        {
-            name: "Sales & Marketing",
-            url: "#",
-            icon: PieChart,
-        },
-        {
-            name: "Travel",
-            url: "#",
-            icon: Map,
-        },
-    ],
-};
+]; // End of navMain array definition
+// Removed stray closing brace from original 'data' object below
+    // navSecondary: [
+    //     {
+    //         title: "Support",
+    //         url: "#",
+    //         icon: LifeBuoy,
+    //     },
+    //     {
+    //         title: "Feedback",
+    //         url: "#",
+    //         icon: Send,
+    //     },
+    // ],
+    // projects: [
+    //     {
+    //         name: "Design Engineering",
+    //         url: "#",
+    //         icon: Frame,
+    //     },
+    //     {
+    //         name: "Sales & Marketing",
+    //         url: "#",
+    //         icon: PieChart,
+    //     },
+    //     {
+    //         name: "Travel",
+    //         url: "#",
+    //         icon: Map,
+    //     },
+    // ],
+// Removed stray closing brace from original 'data' object above
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ user, ...props }: AppSidebarProps) { // Updated function signature
     return (
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
@@ -161,14 +166,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                         <SidebarMenuButton size="lg" asChild>
                             <a href="#">
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <Command className="size-4" />
+                                    <MountainIcon className="size-4" />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">
-                                        Acme Inc
+                                        GymFlow
                                     </span>
                                     <span className="truncate text-xs">
-                                        Enterprise
+                                        Movement Fitness
                                     </span>
                                 </div>
                             </a>
@@ -177,12 +182,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                <NavMain items={data.navMain} />
-                <NavProjects projects={data.projects} />
-                <NavSecondary items={data.navSecondary} className="mt-auto" />
+                <NavMain items={navMain} /> {/* Use navMain constant */}
+                {/* <NavProjects projects={data.projects} />
+                <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
             </SidebarContent>
             <SidebarFooter>
-                <NavUser user={data.user} />
+                <NavUser user={user} /> {/* Use user prop */}
             </SidebarFooter>
         </Sidebar>
     );

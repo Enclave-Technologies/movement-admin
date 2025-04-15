@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "GymFlow | Movement Gyms",
+    title: "GymFlow | Movement Fitness",
     description: "A Lifestyle in Sai Ying Pun",
 };
 

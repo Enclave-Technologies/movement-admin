@@ -1,65 +1,42 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import { AppSidebar } from "@/components/layout-components/app-sidebar";
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
-import { Separator } from "@/components/ui/separator";
+// import { Separator } from "@/components/ui/separator";
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { ModeToggle } from "@/components/theme/theme-toggle";
+import { get_logged_in_user } from "@/actions/logged_in_user_actions";
 
 export const metadata: Metadata = {
-    title: "GymFlow | Movement Gyms",
+    title: "GymFlow | Movement Fitness",
     description: "A Lifestyle in Sai Ying Pun",
 };
 
-export default function AppLayout({
+export default async function AppLayout({
     children,
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    // return (
-    //     <div>
-    //         <p>SIDEBAR</p>
-    //         {/* <ModeToggle /> */}
-    //         {children}
-    //     </div>
-    // );
+    const LoggedInUser = await get_logged_in_user();
+
     return (
         <SidebarProvider>
-            <AppSidebar />
+            <AppSidebar user={LoggedInUser} />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2">
-                    <div className="flex items-center gap-2 px-4">
-                        <SidebarTrigger className="-ml-1" />
-                        <Separator
-                            orientation="vertical"
-                            className="mr-2 h-4"
-                        />
-                        <Breadcrumb>
-                            <BreadcrumbList>
-                                <BreadcrumbItem className="hidden md:block">
-                                    <BreadcrumbLink href="#">
-                                        Building Your Application
-                                    </BreadcrumbLink>
-                                </BreadcrumbItem>
-                                <BreadcrumbSeparator className="hidden md:block" />
-                                <BreadcrumbItem>
-                                    <BreadcrumbPage>
-                                        Data Fetching
-                                    </BreadcrumbPage>
-                                </BreadcrumbItem>
-                            </BreadcrumbList>
-                        </Breadcrumb>
-                    </div>
+                <header className="flex h-16 shrink-0 items-center justify-between px-4 w-full gap-4">
+                    <SidebarTrigger className="-ml-2" />
+                    {/* <Separator orientation="vertical" className="mr-2 h-4" /> */}
+
+                    <input
+                        type="text"
+                        placeholder="Search..."
+                        className="border rounded-md py-2 px-4 w-full" // Adjust max-w-md as needed
+                    />
+
+                    <ModeToggle />
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
                     {children}

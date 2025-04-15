@@ -41,7 +41,7 @@ export function LandingHero() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.4, duration: 0.5 }}
                     >
-                        The ultimate platform for Movement Gyms trainers to
+                        The ultimate platform for Movement Fitness trainers to
                         manage clients, track progress, and build personalized
                         workout plans efficiently.
                     </motion.p>
