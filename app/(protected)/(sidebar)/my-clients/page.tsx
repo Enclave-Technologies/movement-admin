@@ -1,11 +1,10 @@
 import { authenticated_or_login } from "@/actions/appwrite_actions";
-import { LogoutButton } from "@/components/auth/logout-button";
+import { getClientsManagedByUserPaginated } from "@/actions/client_actions";
 import { checkGuestApproval } from "@/lib/auth-utils";
 import { MOVEMENT_SESSION_NAME } from "@/lib/constants";
 import { cookies } from "next/headers";
-import React from "react";
 import { redirect } from "next/navigation";
-import { userRoleTable } from "@/actions/client_actions";
+import ClientsTable from "./clients-table";
 
 export default async function MyClients() {
     // Check if user is a Guest and not approved
@@ -24,32 +23,20 @@ export default async function MyClients() {
         redirect("/login");
     }
 
-    const userRolesData = await userRoleTable();
+    // Get the user ID from the authenticated result
+    const userId = result.$id; // Appwrite user ID
+
+    // Initial clients data (first page)
+    const initialClientsResult = await getClientsManagedByUserPaginated(userId, 0, 10);
 
     return (
-        <div>
-            MyClients - <br />
-            <div className="rounded-md border">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    {Object.keys(userRolesData[0]).map((key) => (
-                      <th key={key} className="p-4 text-left">{key}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {userRolesData.map((row, i) => (
-                    <tr key={i} className="border-b">
-                      {Object.values(row).map((value, j) => (
-                        <td key={j} className="p-4">{String(value)}</td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <LogoutButton />
+        <div className="container mx-auto py-6">
+            <h1 className="text-2xl font-bold mb-6">My Clients</h1>
+
+            <ClientsTable 
+                initialClients={initialClientsResult.clients} 
+                trainerId={userId} 
+            />
         </div>
     );
 }

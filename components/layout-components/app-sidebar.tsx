@@ -131,20 +131,20 @@ const navMain = [
         items: [
             {
                 title: "General",
-                url: "/settings/general",
+                url: "/settings",
             },
-            {
-                title: "Team",
-                url: "/settings/team",
-            },
-            {
-                title: "Billing",
-                url: "/settings/billing",
-            },
-            {
-                title: "Limits",
-                url: "/settings/limits",
-            },
+            // {
+            //     title: "Team",
+            //     url: "/settings/team",
+            // },
+            // {
+            //     title: "Billing",
+            //     url: "/settings/billing",
+            // },
+            // {
+            //     title: "Limits",
+            //     url: "/settings/limits",
+            // },
         ],
     },
 ];
