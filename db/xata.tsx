@@ -45,7 +45,9 @@ export function getDb() {
 type DbType = ReturnType<typeof getDb>;
 
 // Export the db instance for convenience, but only create it when used
-export const db =
-    process.env.NODE_ENV === "production"
-        ? getDb()
-        : (null as unknown as DbType); // This will be replaced with the actual db instance in production
+// export const db =
+//     process.env.NODE_ENV === "production"
+//         ? getDb()
+//         : (null as unknown as DbType); // This will be replaced with the actual db instance in production
+
+export const db: DbType = getDb();

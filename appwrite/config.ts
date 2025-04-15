@@ -1,4 +1,4 @@
-import { Client, Account } from "node-appwrite";
+import { Client, Users, Account } from "node-appwrite";
 
 const createAdminClient = async () => {
     const client = new Client()
@@ -10,6 +10,9 @@ const createAdminClient = async () => {
         get account() {
             return new Account(client);
         },
+        get appwrite_user(){
+            return new Users(client);
+        }
     };
 };
 

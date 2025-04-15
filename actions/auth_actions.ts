@@ -7,8 +7,17 @@ import {
 import { MOVEMENT_SESSION_NAME } from "@/lib/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { ID } from "node-appwrite";
+import { AppwriteException, ID } from "node-appwrite";
+import { db } from "@/db/xata";
 import "server-only";
+import {
+    InsertUser,
+    InsertUserRole,
+    Roles,
+    UserRoles,
+    Users,
+} from "@/db/schemas";
+import { eq } from "drizzle-orm";
 
 export async function get_user_account() {
     const { account } = await createAdminClient();
@@ -34,6 +43,9 @@ export async function login(previousState: string, formData: unknown) {
 
     // 4. Proceed with validated data
     const { email, password } = result.data;
+
+    console.log("[LOGIN] Attempted on email:", email);
+
     const { account } = await createAdminClient();
 
     try {
@@ -86,21 +98,75 @@ export async function register(previousState: string, formData: unknown) {
     // 3. Validate using Zod (throws if invalid)
     const result = RegisterFormSchema.safeParse(formDataObj);
     if (!result.success) {
-        return `Validation failed: ${result.error.message}`;
+        // Compile all error messages into a single string
+        const errorMessage = result.error.issues
+            .map((issue) => {
+                // const field = issue.path.length > 0 ? `${issue.path[0]}: ` : "";
+                return `- ${issue.message}`;
+            })
+            .join("\n"); // Separate errors by newlines (or use ", " for inline)
+
+        return `Validation failed:\n${errorMessage}`;
     }
 
     // 4. Proceed with validated data
     const { email, password, fullName } = result.data;
-    const { account } = await createAdminClient();
+    const { appwrite_user } = await createAdminClient();
     const user_id = ID.unique();
-    const newUser = await account.create(
-        user_id, // userId
-        email, // email
-        password, // password
-        fullName // name (optional)
-    );
+
+    try {
+        await appwrite_user.create(
+            user_id, // userId
+            email, // email
+            // "", // phone (optional)
+            undefined,
+            password, // password
+            fullName // name (optional)
+        );
+    } catch (error) {
+        console.log(error);
+        if (error instanceof AppwriteException) {
+            if (error.code === 409) {
+                return "Email already exists";
+            }
+        }
+        return "Error creating user";
+    }
 
     // 5. create team affiliation
+    const guestTeam = await db
+        .select({ id: Roles.roleId })
+        .from(Roles)
+        .where(eq(Roles.roleName, "Guest"));
+    const newUserRole: InsertUserRole = {
+        roleId: guestTeam[0].id,
+        userId: user_id,
+        approvedByAdmin: false,
+    };
+    const newPerson: InsertUser = {
+        fullName: fullName,
+        appwrite_id: user_id,
+        userId: user_id,
+        email: email,
+        registrationDate: new Date(),
+    };
+    try {
+        await db.transaction(async (tx) => {
+            // Insert user/person
+            await tx.insert(Users).values(newPerson);
+            // Insert user role
+            await tx.insert(UserRoles).values(newUserRole);
+        });
+    } catch (error) {
+        console.error("Transaction failed:", error);
 
-    // 6. Create Person object in DB
+        await appwrite_user.delete(user_id); // Clean up by deleting the user
+
+        // You can add more specific error handling here if needed
+        return error instanceof Error
+            ? error.message
+            : "Unknown error occurred";
+    }
+
+    return "success";
 }
