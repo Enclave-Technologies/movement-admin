@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import "../globals.css";
+import "@/app/globals.css";
 import { AppSidebar } from "@/components/layout-components/app-sidebar";
 // import { Separator } from "@/components/ui/separator";
 import {

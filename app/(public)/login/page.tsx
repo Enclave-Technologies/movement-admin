@@ -11,7 +11,7 @@ export default async function Page() {
     const result = await get_user_if_logged_in(session);
 
     if (result) {
-        redirect("/my-clients");
+        redirect("/awaiting-approval");
     }
 
     return (

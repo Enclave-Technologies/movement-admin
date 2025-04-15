@@ -1,4 +1,5 @@
 import { get_user_if_logged_in } from "@/actions/appwrite_actions";
+import { get_logged_in_user } from "@/actions/logged_in_user_actions";
 import { MOVEMENT_SESSION_NAME } from "@/lib/constants";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
@@ -14,8 +15,24 @@ export default async function Home() {
     const user = await get_user_if_logged_in(session);
 
     if (user) {
-        // Redirect logged-in users server-side
-        redirect("/my-clients");
+        try {
+            // Get detailed user info including role
+            const detailedUser = await get_logged_in_user();
+
+            // Check if user is a Guest and not approved
+            if (
+                detailedUser.role === "Guest" &&
+                !detailedUser.approvedByAdmin
+            ) {
+                redirect("/awaiting-approval");
+            } else {
+                // Redirect logged-in users server-side
+                redirect("/my-clients");
+            }
+        } catch {
+            // If there's an error getting detailed user info, redirect to the default page
+            redirect("/my-clients");
+        }
     }
 
     return (
