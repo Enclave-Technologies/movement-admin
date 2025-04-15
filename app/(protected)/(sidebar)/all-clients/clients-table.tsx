@@ -1,52 +1,115 @@
 "use client";
 
-import { useState } from "react";
-import { getAllClientsPaginated } from "@/actions/client_actions";
-import { DataTable } from "@/components/ui/data-table";
+import React, { useState } from "react";
+import {
+    getClientsManagedByUserPaginated,
+    getAllClientsPaginated,
+} from "@/actions/client_actions";
+import ReusableInfiniteScrollTable from "@/components/ui/reusable-infinite-scroll-table";
+import TableOperations from "@/components/ui/table-operations";
 import { columns, Client } from "./columns";
+import { SortingState } from "@tanstack/react-table";
 
 type ClientsTableProps = {
-  initialClients: Client[];
+    trainerId: string;
+    initialClients: Client[];
+    fetchAllClients?: boolean;
 };
 
 export default function ClientsTable({
-  initialClients,
+    trainerId,
+    initialClients,
+    fetchAllClients = false,
 }: ClientsTableProps) {
-  const [clients, setClients] = useState<Client[]>(initialClients);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(1); // Start with page 1 since we already have page 0 (initialClients)
+    const [globalFilter, setGlobalFilter] = useState("");
 
-  const loadMoreClients = async () => {
-    if (loading || !hasMore) return;
+    // Client component: handle data fetching via server action
+    const fetchData = async (
+        start: number,
+        size: number,
+        sorting?: SortingState,
+        filter?: string
+    ): Promise<{ data: Client[]; totalRowCount: number }> => {
+        const page = Math.floor(start / size) + 1;
 
-    setLoading(true);
-    try {
-      const result = await getAllClientsPaginated(page, 10);
-      if (result.clients.length === 0) {
-        setHasMore(false);
-      } else {
-        // Ensure we're handling the types correctly
-        setClients((prev) => [...prev, ...result.clients as Client[]]);
-        setPage((prev) => prev + 1);
-        setHasMore(result.hasMore);
-      }
-    } catch (error) {
-      console.error("Error loading more clients:", error);
-      setHasMore(false);
-    } finally {
-      setLoading(false);
-    }
-  };
+        let result;
+        if (fetchAllClients) {
+            // Fetch all clients in the system
+            result = await getAllClientsPaginated(page, size);
+        } else {
+            // Fetch only clients managed by this trainer
+            result = await getClientsManagedByUserPaginated(
+                trainerId,
+                page,
+                size
+            );
+        }
 
-  return (
-    <DataTable
-      columns={columns}
-      data={clients}
-      loadMore={loadMoreClients}
-      hasMore={hasMore}
-      isLoading={loading}
-      emptyMessage="No clients found."
-    />
-  );
+        console.log("Fetched data:", result);
+
+        // Calculate totalRowCount based on the API response
+        let totalRowCount;
+
+        if (result.totalCount !== undefined) {
+            // If totalCount is provided, use it
+            totalRowCount = result.totalCount;
+        } else if (result.totalPages !== undefined) {
+            // If totalPages is provided, calculate totalCount
+            totalRowCount = result.totalPages * size;
+        } else if (result.hasMore) {
+            // If only hasMore is provided, estimate totalCount
+            totalRowCount = page * size + size; // Current data + at least one more page
+        } else {
+            // If no pagination info is provided, use the current data length
+            totalRowCount = page * size;
+        }
+
+        console.log("Calculated totalRowCount:", totalRowCount);
+
+        // If there's a filter, apply it client-side
+        let filteredData = result.clients;
+        if (filter && filter.trim() !== "") {
+            const lowerFilter = filter.toLowerCase();
+            filteredData = result.clients.filter((client) => {
+                return Object.values(client).some(
+                    (value) =>
+                        value &&
+                        String(value).toLowerCase().includes(lowerFilter)
+                );
+            });
+        }
+
+        return {
+            data: filteredData,
+            totalRowCount: totalRowCount,
+        };
+    };
+
+    const handleNewClient = () => {
+        // Navigate to new client page or open modal
+        console.log("Add new client");
+        // router.push("/clients/new");
+    };
+
+    return (
+        <div className="space-y-4">
+            <TableOperations
+                columns={columns}
+                globalFilter={globalFilter}
+                setGlobalFilter={setGlobalFilter}
+                onNewClick={handleNewClient}
+                showNewButton={true}
+                showFilterButton={true}
+                showSortButton={true}
+            />
+            <ReusableInfiniteScrollTable<Client, unknown>
+                columns={columns}
+                fetchData={fetchData}
+                pageSize={10}
+                initialData={initialClients}
+                globalFilter={globalFilter}
+                className="max-w-full"
+            />
+        </div>
+    );
 }
