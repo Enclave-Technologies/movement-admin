@@ -26,46 +26,65 @@ export async function get_user_account() {
 }
 
 export async function login(previousState: string, formData: unknown) {
+    console.log("[LOGIN] Starting login process");
+
     // 1. Validate if the input is FormData
     if (!(formData instanceof FormData)) {
+        console.error("[LOGIN] Invalid input: Expected FormData");
         throw new Error("Invalid input: Expected FormData");
     }
 
     // 2. Convert FormData to a plain object for Zod validation
     const formDataObj = Object.fromEntries(formData.entries());
+    console.log("[LOGIN] Form data converted to object:", formDataObj);
 
     // 3. Validate using Zod (throws if invalid)
     const result = LoginFormSchema.safeParse(formDataObj);
     if (!result.success) {
-        // throw new Error(`Validation failed: ${result.error.message}`);
+        console.error("[LOGIN] Validation failed:", result.error.message);
         return `Validation failed: ${result.error.message}`;
     }
 
     // 4. Proceed with validated data
     const { email, password } = result.data;
+    console.log("[LOGIN] Validated data - email:", email);
 
-    console.log("[LOGIN] Attempted on email:", email);
-
+    console.log("[LOGIN] Creating admin client");
     const { account } = await createAdminClient();
 
     try {
+        console.log("[LOGIN] Attempting to create email/password session");
         const session = await account.createEmailPasswordSession(
             email,
             password
         );
+        console.log("[LOGIN] Session created successfully:", session);
 
-        (await cookies()).set(MOVEMENT_SESSION_NAME, session.secret, {
+        const cookieOptions = {
             httpOnly: true,
-            sameSite: "strict",
+            sameSite: "strict" as const,
             secure: process.env.NODE_ENV === "production",
             expires: new Date(session.expire),
             path: "/",
-        });
+        };
+        console.log(
+            "[LOGIN] Setting session cookie with options:",
+            cookieOptions
+        );
+        (await cookies()).set(
+            MOVEMENT_SESSION_NAME,
+            session.secret,
+            cookieOptions
+        );
+        console.log("[LOGIN] Session cookie set successfully");
     } catch (error) {
-        console.error("Error logging in:", error);
+        console.error("[LOGIN] Error during session creation:", error);
 
         // Handle specific error cases
         if (error instanceof AppwriteException) {
+            console.error(
+                `[LOGIN] Appwrite error - code: ${error.code}, message: ${error.message}`
+            );
             if (error.code === 401) {
                 return "Invalid email or password";
             } else if (error.code === 429) {
@@ -76,11 +95,12 @@ export async function login(previousState: string, formData: unknown) {
         return "Invalid credentials";
     }
 
-    // Get user role to determine where to redirect
+    console.log("[LOGIN] Getting user account details");
     try {
-        const user = await account.get();
+        const current_user = await account.get();
+        console.log("[LOGIN] User account retrieved:", current_user);
 
-        // Get user role information
+        console.log("[LOGIN] Fetching user role information");
         const userRoleData = await db
             .select({
                 roleName: Roles.roleName,
@@ -88,22 +108,31 @@ export async function login(previousState: string, formData: unknown) {
             })
             .from(UserRoles)
             .innerJoin(Roles, eq(UserRoles.roleId, Roles.roleId))
-            .where(eq(UserRoles.userId, user.$id));
+            .where(eq(UserRoles.userId, current_user.$id));
+
+        console.log("[LOGIN] User role data:", userRoleData);
 
         if (userRoleData.length > 0) {
             const { roleName, approvedByAdmin } = userRoleData[0];
+            console.log(
+                `[LOGIN] User role: ${roleName}, Approved: ${approvedByAdmin}`
+            );
 
             if (roleName === "Guest" && !approvedByAdmin) {
+                console.log("[LOGIN] Redirecting to awaiting-approval");
                 redirect("/awaiting-approval");
             } else {
+                console.log("[LOGIN] Redirecting to my-clients");
                 redirect("/my-clients");
             }
+        } else {
+            console.log("[LOGIN] No role data found for user");
         }
     } catch (error) {
-        console.error("Error fetching user role:", error);
+        console.error("[LOGIN] Error fetching user role:", error);
     }
 
-    // Default redirect if role check fails
+    console.log("[LOGIN] Default redirect to awaiting-approval");
     redirect("/awaiting-approval");
 }
 

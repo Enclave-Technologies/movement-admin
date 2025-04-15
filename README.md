@@ -8,6 +8,7 @@
 -   [] DB migrate
 -   [x] Dockerize
 -   [x] Auth
+-   [] Error logging (Sentry)
 -   [] Registration
 -   [] my-clients
     -   [] client add
