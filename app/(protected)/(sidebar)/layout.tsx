@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/theme/theme-toggle";
 import { get_logged_in_user } from "@/actions/logged_in_user_actions";
+import { QueryProvider } from "@/providers/query-provider";
 
 export const metadata: Metadata = {
     title: "GymFlow | Movement Fitness",
@@ -39,7 +40,9 @@ export default async function AppLayout({
                     <ModeToggle />
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    {children}
+                    <QueryProvider>
+                        {children}
+                    </QueryProvider>
                     {/* <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                         <div className="aspect-video rounded-xl bg-muted/50" />
                         <div className="aspect-video rounded-xl bg-muted/50" />

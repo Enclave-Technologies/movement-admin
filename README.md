@@ -8,13 +8,14 @@
 -   [] DB migrate
 -   [x] Dockerize
 -   [x] Auth
--   [] Error logging (Sentry)
--   [] Registration
+-   [x] Error logging (Sentry)
+-   [x] Registration
+-   [] Infinite Scroll Table
 -   [] my-clients
     -   [] client add
     -   [] client management
 -   [] all-clients
-    -   [] Resue from above
+    -   [] Re-use from above
 -   [] Coaches
     -   [] coach add
     -   [] coach management

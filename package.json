@@ -40,6 +40,7 @@
         "@radix-ui/react-toggle-group": "^1.1.3",
         "@radix-ui/react-tooltip": "^1.2.0",
         "@sentry/nextjs": "^9.12.0",
+        "@tanstack/react-query": "^5.74.3",
         "@tanstack/react-table": "^8.21.3",
         "@tanstack/react-virtual": "^3.13.6",
         "@xata.io/client": "^0.0.0-next.v93343b9646f57a1e5c51c35eccf0767c2bb80baa",
@@ -68,6 +69,7 @@
         "sonner": "^2.0.3",
         "tailwind-merge": "^3.2.0",
         "tw-animate-css": "^1.2.5",
+        "use-debounce": "^10.0.4",
         "vaul": "^1.1.2",
         "zod": "^3.24.2"
     },
