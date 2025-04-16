@@ -161,7 +161,7 @@ export async function fetchPeopleData(params: {
     sorting?: string;
     filters?: string;
     search?: string;
-}) {
+}): Promise<PersonApiResponse> {
     console.log(`Params received: ${JSON.stringify(params)}`);
 
     // Parse and validate parameters
@@ -195,7 +195,7 @@ export async function fetchPeopleData(params: {
     );
 
     // Simulate server delay
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Apply filtering and search first (affects total count)
     let filteredData = PEOPLE_DATASET;
@@ -226,4 +226,18 @@ export async function fetchPeopleData(params: {
             totalRowCount,
         },
     };
+}
+
+// Generic data fetching function for any table
+export async function fetchTableData<T>(
+    fetchFn: (params: Record<string, unknown>) => Promise<{
+        data: T[];
+        meta: { totalRowCount: number };
+    }>,
+    params: Record<string, unknown>
+): Promise<{
+    data: T[];
+    meta: { totalRowCount: number };
+}> {
+    return fetchFn(params);
 }

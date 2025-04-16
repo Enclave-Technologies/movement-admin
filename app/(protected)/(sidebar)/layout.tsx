@@ -8,8 +8,8 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ModeToggle } from "@/components/theme/theme-toggle";
-import { get_logged_in_user } from "@/actions/logged_in_user_actions";
 import { QueryProvider } from "@/providers/query-provider";
+import { get_logged_in_user } from "@/actions/logged_in_user_actions";
 
 export const metadata: Metadata = {
     title: "GymFlow | Movement Fitness",
@@ -21,11 +21,11 @@ export default async function AppLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    const LoggedInUser = await get_logged_in_user();
+    const user = await get_logged_in_user();
 
     return (
         <SidebarProvider>
-            <AppSidebar user={LoggedInUser} />
+            <AppSidebar user={user} />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center justify-between px-4 w-full gap-4">
                     <SidebarTrigger className="-ml-2" />
@@ -40,9 +40,7 @@ export default async function AppLayout({
                     <ModeToggle />
                 </header>
                 <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-                    <QueryProvider>
-                        {children}
-                    </QueryProvider>
+                    <QueryProvider>{children}</QueryProvider>
                     {/* <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                         <div className="aspect-video rounded-xl bg-muted/50" />
                         <div className="aspect-video rounded-xl bg-muted/50" />

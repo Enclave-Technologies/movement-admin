@@ -1,3 +1,4 @@
+"use server";
 import { createSessionClient } from "@/appwrite/config";
 import { Roles, UserRoles, Users } from "@/db/schemas";
 import { db } from "@/db/xata";
@@ -5,12 +6,20 @@ import { defaultProfileURL, MOVEMENT_SESSION_NAME } from "@/lib/constants";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import "server-only";
 
 export async function get_logged_in_user() {
     const session = (await cookies()).get(MOVEMENT_SESSION_NAME)?.value || null;
     if (session) {
-        const { account } = await createSessionClient(session);
-        const user = await account.get();
+        let user;
+        try {
+            const { account } = await createSessionClient(session);
+            user = await account.get();
+        } catch (error) {
+            console.error("Error fetching user data:", error);
+            // (await cookies()).delete(MOVEMENT_SESSION_NAME);
+            redirect("/login?error=session_expired");
+        }
 
         // Get user data with role information
         const db_user = await db

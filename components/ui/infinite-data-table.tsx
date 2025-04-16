@@ -7,7 +7,8 @@ import {
     Row,
     Table as TableInstance,
 } from "@tanstack/react-table";
-import { useVirtualizer } from "@tanstack/react-virtual";
+// Import types but don't use the function directly
+import type { VirtualItem } from "@tanstack/react-virtual";
 
 import {
     Table,
@@ -27,11 +28,18 @@ interface InfiniteDataTableProps<TData, TValue> {
     className?: string;
     rowClassName?: (row: Row<TData>) => string;
     onRowClick?: (row: Row<TData>) => void;
-    rowVirtualizer: ReturnType<typeof useVirtualizer>;
+    rowVirtualizer: {
+        getVirtualItems: () => VirtualItem[];
+        getTotalSize: () => number;
+        measureElement: (element: Element | null) => void;
+        scrollToIndex: (index: number) => void;
+    };
     tableContainerRef: React.RefObject<HTMLDivElement>;
     table: TableInstance<TData>;
     rows: Row<TData>[];
-    loadMoreRef: React.RefObject<HTMLDivElement>;
+    loadMoreRef?: React.RefObject<HTMLDivElement>;
+    height?: string;
+    onScroll?: (e: React.UIEvent<HTMLDivElement>) => void;
 }
 
 export function InfiniteDataTable<TData, TValue>({
@@ -47,16 +55,10 @@ export function InfiniteDataTable<TData, TValue>({
     table,
     rows,
     loadMoreRef,
+    height = "calc(100vh - 200px)",
+    onScroll,
 }: InfiniteDataTableProps<TData, TValue>) {
     const virtualItems = rowVirtualizer.getVirtualItems();
-
-    const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
-
-    const paddingBottom =
-        virtualItems.length > 0
-            ? rowVirtualizer.getTotalSize() -
-              virtualItems[virtualItems.length - 1].end
-            : 0;
 
     return (
         <div
@@ -65,14 +67,35 @@ export function InfiniteDataTable<TData, TValue>({
                 "relative overflow-auto rounded-md border",
                 className
             )}
-            style={{ height: "calc(100vh - 200px)" }} // Because inline styles takes the most precedence
+            style={{ height }} // Allow customizable height
+            onScroll={onScroll} // Allow custom scroll handler
         >
-            <Table>
-                <TableHeader className="sticky top-0 z-10 bg-background">
+            <Table style={{ display: "grid" }}>
+                <TableHeader
+                    className="sticky top-0 z-10 bg-background"
+                    style={{
+                        display: "grid",
+                        position: "sticky",
+                        top: 0,
+                        zIndex: 1,
+                    }}
+                >
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <TableRow key={headerGroup.id}>
+                        <TableRow
+                            key={headerGroup.id}
+                            style={{ display: "flex", width: "100%" }}
+                        >
                             {headerGroup.headers.map((header) => (
-                                <TableHead key={header.id}>
+                                <TableHead
+                                    key={header.id}
+                                    style={{
+                                        display: "flex",
+                                        width:
+                                            header.getSize() !== 0
+                                                ? header.getSize()
+                                                : "auto",
+                                    }}
+                                >
                                     {header.isPlaceholder
                                         ? null
                                         : flexRender(
@@ -84,7 +107,13 @@ export function InfiniteDataTable<TData, TValue>({
                         </TableRow>
                     ))}
                 </TableHeader>
-                <TableBody>
+                <TableBody
+                    style={{
+                        display: "grid",
+                        height: `${rowVirtualizer.getTotalSize()}px`,
+                        position: "relative",
+                    }}
+                >
                     {rows.length === 0 && !isLoading ? (
                         <TableRow>
                             <TableCell
@@ -96,22 +125,15 @@ export function InfiniteDataTable<TData, TValue>({
                         </TableRow>
                     ) : (
                         <>
-                            {paddingTop > 0 && (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        style={{
-                                            height: `${paddingTop}px`,
-                                            padding: 0,
-                                        }}
-                                    />
-                                </TableRow>
-                            )}
-                            {virtualItems.map((virtualRow) => {
+                            {virtualItems.map((virtualRow: VirtualItem) => {
                                 const row = rows[virtualRow.index];
                                 return (
                                     <TableRow
                                         key={row.id}
+                                        data-index={virtualRow.index}
+                                        ref={(node) =>
+                                            rowVirtualizer.measureElement(node)
+                                        }
                                         data-state={
                                             row.getIsSelected() && "selected"
                                         }
@@ -122,9 +144,25 @@ export function InfiniteDataTable<TData, TValue>({
                                             onRowClick ? "cursor-pointer" : ""
                                         )}
                                         onClick={() => onRowClick?.(row)}
+                                        style={{
+                                            display: "flex",
+                                            position: "absolute",
+                                            transform: `translateY(${virtualRow.start}px)`,
+                                            width: "100%",
+                                        }}
                                     >
                                         {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
+                                            <TableCell
+                                                key={cell.id}
+                                                style={{
+                                                    display: "flex",
+                                                    width:
+                                                        cell.column.getSize() !==
+                                                        0
+                                                            ? cell.column.getSize()
+                                                            : "auto",
+                                                }}
+                                            >
                                                 {flexRender(
                                                     cell.column.columnDef.cell,
                                                     cell.getContext()
@@ -134,17 +172,6 @@ export function InfiniteDataTable<TData, TValue>({
                                     </TableRow>
                                 );
                             })}
-                            {paddingBottom > 0 && (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={columns.length}
-                                        style={{
-                                            height: `${paddingBottom}px`,
-                                            padding: 0,
-                                        }}
-                                    />
-                                </TableRow>
-                            )}
                         </>
                     )}
                     {isLoading && rows.length > 0 && (
@@ -153,14 +180,14 @@ export function InfiniteDataTable<TData, TValue>({
                                 colSpan={columns.length}
                                 className="h-12 text-center text-muted-foreground"
                             >
-                                Loading...
+                                Loading more...
                             </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
             </Table>
             {/* Sentinel element for infinite scroll */}
-            {hasMore && (
+            {hasMore && loadMoreRef && (
                 <div
                     ref={loadMoreRef}
                     className="h-20 w-full flex items-center justify-center"
