@@ -2,9 +2,6 @@
 import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
-import { TableSearch } from "@/components/ui/table-search";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, X } from "lucide-react";
 import { columns } from "./columns";
 import { Person, PersonApiResponse } from "@/actions/table_actions";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
@@ -15,6 +12,7 @@ import {
     getSortedRowModel,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import CompactTableOperations from "@/components/ui/compact-table-operations";
 
 interface InfiniteTableProps {
     initialData: PersonApiResponse;
@@ -35,12 +33,13 @@ export function InfiniteTable({
         columnFilters,
         searchQuery,
         handleSearchChange,
-        resetFilters,
+        handleSortingChange,
+        handleColumnFiltersChange,
         urlParams,
     } = useTableActions();
 
     // Use React Query for data fetching with infinite scroll
-    const { data, fetchNextPage, isFetchingNextPage, isLoading, refetch } =
+    const { data, fetchNextPage, isFetchingNextPage, isLoading } =
         useInfiniteQuery<PersonApiResponse>({
             queryKey: ["people", urlParams],
             queryFn: async ({ pageParam = 0 }) => {
@@ -145,59 +144,44 @@ export function InfiniteTable({
         fetchMoreOnBottomReached(tableContainerRef.current);
     }, [fetchMoreOnBottomReached]);
 
-    // Reset filters
-    const handleResetFilters = () => {
-        resetFilters();
-    };
-
-    // Refresh data
-    const handleRefresh = () => {
-        refetch();
-    };
-
     if (isLoading && flatData.length === 0) {
         return <div>Loading...</div>;
     }
 
     return (
         <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row justify-between gap-4">
-                <TableSearch
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    placeholder="Search people..."
-                    className="w-full sm:w-[300px]"
-                />
-                <div className="flex items-center gap-2">
-                    {(sorting.length > 0 ||
-                        columnFilters.length > 0 ||
-                        searchQuery) && (
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleResetFilters}
-                            className="h-9"
-                        >
-                            <X className="mr-2 h-4 w-4" />
-                            Clear filters
-                        </Button>
-                    )}
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRefresh}
-                        className="h-9"
-                        disabled={isLoading}
-                    >
-                        <RefreshCw
-                            className={`mr-2 h-4 w-4 ${
-                                isLoading ? "animate-spin" : ""
-                            }`}
-                        />
-                        Refresh
-                    </Button>
-                </div>
-            </div>
+            <CompactTableOperations
+                columns={columns}
+                globalFilter={searchQuery}
+                setGlobalFilter={handleSearchChange}
+                onSortChange={(columnId, desc) => {
+                    if (columnId) {
+                        handleSortingChange([{ id: columnId, desc }]);
+                    } else {
+                        handleSortingChange([]);
+                    }
+                }}
+                onFilterChange={(columnId, value) => {
+                    if (columnId && value) {
+                        const newFilters = [...columnFilters];
+                        const existingFilterIndex = newFilters.findIndex(
+                            (f) => f.id === columnId
+                        );
+
+                        if (existingFilterIndex >= 0) {
+                            newFilters[existingFilterIndex].value = value;
+                        } else {
+                            newFilters.push({
+                                id: columnId,
+                                value,
+                            });
+                        }
+                        handleColumnFiltersChange(newFilters);
+                    } else {
+                        handleColumnFiltersChange([]);
+                    }
+                }}
+            />
 
             <div className="flex items-center text-sm text-muted-foreground">
                 ({flatData.length} of {totalRowCount} rows fetched)
