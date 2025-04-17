@@ -51,6 +51,7 @@ export default async function ExampleTablePage({
           initialData={initialData}
           fetchDataFn={fetchPeopleData}
           columns={columns}
+          queryId="example-table"
         />
       </Suspense>
     </div>

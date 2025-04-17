@@ -27,7 +27,7 @@ export default async function MyClients() {
   }
 
   // Get the user ID from the authenticated result
-  const userId = result.$id; // Appwrite user ID
+  const userId = result.$id; // Appwrite user ID0
 
   // Initial clients data (first page)
   const initialResult = await getClientsManagedByUserPaginated(userId, 0, 10);
@@ -41,6 +41,7 @@ export default async function MyClients() {
           initialData={initialResult}
           fetchDataFn={getClientsManagedByUserPaginated}
           columns={columns}
+          queryId={userId}
         />
       </Suspense>
     </div>

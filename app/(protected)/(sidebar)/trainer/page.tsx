@@ -183,6 +183,7 @@ export default async function Trainer({
           initialData={initialResult}
           fetchDataFn={getClientsManagedByUserPaginated}
           columns={columns}
+          queryId={userId}
         />
       </Suspense>
     </div>

@@ -39,6 +39,7 @@ export default async function ExerciseLibraryPage() {
           initialData={initialResult}
           fetchDataFn={getAllExercises}
           columns={columns}
+          queryId="exercise-library"
         />
       </Suspense>
     </div>

@@ -24,12 +24,14 @@ interface InfiniteTableProps {
   };
   fetchDataFn: (params: any) => Promise<any>;
   columns: ColumnDef<any, unknown>[];
+  queryId?: string;
 }
 
 export function InfiniteTable({
   initialData,
   fetchDataFn,
   columns,
+  queryId = "default",
 }: InfiniteTableProps) {
   // Reference to the scrolling element
   const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -47,7 +49,7 @@ export function InfiniteTable({
   // Use React Query for data fetching with infinite scroll
   const { data, fetchNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery<PersonApiResponse>({
-      queryKey: ["people", urlParams],
+      queryKey: ["tableData", urlParams, queryId],
       queryFn: async ({ pageParam = 0 }) => {
         const params = {
           ...urlParams,

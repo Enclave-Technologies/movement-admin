@@ -25,6 +25,7 @@ export default async function AllClientsPage() {
           initialData={initialClientsData}
           fetchDataFn={getAllClientsPaginated}
           columns={columns}
+          queryId="all-clients"
         />
       </Suspense>
     </div>

@@ -39,6 +39,7 @@ export default async function CoachesPage() {
           initialData={initialResult}
           fetchDataFn={getAllCoachesPaginated}
           columns={columns}
+          queryId="coaches"
         />
       </Suspense>
     </div>
