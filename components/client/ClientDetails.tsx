@@ -115,86 +115,88 @@ const ClientDetails = ({ client_id }) => {
 
   return (
     <TrainerProvider>
-      <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-visible shadow-md border border-gray-200">
-        <Tabs
-          selectedTab={selectedTab}
-          setSelectedTab={(tabName: string) => {
-            if (hasUnsavedChanges) {
-              setSelectedTabName(tabName);
-              setShowUnsavedChangeModal(true);
-            } else {
-              setSelectedTab(tabName);
-            }
-          }}
-        />
-        <div className="p-8 bg-white w-full rounded-b-xl">
-          {selectedTab == "workout-history" && (
-            <WorkoutHistoryTable
-              dataLoading={fetchingWorkouts}
-              handleViewSession={null}
-              sessions={sessionLog}
-              deleteSession={deleteSession}
-              deletingSession={deletingSession}
-            />
-          )}
-          {selectedTab == "goals" && (
-            <GoalList
-              pageLoading={fetchingGoals}
-              goals={goals}
-              setGoals={setGoals}
-              clientData={userData}
-              setShowToast={setShowToast}
-              setToastMessage={setToastMessage}
-              setToastType={setToastType}
-            />
-          )}
-          {selectedTab == "workout-plan" && (
-            <WorkoutPlan
-              pageLoading={dataLoading}
-              setPageLoading={setFetchingWorkouts}
-              fetchTrackedWorkouts={fetchTrackedWorkouts}
-              client_id={client_id}
-              workouts={workouts}
-              clientPhases={clientPhases}
-              setClientPhases={setClientPhases}
-              nextSession={nextSession}
-              progressId={progressId}
-              setShowToast={setShowToast}
-              setToastMessage={setToastMessage}
-              setToastType={setToastType}
-              setHasUnsavedChanges={setHasUnsavedChanges}
-            />
-          )}
-          {selectedTab == "body-mass-composition" && (
-            <BodyMassComposition
-              client_id={client_id}
-              setShowToast={setShowToast}
-              setToastMessage={setToastMessage}
-              setToastType={setToastType}
-            />
-          )}
-          {showToast && (
-            <Toast
-              message={toastMessage}
-              onClose={handleToastClose}
-              type={toastType}
-            />
-          )}
+      <div className="px-6">
+        <div className="flex flex-col items-start w-full gap-0 bg-white rounded-xl overflow-visible shadow-md border border-gray-200">
+          <Tabs
+            selectedTab={selectedTab}
+            setSelectedTab={(tabName: string) => {
+              if (hasUnsavedChanges) {
+                setSelectedTabName(tabName);
+                setShowUnsavedChangeModal(true);
+              } else {
+                setSelectedTab(tabName);
+              }
+            }}
+          />
+          <div className="p-8 bg-white w-full rounded-b-xl">
+            {selectedTab == "workout-history" && (
+              <WorkoutHistoryTable
+                dataLoading={fetchingWorkouts}
+                handleViewSession={null}
+                sessions={sessionLog}
+                deleteSession={deleteSession}
+                deletingSession={deletingSession}
+              />
+            )}
+            {selectedTab == "goals" && (
+              <GoalList
+                pageLoading={fetchingGoals}
+                goals={goals}
+                setGoals={setGoals}
+                clientData={userData}
+                setShowToast={setShowToast}
+                setToastMessage={setToastMessage}
+                setToastType={setToastType}
+              />
+            )}
+            {selectedTab == "workout-plan" && (
+              <WorkoutPlan
+                pageLoading={dataLoading}
+                setPageLoading={setFetchingWorkouts}
+                fetchTrackedWorkouts={fetchTrackedWorkouts}
+                client_id={client_id}
+                workouts={workouts}
+                clientPhases={clientPhases}
+                setClientPhases={setClientPhases}
+                nextSession={nextSession}
+                progressId={progressId}
+                setShowToast={setShowToast}
+                setToastMessage={setToastMessage}
+                setToastType={setToastType}
+                setHasUnsavedChanges={setHasUnsavedChanges}
+              />
+            )}
+            {selectedTab == "body-mass-composition" && (
+              <BodyMassComposition
+                client_id={client_id}
+                setShowToast={setShowToast}
+                setToastMessage={setToastMessage}
+                setToastType={setToastType}
+              />
+            )}
+            {showToast && (
+              <Toast
+                message={toastMessage}
+                onClose={handleToastClose}
+                type={toastType}
+              />
+            )}
 
-          {showUnsavedChangeModal && (
-            <UnsavedChangesModal
-              isOpen={showUnsavedChangeModal}
-              onStay={() => {
-                setShowUnsavedChangeModal(false);
-              }}
-              onLeave={() => {
-                setSelectedTab(selectedTabName);
-                localStorage.setItem("workout-plan", "false");
-                setHasUnsavedChanges(false);
-                setShowUnsavedChangeModal(false);
-              }}
-            />
-          )}
+            {showUnsavedChangeModal && (
+              <UnsavedChangesModal
+                isOpen={showUnsavedChangeModal}
+                onStay={() => {
+                  setShowUnsavedChangeModal(false);
+                }}
+                onLeave={() => {
+                  setSelectedTab(selectedTabName);
+                  localStorage.setItem("workout-plan", "false");
+                  setHasUnsavedChanges(false);
+                  setShowUnsavedChangeModal(false);
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
     </TrainerProvider>

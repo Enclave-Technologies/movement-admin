@@ -416,46 +416,48 @@ const WorkoutPlan = ({
     localStorage.setItem("workout-plan", "true");
     setOpRunning(true);
     try {
-      const session = clientPhases.flatMap((phase) =>
-        phase.sessions.find((session) => session.sessionId === sessionId)
-      )[0];
+      console.log(clientPhases, sessionId);
+      const sessions = clientPhases.flatMap((phase) => phase.sessions);
+      const session = sessions.find((sess) => sess.sessionId === sessionId);
 
       const exerciseTime = calculateSessionTime(updatedExercise);
+      console.log(session);
+      if (session) {
+        // Find the current exercise in the session to get its existing time
+        const existingExercise = session.exercises.find(
+          (e) => e.id === updatedExercise.id
+        );
+        const existingExerciseTime = existingExercise
+          ? calculateSessionTime(existingExercise)
+          : 0;
 
-      // Find the current exercise in the session to get its existing time
-      const existingExercise = session.exercises.find(
-        (e) => e.id === updatedExercise.id
-      );
-      const existingExerciseTime = existingExercise
-        ? calculateSessionTime(existingExercise)
-        : 0;
+        // Calculate the new sessionTime
+        const currentSessionTime = session.sessionTime ?? 0; // Default to 0 if null
+        const newSessionTime = Number(
+          (currentSessionTime - existingExerciseTime + exerciseTime).toFixed(2)
+        ); // Add exerciseTime to the sessionTime
 
-      // Calculate the new sessionTime
-      const currentSessionTime = session.sessionTime ?? 0; // Default to 0 if null
-      const newSessionTime = Number(
-        (currentSessionTime - existingExerciseTime + exerciseTime).toFixed(2)
-      ); // Add exerciseTime to the sessionTime
-
-      // Update the exercise in the specific session and phase
-      const updatedPhases = clientPhases.map((phase) =>
-        phase.phaseId === phaseId
-          ? {
-              ...phase,
-              sessions: phase.sessions.map((session) =>
-                session.sessionId === sessionId
-                  ? {
-                      ...session,
-                      sessionTime: newSessionTime.toString(), // Update sessionTime
-                      exercises: session.exercises.map((e) =>
-                        e.id === updatedExercise.id ? updatedExercise : e
-                      ),
-                    }
-                  : session
-              ),
-            }
-          : phase
-      );
-      setClientPhases(updatedPhases);
+        // Update the exercise in the specific session and phase
+        const updatedPhases = clientPhases.map((phase) =>
+          phase.phaseId === phaseId
+            ? {
+                ...phase,
+                sessions: phase.sessions.map((session) =>
+                  session.sessionId === sessionId
+                    ? {
+                        ...session,
+                        sessionTime: newSessionTime.toString(), // Update sessionTime
+                        exercises: session.exercises.map((e) =>
+                          e.id === updatedExercise.id ? updatedExercise : e
+                        ),
+                      }
+                    : session
+                ),
+              }
+            : phase
+        );
+        setClientPhases(updatedPhases);
+      }
     } finally {
       setOpRunning(false);
     }
@@ -723,8 +725,8 @@ const WorkoutPlan = ({
                 setToastMessage={setToastMessage}
                 setToastType={setToastType}
                 savingState={savingState}
-                opRunning={opRunning}
-                setOpRunning={setOpRunning}
+                opRunning={false}
+                setOpRunning={(bool: boolean) => {}}
               />
             ))
           )}
