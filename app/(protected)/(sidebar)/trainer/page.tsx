@@ -136,7 +136,7 @@ export default async function Trainer({
             <div>
               <div className="text-sm font-medium">Email</div>
               <div className="text-sm text-muted-foreground">
-                {trainerData.email || "—"}
+                {trainerData.email || "- -"}
               </div>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default async function Trainer({
             <div>
               <div className="text-sm font-medium">Phone</div>
               <div className="text-sm text-muted-foreground">
-                {trainerData.phone || "—"}
+                {trainerData.phone || "- -"}
               </div>
             </div>
           </div>
