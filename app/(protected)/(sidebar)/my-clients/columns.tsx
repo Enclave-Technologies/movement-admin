@@ -72,7 +72,7 @@ export const columns: ColumnDef<Client>[] = [
         header: "Name",
         cell: ({ row }) => {
             const value = row.getValue("fullName") as string;
-            return <div className="font-medium">{value || "—"}</div>;
+            return <div className="font-medium">{value || "- -"}</div>;
         },
     },
     {
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Client>[] = [
         header: "Email",
         cell: ({ row }) => {
             const value = row.getValue("email") as string;
-            return <div>{value || "—"}</div>;
+            return <div>{value || "- -"}</div>;
         },
     },
     {
@@ -88,7 +88,7 @@ export const columns: ColumnDef<Client>[] = [
         header: "Phone",
         cell: ({ row }) => {
             const value = row.getValue("phone") as string;
-            return <div>{value || "—"}</div>;
+            return <div>{value || "- -"}</div>;
         },
     },
     {
