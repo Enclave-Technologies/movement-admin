@@ -25,6 +25,9 @@ interface CompactTableOperationsProps<TData, TValue> {
     setGlobalFilter: (value: string) => void;
     onSortChange?: (columnId: string, desc: boolean) => void;
     onFilterChange?: (columnId: string, value: string) => void;
+    onApplyClick?: () => void;
+    showNewButton?: boolean;
+    onNewClick?: () => void;
     className?: string;
 }
 
@@ -34,6 +37,9 @@ export default function CompactTableOperations<TData, TValue>({
     setGlobalFilter,
     onSortChange,
     onFilterChange,
+    onApplyClick,
+    showNewButton = false,
+    onNewClick,
     className = "",
 }: CompactTableOperationsProps<TData, TValue>) {
     const [searchExpanded, setSearchExpanded] = useState(false);
@@ -126,9 +132,10 @@ export default function CompactTableOperations<TData, TValue>({
     return (
         <div className={cn("flex flex-col space-y-2", className)}>
             {/* Toolbar - Always visible */}
-            <div className="flex items-center justify-between">
-                {/* Left side - Action buttons */}
-                <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+                {/* Left side - Action buttons and active filters/sorts */}
+                <div className="flex items-center gap-2 flex-wrap">
+                    {/* Search button/input */}
                     {searchExpanded ? (
                         <div className="flex items-center">
                             <div className="relative">
@@ -360,73 +367,96 @@ export default function CompactTableOperations<TData, TValue>({
                             )}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                </div>
 
-                {/* Right side - Clear All button (only shown when there are active filters/sorts) */}
-                {hasAnyActive && (
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        className="h-8"
-                        onClick={clearAll}
-                    >
-                        <X size={16} className="mr-1" />
-                        Clear All
-                    </Button>
-                )}
-            </div>
-
-            {/* Active filters/sorts display - only shown when active */}
-            {(hasActiveFilter || hasActiveSort) && (
-                <div className="flex flex-wrap gap-2 items-center mt-2">
+                    {/* Active filters/sorts chips - inline with toolbar */}
                     {hasActiveFilter && (
-                        <div className="flex items-center bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm">
+                        <div className="flex items-center bg-primary text-primary-foreground rounded-full h-8 px-3 text-xs">
                             <span className="font-medium mr-1">Filter:</span>
-                            <span>
+                            <span className="truncate max-w-[120px]">
                                 {selectedFilterColumn} = {filterValue}
                             </span>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-5 w-5 ml-1 -mr-1 text-primary-foreground hover:text-primary-foreground/80 hover:bg-primary/80"
+                                className="h-5 w-5 ml-1 -mr-1 text-primary-foreground hover:text-primary-foreground/80 hover:bg-transparent rounded-full"
                                 onClick={clearFilter}
                             >
-                                <X size={12} />
+                                <X size={10} />
                             </Button>
                         </div>
                     )}
 
                     {hasActiveSort && (
-                        <div className="flex items-center bg-primary text-primary-foreground rounded-md px-2 py-1 text-sm">
+                        <div className="flex items-center bg-primary text-primary-foreground rounded-full h-8 px-3 text-xs">
                             <span className="font-medium mr-1">Sort:</span>
                             <button
                                 type="button"
-                                className="flex items-center cursor-pointer hover:underline"
+                                className="flex items-center cursor-pointer hover:underline truncate max-w-[120px]"
                                 onClick={toggleSortDirection}
                                 title="Click to toggle sort direction"
                             >
                                 <span>
                                     {selectedSortColumn} (
-                                    {sortDirection === "asc"
-                                        ? "ascending"
-                                        : "descending"}
-                                    )
+                                    {sortDirection === "asc" ? "asc" : "desc"})
                                 </span>
-                                <ArrowUpDown size={12} className="ml-1" />
+                                <ArrowUpDown
+                                    size={10}
+                                    className="ml-1 flex-shrink-0"
+                                />
                             </button>
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="h-5 w-5 ml-1 -mr-1 text-primary-foreground hover:text-primary-foreground/80 hover:bg-primary/80"
+                                className="h-5 w-5 ml-1 -mr-1 text-primary-foreground hover:text-primary-foreground/80 hover:bg-transparent rounded-full flex-shrink-0"
                                 onClick={clearSort}
                             >
-                                <X size={12} />
+                                <X size={10} />
                             </Button>
                         </div>
                     )}
                 </div>
-            )}
+
+                {/* Right side - Action buttons */}
+                <div className="flex items-center gap-2">
+                    {/* Apply button - always visible */}
+                    <Button
+                        type="button"
+                        variant="default"
+                        size="sm"
+                        className="h-8"
+                        onClick={onApplyClick}
+                    >
+                        Apply
+                    </Button>
+
+                    {/* Clear All button - only shown when there are active filters/sorts */}
+                    {hasAnyActive && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8"
+                            onClick={clearAll}
+                        >
+                            <X size={16} className="mr-1" />
+                            Clear All
+                        </Button>
+                    )}
+                    
+                    {/* New button - only shown if enabled, positioned at the very right */}
+                    {showNewButton && (
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-8"
+                            onClick={onNewClick}
+                        >
+                            New
+                        </Button>
+                    )}
+                </div>
+            </div>
         </div>
     );
 }

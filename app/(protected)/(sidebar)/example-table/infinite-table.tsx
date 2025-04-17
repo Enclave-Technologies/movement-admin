@@ -181,6 +181,15 @@ export function InfiniteTable({
                         handleColumnFiltersChange([]);
                     }
                 }}
+                onApplyClick={() => {
+                    console.log("Apply clicked - refreshing data");
+                    // In a real application, you might want to trigger a data refresh here
+                }}
+                showNewButton={true}
+                onNewClick={() => {
+                    console.log("New button clicked");
+                    // In a real application, you might want to navigate to a create form or open a modal
+                }}
             />
 
             <div className="flex items-center text-sm text-muted-foreground">
