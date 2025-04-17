@@ -752,7 +752,7 @@ export async function fetchUserDetails() {
 
         const fullDetails = await database.getDocument(
             process.env.NEXT_PUBLIC_DATABASE_ID,
-            process.env.NEXT_PUBLIC_COLLECTION_USERS, // Fetch from USERS collection now
+            process.env.NEXT_PUBLIC_COLLECTION_TRAINERS, // Fetch from USERS collection now
             accDetails.$id
         );
 
