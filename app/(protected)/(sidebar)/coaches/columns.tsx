@@ -2,9 +2,18 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 // import { Checkbox } from "@/components/ui/checkbox";
-import { Edit } from "lucide-react";
+import { Edit, MoreHorizontal, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Define the Coach type to match our database schema
 export type Coach = {
@@ -18,6 +27,40 @@ export type Coach = {
   gender: "male" | "female" | "non-binary" | "prefer-not-to-say" | null;
   approved: boolean | null;
   title?: string; // Role or title
+};
+
+// Create a separate client component for the actions cell
+const ActionsCell = ({ coachId }: { coachId: string }) => {
+  const router = useRouter();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="h-8 w-8 p-0">
+          <span className="sr-only">Open menu</span>
+          <MoreHorizontal className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => router.push(`/trainer?id=${coachId}`)}
+          className="cursor-pointer"
+        >
+          <User className="mr-2 h-4 w-4" />
+          <span>View Profile</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() => handleEditCoach(coachId)}
+          className="cursor-pointer"
+        >
+          <Edit className="mr-2 h-4 w-4" />
+          <span>Edit Profile</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 };
 
 export const columns: ColumnDef<Coach>[] = [
@@ -199,19 +242,10 @@ export const columns: ColumnDef<Coach>[] = [
   },
   {
     id: "actions",
+    header: "Actions",
     cell: ({ row }) => {
       const coach = row.original;
-
-      return (
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => handleEditCoach(coach.userId)}
-        >
-          <Edit className="h-4 w-4" />
-          <span className="sr-only">Edit</span>
-        </Button>
-      );
+      return <ActionsCell coachId={coach.userId} />;
     },
   },
 ];
@@ -220,5 +254,4 @@ export const columns: ColumnDef<Coach>[] = [
 function handleEditCoach(coachId: string) {
   console.log(`Editing coach ${coachId}`);
   // Navigate to edit page or open edit modal
-  // Example: router.push(`/coaches/edit/${coachId}`);
 }
