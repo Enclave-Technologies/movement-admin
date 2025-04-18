@@ -5,7 +5,7 @@ import { db } from "@/db/xata";
 import { defaultProfileURL, MOVEMENT_SESSION_NAME } from "@/lib/constants";
 import { eq } from "drizzle-orm";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 import "server-only";
 
 export async function get_logged_in_user() {
@@ -18,7 +18,8 @@ export async function get_logged_in_user() {
         } catch (error) {
             console.error("Error fetching user data:", error);
             // (await cookies()).delete(MOVEMENT_SESSION_NAME);
-            redirect("/login?error=session_expired");
+            // redirect("/login?error=session_expired");
+            return null;
         }
 
         // Get user data with role information
@@ -56,6 +57,7 @@ export async function get_logged_in_user() {
 
         return modified_user[0];
     } else {
-        redirect("/login");
+        // redirect("/login");
+        return null;
     }
 }

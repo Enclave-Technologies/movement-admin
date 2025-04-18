@@ -43,7 +43,7 @@ export interface UserData {
 
 // Define props interface including the user data
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    user: UserData;
+    user: UserData | null;
 }
 
 // Keep navMain static for now, or make it a prop too if needed
