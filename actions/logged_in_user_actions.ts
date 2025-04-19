@@ -13,8 +13,24 @@ export async function get_logged_in_user() {
     if (session) {
         let user;
         try {
-            const { account } = await createSessionClient(session);
-            user = await account.get();
+            let account;
+            try {
+                const sessionClient = await createSessionClient(session);
+                account = sessionClient.account;
+            } catch (err) {
+                console.error("Error creating session client:", err);
+                // throw err;
+                return null;
+            }
+
+            try {
+                user = await account.get();
+            } catch (err) {
+                console.error("Error getting account data:", err);
+                // If we get an AppwriteException about missing scope, it means the user isn't properly authenticated
+                // or doesn't have the right permissions
+                return null;
+            }
         } catch (error) {
             console.error("Error fetching user data:", error);
             // (await cookies()).delete(MOVEMENT_SESSION_NAME);
