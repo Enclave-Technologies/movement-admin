@@ -21,6 +21,7 @@ export default async function Home() {
 
             // Check if user is a Guest and not approved
             if (
+                detailedUser &&
                 detailedUser.role === "Guest" &&
                 !detailedUser.approvedByAdmin
             ) {

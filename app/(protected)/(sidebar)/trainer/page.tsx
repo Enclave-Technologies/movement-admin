@@ -19,8 +19,9 @@ import { Separator } from "@/components/ui/separator";
 export default async function Trainer({
     searchParams,
 }: {
-    searchParams: { id?: string };
+    searchParams: Promise<{ id?: string }>;
 }) {
+    const resolvedSearchParams = await searchParams;
     await checkGuestApproval();
 
     const session = (await cookies()).get(MOVEMENT_SESSION_NAME)?.value || null;
@@ -36,7 +37,7 @@ export default async function Trainer({
         redirect("/login");
     }
 
-    const userId = searchParams.id || result.$id;
+    const userId = resolvedSearchParams.id || result.$id;
 
     // Get trainer details and clients
     const trainerData = await getCoachById(userId);
