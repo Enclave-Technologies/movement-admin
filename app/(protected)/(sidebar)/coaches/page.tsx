@@ -31,7 +31,7 @@ export default async function CoachesPage() {
     });
 
     return (
-        <div className="container mx-auto py-6">
+        <div className="container mx-auto py-2 md:py-6">
             <h1 className="text-2xl font-bold mb-6">Coaching Team</h1>
 
             <Suspense fallback={<TableSkeleton />}>

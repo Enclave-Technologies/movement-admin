@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
-import { Client } from "./columns";
+import { Client, tableOperations } from "./columns";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
     ColumnDef,
@@ -15,22 +15,17 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import CompactTableOperations from "@/components/ui/compact-table-operations";
 
 interface InfiniteTableProps {
-    initialData: {
-        data: any[];
-        meta: {
-            totalRowCount: number;
-        };
-    };
-    fetchDataFn: (params: any) => Promise<any>;
+    fetchDataFn: (trainerIdOrParams: any, params?: any) => Promise<any>;
     columns: ColumnDef<any, unknown>[];
     queryId?: string;
+    trainerId?: string;
 }
 
 export function InfiniteTable({
-    initialData,
     fetchDataFn,
     columns,
     queryId = "default",
+    trainerId,
 }: InfiniteTableProps) {
     // Reference to the scrolling element
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -48,12 +43,23 @@ export function InfiniteTable({
     // Use React Query for data fetching with infinite scroll
     const { data, fetchNextPage, isFetchingNextPage, isLoading } =
         useInfiniteQuery({
-            queryKey: ["tableData", urlParams, queryId],
+            queryKey: ["tableData", urlParams, queryId], //refetch when these change
             queryFn: async ({ pageParam = 0 }) => {
+                // Add pageIndex to params but don't include it in URL
                 const params = {
                     ...urlParams,
                     pageIndex: pageParam,
                 };
+
+                // If trainerId is provided, pass it as the first parameter
+                if (trainerId) {
+                    return fetchDataFn(
+                        trainerId,
+                        params as Record<string, unknown>
+                    );
+                }
+
+                // Otherwise, just pass the params
                 return fetchDataFn(params as Record<string, unknown>);
             },
             initialPageParam: 0,
@@ -61,10 +67,6 @@ export function InfiniteTable({
                 // Simply return the length of allPages as the next page param
                 // This will be 1, 2, 3, etc. as pages are added
                 return allPages.length;
-            },
-            initialData: {
-                pages: [initialData],
-                pageParams: [0],
             },
             refetchOnWindowFocus: false,
             placeholderData: keepPreviousData,
@@ -153,11 +155,14 @@ export function InfiniteTable({
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-x-auto no-scrollbar pt-1">
             <CompactTableOperations
+                className="min-w-[800px] flex-nowrap"
                 columns={columns}
                 globalFilter={searchQuery}
                 setGlobalFilter={handleSearchChange}
+                filterableColumns={tableOperations.filterableColumns}
+                sortableColumns={tableOperations.sortableColumns}
                 onSortChange={(columnId, desc) => {
                     if (columnId) {
                         handleSortingChange([{ id: columnId, desc }]);

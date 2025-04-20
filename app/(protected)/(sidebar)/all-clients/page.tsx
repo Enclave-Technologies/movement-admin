@@ -22,7 +22,7 @@ export default async function AllClientsPage() {
     // const initialClientsData = await getAllClientsPaginated(0, 10);
 
     return (
-        <div className="container mx-auto py-6">
+        <div className="container mx-auto py-2 md:py-6">
             <h1 className="text-2xl font-bold mb-6">All Clients</h1>
 
             <div className="flex-1 overflow-hidden">

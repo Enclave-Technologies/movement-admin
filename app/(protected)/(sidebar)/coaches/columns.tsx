@@ -63,6 +63,25 @@ const ActionsCell = ({ coachId }: { coachId: string }) => {
   );
 };
 
+// Define which columns can be filtered and sorted with user-friendly labels
+export const tableOperations = {
+    filterableColumns: [
+        { id: "fullName", label: "Name" },
+        { id: "email", label: "Email" },
+        { id: "phone", label: "Phone" },
+        { id: "gender", label: "Gender" },
+        { id: "title", label: "Title" }
+    ],
+    sortableColumns: [
+        { id: "fullName", label: "Name" },
+        { id: "email", label: "Email" },
+        { id: "phone", label: "Phone" },
+        { id: "gender", label: "Gender" },
+        { id: "title", label: "Title" },
+        { id: "registrationDate", label: "Registered" }
+    ],
+};
+
 export const columns: ColumnDef<Coach>[] = [
   // {
   //   id: "select",
@@ -247,6 +266,8 @@ export const columns: ColumnDef<Coach>[] = [
       const coach = row.original;
       return <ActionsCell coachId={coach.userId} />;
     },
+    enableSorting: false,
+    enableColumnFilter: false,
   },
 ];
 

@@ -19,6 +19,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "./button";
 import { cn } from "@/lib/utils";
 
+// Define the column config type with label
+interface ColumnConfig {
+    id: string;
+    label: string;
+}
+
 interface CompactTableOperationsProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
     globalFilter: string;
@@ -29,6 +35,8 @@ interface CompactTableOperationsProps<TData, TValue> {
     showNewButton?: boolean;
     onNewClick?: () => void;
     className?: string;
+    filterableColumns?: ColumnConfig[] | string[];
+    sortableColumns?: ColumnConfig[] | string[];
 }
 
 export default function CompactTableOperations<TData, TValue>({
@@ -41,13 +49,21 @@ export default function CompactTableOperations<TData, TValue>({
     showNewButton = false,
     onNewClick,
     className = "",
+    filterableColumns,
+    sortableColumns,
 }: CompactTableOperationsProps<TData, TValue>) {
     const [searchExpanded, setSearchExpanded] = useState(false);
     const [selectedFilterColumn, setSelectedFilterColumn] = useState<
         string | null
     >(null);
+    const [selectedFilterLabel, setSelectedFilterLabel] = useState<
+        string | null
+    >(null);
     const [filterValue, setFilterValue] = useState("");
     const [selectedSortColumn, setSelectedSortColumn] = useState<string | null>(
+        null
+    );
+    const [selectedSortLabel, setSelectedSortLabel] = useState<string | null>(
         null
     );
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -58,6 +74,50 @@ export default function CompactTableOperations<TData, TValue>({
     const hasActiveSort = !!selectedSortColumn;
     const hasActiveSearch = !!globalFilter;
     const hasAnyActive = hasActiveFilter || hasActiveSort || hasActiveSearch;
+
+    // Helper function to check if a column is filterable
+    const isColumnFilterable = (columnId: string): boolean => {
+        if (!filterableColumns) return true;
+        
+        if (Array.isArray(filterableColumns) && filterableColumns.length > 0) {
+            if (typeof filterableColumns[0] === 'string') {
+                return (filterableColumns as string[]).includes(columnId);
+            } else {
+                return (filterableColumns as ColumnConfig[]).some(config => config.id === columnId);
+            }
+        }
+        
+        return true;
+    };
+
+    // Helper function to check if a column is sortable
+    const isColumnSortable = (columnId: string): boolean => {
+        if (!sortableColumns) return true;
+        
+        if (Array.isArray(sortableColumns) && sortableColumns.length > 0) {
+            if (typeof sortableColumns[0] === 'string') {
+                return (sortableColumns as string[]).includes(columnId);
+            } else {
+                return (sortableColumns as ColumnConfig[]).some(config => config.id === columnId);
+            }
+        }
+        
+        return true;
+    };
+
+    // Helper function to get column label
+    const getColumnLabel = (columnId: string, isForFilter: boolean = true): string => {
+        const columnList = isForFilter ? filterableColumns : sortableColumns;
+        
+        if (columnList && Array.isArray(columnList) && columnList.length > 0 && 
+            typeof columnList[0] !== 'string') {
+            const columnConfig = (columnList as ColumnConfig[])
+                .find(config => config.id === columnId);
+            return columnConfig?.label || columnId;
+        }
+        
+        return columnId;
+    };
 
     const toggleSearch = () => {
         setSearchExpanded(!searchExpanded);
@@ -76,6 +136,7 @@ export default function CompactTableOperations<TData, TValue>({
 
     const handleFilterColumnSelect = (columnId: string) => {
         setSelectedFilterColumn(columnId);
+        setSelectedFilterLabel(getColumnLabel(columnId, true));
     };
 
     const handleSortColumnSelect = (columnId: string) => {
@@ -86,6 +147,7 @@ export default function CompactTableOperations<TData, TValue>({
             onSortChange?.(columnId, newDirection === "desc");
         } else {
             setSelectedSortColumn(columnId);
+            setSelectedSortLabel(getColumnLabel(columnId, false));
             setSortDirection("asc");
             onSortChange?.(columnId, false);
         }
@@ -101,6 +163,7 @@ export default function CompactTableOperations<TData, TValue>({
 
     const clearFilter = () => {
         setSelectedFilterColumn(null);
+        setSelectedFilterLabel(null);
         setFilterValue("");
         setFilterPopoverOpen(false);
         onFilterChange?.("", "");
@@ -108,6 +171,7 @@ export default function CompactTableOperations<TData, TValue>({
 
     const clearSort = () => {
         setSelectedSortColumn(null);
+        setSelectedSortLabel(null);
         onSortChange?.("", false);
     };
 
@@ -120,8 +184,10 @@ export default function CompactTableOperations<TData, TValue>({
 
     const clearAll = () => {
         setSelectedFilterColumn(null);
+        setSelectedFilterLabel(null);
         setFilterValue("");
         setSelectedSortColumn(null);
+        setSelectedSortLabel(null);
         setSortDirection("asc");
         setGlobalFilter("");
         setFilterPopoverOpen(false);
@@ -218,36 +284,48 @@ export default function CompactTableOperations<TData, TValue>({
 
                                 {!selectedFilterColumn ? (
                                     <div className="grid gap-2 max-h-[200px] overflow-y-auto">
-                                        {columns.length > 0 ? (
-                                            columns.map((column) => {
-                                                // Extract column name from header or accessorKey
-                                                const columnId =
-                                                    typeof column.header ===
-                                                    "string"
-                                                        ? column.header
-                                                        : "accessorKey" in
-                                                          column
-                                                        ? String(
-                                                              column.accessorKey
-                                                          )
-                                                        : column.id || "Column";
+                                    {columns.length > 0 ? (
+                                        columns.map((column) => {
+                                            // Extract column name from header or accessorKey
+                                            const columnId =
+                                                typeof column.header ===
+                                                "string"
+                                                    ? column.header
+                                                    : "accessorKey" in
+                                                      column
+                                                    ? String(
+                                                          column.accessorKey
+                                                      )
+                                                    : column.id || "Column";
+                                            
+                                            // Skip columns that are not filterable
+                                            if (!isColumnFilterable(columnId)) {
+                                                return null;
+                                            }
+                                            
+                                            // Skip columns with enableColumnFilter explicitly set to false
+                                            if (column.enableColumnFilter === false) {
+                                                return null;
+                                            }
 
-                                                return (
-                                                    <Button
-                                                        key={`filter-${columnId}`}
-                                                        variant="outline"
-                                                        size="sm"
-                                                        className="justify-start font-normal"
-                                                        onClick={() =>
-                                                            handleFilterColumnSelect(
-                                                                columnId
-                                                            )
-                                                        }
-                                                    >
-                                                        {columnId}
-                                                    </Button>
-                                                );
-                                            })
+                                            const columnLabel = getColumnLabel(columnId, true);
+
+                                            return (
+                                                <Button
+                                                    key={`filter-${columnId}`}
+                                                    variant="outline"
+                                                    size="sm"
+                                                    className="justify-start font-normal"
+                                                    onClick={() =>
+                                                        handleFilterColumnSelect(
+                                                            columnId
+                                                        )
+                                                    }
+                                                >
+                                                    {columnLabel}
+                                                </Button>
+                                            );
+                                        }).filter(Boolean)
                                         ) : (
                                             <div className="text-sm text-muted-foreground">
                                                 No columns available
@@ -261,17 +339,16 @@ export default function CompactTableOperations<TData, TValue>({
                                                 variant="outline"
                                                 className="font-normal"
                                             >
-                                                {selectedFilterColumn}
+                                                {selectedFilterLabel || selectedFilterColumn}
                                             </Badge>
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
                                                 className="h-6 w-6"
-                                                onClick={() =>
-                                                    setSelectedFilterColumn(
-                                                        null
-                                                    )
-                                                }
+                                                onClick={() => {
+                                                    setSelectedFilterColumn(null);
+                                                    setSelectedFilterLabel(null);
+                                                }}
                                             >
                                                 <X size={14} />
                                             </Button>
@@ -280,7 +357,7 @@ export default function CompactTableOperations<TData, TValue>({
                                         <div className="relative">
                                             <Input
                                                 id="filter-input"
-                                                placeholder={`Filter by ${selectedFilterColumn}...`}
+                                                placeholder={`Filter by ${selectedFilterLabel || selectedFilterColumn}...`}
                                                 className="h-8 pr-8"
                                                 value={filterValue}
                                                 onChange={(e) =>
@@ -358,6 +435,18 @@ export default function CompactTableOperations<TData, TValue>({
                                             : "accessorKey" in column
                                             ? String(column.accessorKey)
                                             : column.id || "Column";
+                                    
+                                    // Skip columns that are not sortable
+                                    if (!isColumnSortable(columnId)) {
+                                        return null;
+                                    }
+                                    
+                                    // Skip columns with enableSorting explicitly set to false
+                                    if (column.enableSorting === false) {
+                                        return null;
+                                    }
+
+                                    const columnLabel = getColumnLabel(columnId, false);
 
                                     return (
                                         <DropdownMenuItem
@@ -366,10 +455,10 @@ export default function CompactTableOperations<TData, TValue>({
                                                 handleSortColumnSelect(columnId)
                                             }
                                         >
-                                            {columnId}
+                                            {columnLabel}
                                         </DropdownMenuItem>
                                     );
-                                })
+                                }).filter(Boolean)
                             ) : (
                                 <DropdownMenuItem disabled>
                                     No columns available
@@ -383,7 +472,7 @@ export default function CompactTableOperations<TData, TValue>({
                         <div className="flex items-center bg-primary text-primary-foreground rounded-full h-8 px-3 text-xs">
                             <span className="font-medium mr-1">Filter:</span>
                             <span className="truncate max-w-[120px]">
-                                {selectedFilterColumn} = {filterValue}
+                                {selectedFilterLabel || selectedFilterColumn} = {filterValue}
                             </span>
                             <Button
                                 variant="ghost"
@@ -406,7 +495,7 @@ export default function CompactTableOperations<TData, TValue>({
                                 title="Click to toggle sort direction"
                             >
                                 <span>
-                                    {selectedSortColumn} (
+                                    {selectedSortLabel || selectedSortColumn} (
                                     {sortDirection === "asc" ? "asc" : "desc"})
                                 </span>
                                 <ArrowUpDown

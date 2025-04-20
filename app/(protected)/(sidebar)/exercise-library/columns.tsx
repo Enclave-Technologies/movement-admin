@@ -24,6 +24,22 @@ export type Exercise = {
   status?: boolean;
 };
 
+// Define which columns can be filtered and sorted with user-friendly labels
+export const tableOperations = {
+    filterableColumns: [
+        { id: "name", label: "Exercise Name" },
+        { id: "difficulty", label: "Motion" },
+        { id: "muscleGroup", label: "Target Area" }
+    ],
+    sortableColumns: [
+        { id: "name", label: "Exercise Name" },
+        { id: "difficulty", label: "Motion" },
+        { id: "muscleGroup", label: "Target Area" },
+        { id: "status", label: "Approval Status" },
+        { id: "createdAt", label: "Created" }
+    ],
+};
+
 export const columns: ColumnDef<Exercise>[] = [
   {
     id: "select",
@@ -46,6 +62,7 @@ export const columns: ColumnDef<Exercise>[] = [
     ),
     enableSorting: false,
     enableHiding: false,
+    enableColumnFilter: false,
   },
   {
     accessorKey: "difficulty",
@@ -196,6 +213,8 @@ export const columns: ColumnDef<Exercise>[] = [
         </Button>
       );
     },
+    enableSorting: false,
+    enableColumnFilter: false,
   },
 ];
 

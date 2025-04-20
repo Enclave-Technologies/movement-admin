@@ -245,6 +245,25 @@ function ActionsCell({ userId }: { userId: string }) {
     );
 }
 
+// Define which columns can be filtered and sorted with user-friendly labels
+export const tableOperations = {
+    filterableColumns: [
+        { id: "fullName", label: "Full Name" },
+        { id: "email", label: "Email" },
+        { id: "phone", label: "Phone" },
+        { id: "gender", label: "Gender" }
+    ],
+    sortableColumns: [
+        { id: "fullName", label: "Full Name" },
+        { id: "email", label: "Email" },
+        { id: "phone", label: "Phone" },
+        { id: "gender", label: "Gender" },
+        { id: "age", label: "Age" },
+        { id: "registrationDate", label: "Member Since" },
+        { id: "trainerName", label: "Trainer" }
+    ],
+};
+
 export const columns: ColumnDef<Client>[] = [
     {
         id: "select",
@@ -275,6 +294,7 @@ export const columns: ColumnDef<Client>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
+        enableColumnFilter: false,
         size: 40,
     },
     {
@@ -312,6 +332,7 @@ export const columns: ColumnDef<Client>[] = [
             const value = row.getValue("registrationDate") as Date;
             return <div className="text-center">{formatDate(value)}</div>;
         },
+        enableColumnFilter: false,
         size: 120,
     },
     {
@@ -383,6 +404,7 @@ export const columns: ColumnDef<Client>[] = [
                 </div>
             );
         },
+        enableColumnFilter: false,
         size: 60,
     },
     {
@@ -406,6 +428,8 @@ export const columns: ColumnDef<Client>[] = [
                 </div>
             );
         },
+        enableSorting: false,
+        enableColumnFilter: false,
         size: 80,
     },
 ];

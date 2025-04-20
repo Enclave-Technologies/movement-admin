@@ -27,22 +27,19 @@ export default async function MyClients() {
     }
 
     // Get the user ID from the authenticated result
-    const userId = result.$id; // Appwrite user ID0
-
-    // Initial clients data (first page)
-    const initialResult = await getClientsManagedByUserPaginated(userId, 0, 10);
+    const userId = result.$id; // Appwrite user ID
 
     return (
-        <div className="container mx-auto py-6">
+        <div className="container mx-auto py-2 md:py-6">
             <h1 className="text-2xl font-bold mb-6">My Clients</h1>
 
-            <div className="">
+            <div className="flex-1 overflow-hidden">
                 <Suspense fallback={<TableSkeleton />}>
                     <InfiniteTable
-                        initialData={initialResult}
                         fetchDataFn={getClientsManagedByUserPaginated}
                         columns={columns}
-                        queryId={userId}
+                        queryId={`my-clients-${userId}`}
+                        trainerId={userId}
                     />
                 </Suspense>
             </div>

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
-import { Client, ClientResponse } from "./columns";
+import { Client, ClientResponse, tableOperations } from "./columns";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
     ColumnDef,
@@ -160,6 +160,8 @@ export function InfiniteTable({
                 columns={columns}
                 globalFilter={searchQuery}
                 setGlobalFilter={handleSearchChange}
+                filterableColumns={tableOperations.filterableColumns}
+                sortableColumns={tableOperations.sortableColumns}
                 onSortChange={(columnId, desc) => {
                     if (columnId) {
                         handleSortingChange([{ id: columnId, desc }]);

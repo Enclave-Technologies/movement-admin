@@ -101,33 +101,223 @@ export async function getClientsManagedByUser(trainerAppwriteId: string) {
 /**
  * Returns paginated users (clients) managed by the given trainer appwrite_id.
  * @param trainerAppwriteId - The appwrite_id of the trainer
- * @param page - The page number (0-based)
- * @param pageSize - Number of items per page
- * @returns Object containing clients array and total count
+ * @param params - Object containing pagination, sorting, and filtering parameters
+ *                 OR page number (0-based) for backward compatibility
+ * @param pageSize - Number of items per page (used only if first param is a number)
+ * @returns Object containing clients array and pagination info
  */
 export async function getClientsManagedByUserPaginated(
     trainerAppwriteId: string,
-    page: number = 0,
+    params: Record<string, unknown> | number = 0,
     pageSize: number = 10
 ) {
+    // Handle both new params object and old separate parameters
+    let page = 0;
+    let size = pageSize;
+    let filters: Record<string, unknown> = {};
+    let sorting: Array<{ id: string; desc: boolean }> = [];
+    let search: string | undefined;
+    let parsedFilters: Array<{ id: string; value: unknown }> = [];
+
+    // Ensure trainerAppwriteId is a string
+    if (typeof trainerAppwriteId !== 'string') {
+        console.error('Invalid trainerAppwriteId:', trainerAppwriteId);
+        throw new Error('trainerAppwriteId must be a string');
+    }
+
     console.log(
-        `Fetching paginated clients for trainer: ${trainerAppwriteId}, page: ${page}, pageSize: ${pageSize}`
+        `Received params for trainer ${trainerAppwriteId}:`,
+        JSON.stringify(params, null, 2)
     );
+
+    if (typeof params === "object") {
+        // Extract pagination parameters from params
+        page =
+            typeof params.pageIndex === "number"
+                ? params.pageIndex
+                : typeof params.pageIndex === "string"
+                ? parseInt(params.pageIndex, 10)
+                : 0;
+
+        size =
+            typeof params.pageSize === "number"
+                ? params.pageSize
+                : typeof params.pageSize === "string"
+                ? parseInt(params.pageSize, 10)
+                : 10;
+
+        // Extract sorting from params
+        if (params.sorting && typeof params.sorting === "string") {
+            try {
+                sorting = JSON.parse(params.sorting as string);
+            } catch (e) {
+                console.error("Error parsing sorting parameter:", e);
+            }
+        }
+
+        // Extract search from params
+        search = typeof params.search === "string" ? params.search : undefined;
+
+        // Extract filters from params
+        if (params.filters && typeof params.filters === "string") {
+            try {
+                parsedFilters = JSON.parse(params.filters as string);
+                console.log("Parsed filters:", parsedFilters);
+            } catch (e) {
+                console.error("Error parsing filters parameter:", e);
+            }
+        }
+
+        // Keep all other params for potential filtering
+        filters = { ...params };
+        // Remove extracted pagination params to avoid duplication
+        delete filters.pageIndex;
+        delete filters.pageSize;
+        delete filters.sorting;
+        delete filters.search;
+        delete filters.filters;
+    } else {
+        // Old style: separate parameters
+        page = params;
+    }
+
+    console.log(
+        `Fetching paginated clients for trainer: ${trainerAppwriteId}, page: ${page}, pageSize: ${size}`
+    );
+    if (sorting.length > 0) {
+        console.log(`Sorting:`, sorting);
+    }
+    if (search) {
+        console.log(`Search query:`, search);
+    }
+    if (Object.keys(filters).length > 0) {
+        console.log(`Additional filters:`, filters);
+    }
 
     const Trainer = alias(Users, "trainer");
     const Client = alias(Users, "client");
+
+    // Build where conditions
+    const baseConditions = [
+        eq(TrainerClients.trainerId, trainerAppwriteId),
+        eq(TrainerClients.isActive, true),
+    ];
+
+    // Define allowed filter columns
+    const ALLOWED_FILTER_COLUMNS = new Set([
+        "fullName", "email", "phone", "gender"
+    ]);
+
+    // Add filter conditions
+    const filterConditions = parsedFilters
+        .map((filter: { id: string; value: unknown }) => {
+            const { id, value } = filter;
+            
+            // Skip filters for columns that are not in the allowed list
+            if (!ALLOWED_FILTER_COLUMNS.has(id)) {
+                console.warn(`Unsupported filter column: ${id}`);
+                return undefined;
+            }
+            
+            switch (id) {
+                case "fullName":
+                    return sql`${Client.fullName} ILIKE ${`%${String(value)}%`}`;
+                case "email":
+                    return sql`${Client.email} ILIKE ${`%${String(value)}%`}`;
+                case "phone":
+                    return sql`${Client.phone} ILIKE ${`%${String(value)}%`}`;
+                case "gender":
+                    // Handle gender as enum with specific allowed values
+                    const genderValue = String(value).toUpperCase();
+                    if (genderValue === "M" || genderValue === "MALE") {
+                        return eq(Client.gender, "male");
+                    } else if (
+                        genderValue === "F" ||
+                        genderValue === "FEMALE"
+                    ) {
+                        return eq(Client.gender, "female");
+                    } else if (
+                        genderValue === "NB" ||
+                        genderValue === "NON-BINARY"
+                    ) {
+                        return eq(Client.gender, "non-binary");
+                    } else {
+                        return eq(Client.gender, "prefer-not-to-say");
+                    }
+                default:
+                    console.warn(`Unsupported filter column: ${id}`);
+                    return undefined;
+            }
+        })
+        .filter(Boolean);
+
+    // Add search condition if provided
+    let searchCondition;
+    if (search) {
+        const searchLike = `%${search}%`;
+        searchCondition = sql`(
+            ${Client.fullName} ILIKE ${searchLike} OR
+            ${Client.email} ILIKE ${searchLike} OR
+            ${Client.phone} ILIKE ${searchLike}
+        )`;
+    }
+
+    // Combine all conditions
+    const whereConditions = [
+        ...baseConditions,
+        ...filterConditions,
+        ...(searchCondition ? [searchCondition] : []),
+    ];
+
+    // Build order by
+    let orderByColumns = [desc(TrainerClients.assignedDate)]; // Default sorting
+
+    if (sorting.length > 0) {
+        orderByColumns = sorting.map((sort) => {
+            const { id, desc: isDesc } = sort;
+            switch (id) {
+                case "email":
+                    return isDesc
+                        ? desc(Client.email)
+                        : sql`${Client.email} asc`;
+                case "fullName":
+                    return isDesc
+                        ? desc(Client.fullName)
+                        : sql`${Client.fullName} asc`;
+                case "registrationDate":
+                    return isDesc
+                        ? desc(Client.registrationDate)
+                        : sql`${Client.registrationDate} asc`;
+                case "phone":
+                    return isDesc
+                        ? desc(Client.phone)
+                        : sql`${Client.phone} asc`;
+                case "gender":
+                    return isDesc
+                        ? desc(Client.gender)
+                        : sql`${Client.gender} asc`;
+                case "age":
+                    // Age is calculated, so we sort by dob instead
+                    return isDesc ? sql`${Client.dob} asc` : desc(Client.dob); // Reverse logic for age
+                case "trainerName":
+                    return isDesc
+                        ? desc(Trainer.fullName)
+                        : sql`${Trainer.fullName} asc`;
+                default:
+                    console.warn(`Unsupported sort column: ${id}`);
+                    return desc(TrainerClients.assignedDate); // Default
+            }
+        });
+    }
 
     // Fetch total count and paginated clients concurrently for faster response
     const [countResult, clientsWithTrainerName] = await Promise.all([
         db
             .select({ count: sql<number>`count(*)` })
             .from(TrainerClients)
-            .where(
-                and(
-                    eq(TrainerClients.trainerId, trainerAppwriteId),
-                    eq(TrainerClients.isActive, true)
-                )
-            ),
+            .innerJoin(Client, eq(Client.userId, TrainerClients.clientId))
+            .innerJoin(Trainer, eq(Trainer.userId, TrainerClients.trainerId))
+            .where(and(...whereConditions)),
         db
             .select({
                 trainerName: Trainer.fullName,
@@ -147,20 +337,15 @@ export async function getClientsManagedByUserPaginated(
             .from(TrainerClients)
             .innerJoin(Trainer, eq(Trainer.userId, TrainerClients.trainerId)) // trainer join
             .innerJoin(Client, eq(Client.userId, TrainerClients.clientId)) // client join
-            .where(
-                and(
-                    eq(Trainer.userId, trainerAppwriteId), // filter for trainer
-                    eq(TrainerClients.isActive, true)
-                )
-            )
-            .orderBy(desc(TrainerClients.assignedDate))
-            .limit(pageSize)
-            .offset(page * pageSize),
+            .where(and(...whereConditions))
+            .orderBy(...orderByColumns)
+            .limit(size)
+            .offset(page * size),
     ]);
 
     const totalCount = Number(countResult[0]?.count || 0);
 
-    // Map clients to add age calculated on server side (can optimize further by caching if needed)
+    // Map clients to add age calculated on server side
     const clientsWithAge = clientsWithTrainerName.map((client) => {
         let age = null;
         if (client.dob) {
@@ -177,19 +362,18 @@ export async function getClientsManagedByUserPaginated(
 
     console.log(
         `Found ${clientsWithAge.length} clients (page ${page} of ${Math.ceil(
-            totalCount / pageSize
+            totalCount / size
         )}) for trainer: ${trainerAppwriteId}`
     );
-    // console.log("Sample client data:", clientsWithAge[0] || "No clients found");
 
     return {
         data: clientsWithAge,
         meta: {
             totalRowCount: totalCount,
             page,
-            pageSize,
-            totalPages: Math.ceil(totalCount / pageSize),
-            hasMore: (page + 1) * pageSize < totalCount,
+            pageSize: size,
+            totalPages: Math.ceil(totalCount / size),
+            hasMore: (page + 1) * size < totalCount,
         },
     };
 }
@@ -293,11 +477,29 @@ export async function getAllClientsPaginated(
         eq(TrainerClients.isActive, true),
     ];
 
+    // Define allowed filter columns
+    const ALLOWED_FILTER_COLUMNS = new Set([
+        "fullName", "email", "phone", "gender"
+    ]);
+
     // Add filter conditions
     const filterConditions = parsedFilters
         .map((filter: { id: string; value: unknown }) => {
             const { id, value } = filter;
+            
+            // Skip filters for columns that are not in the allowed list
+            if (!ALLOWED_FILTER_COLUMNS.has(id)) {
+                console.warn(`Unsupported filter column: ${id}`);
+                return undefined;
+            }
+            
             switch (id) {
+                case "fullName":
+                    return sql`${Client.fullName} ILIKE ${`%${String(value)}%`}`;
+                case "email":
+                    return sql`${Client.email} ILIKE ${`%${String(value)}%`}`;
+                case "phone":
+                    return sql`${Client.phone} ILIKE ${`%${String(value)}%`}`;
                 case "gender":
                     // Handle gender as enum with specific allowed values
                     const genderValue = String(value).toUpperCase();
@@ -316,7 +518,6 @@ export async function getAllClientsPaginated(
                     } else {
                         return eq(Client.gender, "prefer-not-to-say");
                     }
-                // Add more filter cases as needed based on columns.tsx
                 default:
                     console.warn(`Unsupported filter column: ${id}`);
                     return undefined;
