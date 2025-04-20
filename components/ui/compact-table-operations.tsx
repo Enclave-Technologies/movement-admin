@@ -125,14 +125,24 @@ export default function CompactTableOperations<TData, TValue>({
         setSortDirection("asc");
         setGlobalFilter("");
         setFilterPopoverOpen(false);
+        
+        // Clear URL parameters
+        const newSearchParams = new URLSearchParams();
+        const pathname = window.location.pathname;
+        window.history.replaceState(null, '', `${pathname}?${newSearchParams}`);
+
+        // Notify parent components
         onFilterChange?.("", "");
         onSortChange?.("", false);
+        
+        // Force a refresh of the table data
+        onApplyClick?.();
     };
 
     return (
         <div className={cn("flex flex-col space-y-2", className)}>
             {/* Toolbar - Always visible */}
-            <div className="flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center justify-between gap-2 overflow-x-auto flex-nowrap no-scrollbar h-12">
                 {/* Left side - Action buttons and active filters/sorts */}
                 <div className="flex items-center gap-2 flex-wrap">
                     {/* Search button/input */}
@@ -442,7 +452,7 @@ export default function CompactTableOperations<TData, TValue>({
                             Clear All
                         </Button>
                     )}
-                    
+
                     {/* New button - only shown if enabled, positioned at the very right */}
                     {showNewButton && (
                         <Button

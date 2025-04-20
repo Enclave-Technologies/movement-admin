@@ -11,6 +11,14 @@ import {
     flexRender,
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
+import { Table } from "lucide-react";
+import {
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "./table";
 
 interface ReusableInfiniteScrollTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -240,14 +248,14 @@ const ReusableInfiniteScrollTable = <
         <div
             ref={tableContainerRef}
             className={className + " relative overflow-auto rounded-md border"}
-            style={{ height: "calc(100vh - 200px)" }}
+            style={{ height: "calc(100vh - 250px)" }}
         >
-            <table className="w-full border-collapse">
-                <thead className="sticky top-0 bg-background z-10">
+            <Table className="w-full border-collapse">
+                <TableHeader className="sticky top-0 bg-background z-10">
                     {table.getHeaderGroups().map((headerGroup) => (
-                        <tr key={headerGroup.id}>
+                        <TableRow key={headerGroup.id}>
                             {headerGroup.headers.map((header) => (
-                                <th
+                                <TableHead
                                     key={header.id}
                                     className="border-b border-border px-4 py-3 text-left font-medium text-muted-foreground"
                                 >
@@ -327,22 +335,22 @@ const ReusableInfiniteScrollTable = <
                                         (header.column.columnDef
                                             .header as React.ReactNode)
                                     )}
-                                </th>
+                                </TableHead>
                             ))}
-                        </tr>
+                        </TableRow>
                     ))}
-                </thead>
-                <tbody>
+                </TableHeader>
+                <TableBody>
                     {paddingTop > 0 && (
-                        <tr>
+                        <TableRow>
                             <td style={{ height: paddingTop }} />
-                        </tr>
+                        </TableRow>
                     )}
                     {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                         const row = rows[virtualRow.index];
                         const isEven = virtualRow.index % 2 === 0;
                         return (
-                            <tr
+                            <TableRow
                                 key={row.id}
                                 className={`${
                                     isEven ? "bg-muted/50" : "bg-background"
@@ -354,7 +362,7 @@ const ReusableInfiniteScrollTable = <
                                 onClick={() => onRowClick?.(row.original)}
                             >
                                 {row.getVisibleCells().map((cell) => (
-                                    <td
+                                    <TableCell
                                         key={cell.id}
                                         className="border-b border-border px-4 py-3"
                                     >
@@ -363,19 +371,19 @@ const ReusableInfiniteScrollTable = <
                                             cell.column.columnDef.cell,
                                             cell.getContext()
                                         )}
-                                    </td>
+                                    </TableCell>
                                 ))}
-                            </tr>
+                            </TableRow>
                         );
                     })}
                     {paddingBottom > 0 && (
-                        <tr>
-                            <td style={{ height: paddingBottom }} />
-                        </tr>
+                        <TableRow>
+                            <TableCell style={{ height: paddingBottom }} />
+                        </TableRow>
                     )}
                     {isFetching && (
-                        <tr>
-                            <td
+                        <TableRow>
+                            <TableCell
                                 colSpan={columns.length}
                                 className="text-center py-4"
                             >
@@ -385,11 +393,11 @@ const ReusableInfiniteScrollTable = <
                                         Loading more data...
                                     </span>
                                 </div>
-                            </td>
-                        </tr>
+                            </TableCell>
+                        </TableRow>
                     )}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
         </div>
     );
 };

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
-import { Client } from "./columns";
+import { Client, ClientResponse } from "./columns";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
     ColumnDef,
@@ -15,19 +15,18 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 import CompactTableOperations from "@/components/ui/compact-table-operations";
 
 interface InfiniteTableProps {
-    initialData: {
-        data: any[];
-        meta: {
-            totalRowCount: number;
-        };
-    };
+    // initialData: {
+    //     data: any[];
+    //     meta: {
+    //         totalRowCount: number;
+    //     };
+    // };
     fetchDataFn: (params: any) => Promise<any>;
     columns: ColumnDef<any, unknown>[];
     queryId?: string;
 }
 
 export function InfiniteTable({
-    initialData,
     fetchDataFn,
     columns,
     queryId = "default",
@@ -47,28 +46,27 @@ export function InfiniteTable({
 
     // Use React Query for data fetching with infinite scroll
     const { data, fetchNextPage, isFetchingNextPage, isLoading } =
-        useInfiniteQuery({
-            queryKey: ["tableData", urlParams, queryId],
+        useInfiniteQuery<ClientResponse>({
+            queryKey: ["allClients", urlParams, queryId], //refetch when these change
             queryFn: async ({ pageParam = 0 }) => {
+                // Add pageIndex to params but don't include it in URL
                 const params = {
                     ...urlParams,
                     pageIndex: pageParam,
                 };
+
                 return fetchDataFn(params as Record<string, unknown>);
             },
             initialPageParam: 0,
-            getNextPageParam: (
-                _lastPage,
-                allPages
-            ) => {
+            getNextPageParam: (_lastPage, allPages) => {
                 // Simply return the length of allPages as the next page param
                 // This will be 1, 2, 3, etc. as pages are added
                 return allPages.length;
             },
-            initialData: {
-                pages: [initialData],
-                pageParams: [0],
-            },
+            // initialData: {
+            //     pages: [initialData],
+            //     pageParams: [0],
+            // },
             refetchOnWindowFocus: false,
             placeholderData: keepPreviousData,
         });
@@ -131,14 +129,14 @@ export function InfiniteTable({
                     !isFetchingNextPage &&
                     totalFetched < totalRowCount
                 ) {
-                    console.log("Fetching more data...", {
-                        scrollHeight,
-                        scrollTop,
-                        clientHeight,
-                        isFetchingNextPage,
-                        totalFetched,
-                        totalRowCount,
-                    });
+                    // console.log("Fetching more data...", {
+                    //     scrollHeight,
+                    //     scrollTop,
+                    //     clientHeight,
+                    //     isFetchingNextPage,
+                    //     totalFetched,
+                    //     totalRowCount,
+                    // });
                     fetchNextPage();
                 }
             }
@@ -156,8 +154,9 @@ export function InfiniteTable({
     }
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-x-auto no-scrollbar pt-1">
             <CompactTableOperations
+                className="min-w-[800px] flex-nowrap"
                 columns={columns}
                 globalFilter={searchQuery}
                 setGlobalFilter={handleSearchChange}
@@ -219,7 +218,7 @@ export function InfiniteTable({
                         : "No data available."
                 }
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
-                height="calc(100vh - 250px)"
+                height="calc(100vh - 290px)"
                 className="w-full"
             />
 

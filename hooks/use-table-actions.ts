@@ -24,9 +24,7 @@ export function useTableActions() {
     return searchParams.get("search") || ""
   })
   
-  const [pageIndex, setPageIndex] = useState<number>(() => {
-    return Number(searchParams.get("pageIndex") || 0)
-  })
+  const [pageIndex, setPageIndex] = useState<number>(0) // Don't read from URL
   
   const [pageSize, setPageSize] = useState<number>(() => {
     return Number(searchParams.get("pageSize") || 50)
@@ -45,6 +43,11 @@ export function useTableActions() {
       }
     })
     
+    // Remove pageIndex from URL if it exists
+    if (params.has("pageIndex")) {
+      params.delete("pageIndex")
+    }
+    
     // Update the URL
     router.push(`${pathname}?${params.toString()}`)
   }, [pathname, router, searchParams])
@@ -52,27 +55,27 @@ export function useTableActions() {
   // Handle sorting change
   const handleSortingChange = useCallback((newSorting: SortingState) => {
     setSorting(newSorting)
+    setPageIndex(0) // Reset to first page on sort change
     updateSearchParams({
       sorting: newSorting.length ? JSON.stringify(newSorting) : null,
-      pageIndex: "0", // Reset to first page on sort change
     })
   }, [updateSearchParams])
 
   // Handle column filters change
   const handleColumnFiltersChange = useCallback((newFilters: ColumnFiltersState) => {
     setColumnFilters(newFilters)
+    setPageIndex(0) // Reset to first page on filter change
     updateSearchParams({
       filters: newFilters.length ? JSON.stringify(newFilters) : null,
-      pageIndex: "0", // Reset to first page on filter change
     })
   }, [updateSearchParams])
 
   // Handle search query change
   const handleSearchChange = useCallback((query: string) => {
     setSearchQuery(query)
+    setPageIndex(0) // Reset to first page on search change
     updateSearchParams({
       search: query || null,
-      pageIndex: "0", // Reset to first page on search change
     })
   }, [updateSearchParams])
 
@@ -80,26 +83,21 @@ export function useTableActions() {
   const handlePaginationChange = useCallback((newPageIndex: number, newPageSize?: number) => {
     setPageIndex(newPageIndex)
     
-    const updates: Record<string, string | null> = {
-      pageIndex: String(newPageIndex),
-    }
+    const updates: Record<string, string | null> = {}
     
     if (newPageSize !== undefined && newPageSize !== pageSize) {
       setPageSize(newPageSize)
       updates.pageSize = String(newPageSize)
+      updateSearchParams(updates)
     }
-    
-    updateSearchParams(updates)
   }, [updateSearchParams, pageSize])
 
   // Handle load more for infinite scroll
   const handleLoadMore = useCallback(() => {
     const nextPageIndex = pageIndex + 1
     setPageIndex(nextPageIndex)
-    updateSearchParams({
-      pageIndex: String(nextPageIndex),
-    })
-  }, [pageIndex, updateSearchParams])
+    // Don't update URL for pageIndex
+  }, [pageIndex])
 
   // Reset all filters
   const resetFilters = useCallback(() => {
@@ -112,7 +110,6 @@ export function useTableActions() {
       sorting: null,
       filters: null,
       search: null,
-      pageIndex: "0",
     })
   }, [updateSearchParams])
 
@@ -137,8 +134,8 @@ export function useTableActions() {
       sorting: sorting.length ? JSON.stringify(sorting) : undefined,
       filters: columnFilters.length ? JSON.stringify(columnFilters) : undefined,
       search: searchQuery || undefined,
-      pageIndex: pageIndex.toString(),
       pageSize: pageSize.toString(),
+      // pageIndex is intentionally omitted from urlParams
     }
   }
 }

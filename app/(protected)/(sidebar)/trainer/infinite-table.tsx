@@ -57,10 +57,7 @@ export function InfiniteTable({
                 return fetchDataFn(params as Record<string, unknown>);
             },
             initialPageParam: 0,
-            getNextPageParam: (
-                _lastPage,
-                allPages
-            ) => {
+            getNextPageParam: (_lastPage, allPages) => {
                 // Simply return the length of allPages as the next page param
                 // This will be 1, 2, 3, etc. as pages are added
                 return allPages.length;
@@ -219,7 +216,7 @@ export function InfiniteTable({
                         : "No data available."
                 }
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
-                height="calc(100vh - 250px)"
+                height="calc(100vh - 290px)"
                 className="w-full"
             />
 

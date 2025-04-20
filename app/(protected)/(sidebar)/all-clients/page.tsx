@@ -19,16 +19,15 @@ export default async function AllClientsPage() {
     }
 
     // Fetch initial page of all clients in the system
-    const initialClientsData = await getAllClientsPaginated(1, 10);
+    // const initialClientsData = await getAllClientsPaginated(0, 10);
 
     return (
         <div className="container mx-auto py-6">
             <h1 className="text-2xl font-bold mb-6">All Clients</h1>
 
-            <div className="">
+            <div className="flex-1 overflow-hidden">
                 <Suspense fallback={<TableSkeleton />}>
                     <InfiniteTable
-                        initialData={initialClientsData}
                         fetchDataFn={getAllClientsPaginated}
                         columns={columns}
                         queryId="all-clients"

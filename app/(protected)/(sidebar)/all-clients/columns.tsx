@@ -45,6 +45,13 @@ export type Client = {
     trainerName?: string | null;
 };
 
+export type ClientResponse = {
+    data: Client[]
+    meta: {
+      totalRowCount: number
+    }
+  }
+
 // Function to get initials from a name
 function getInitials(name: string): string {
     return name

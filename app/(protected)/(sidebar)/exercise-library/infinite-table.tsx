@@ -216,7 +216,7 @@ export function InfiniteTable({
                         : "No data available."
                 }
                 onScroll={(e) => fetchMoreOnBottomReached(e.currentTarget)}
-                height="calc(100vh - 250px)"
+                height="calc(100vh - 290px)"
                 className="w-full"
             />
 
