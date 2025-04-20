@@ -2,7 +2,7 @@ import { getAllClientsPaginated } from "@/actions/client_actions";
 // import { get_logged_in_user } from "@/actions/logged_in_user_actions";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
-import { InfiniteTable } from "../example-table/infinite-table";
+import { InfiniteTable } from "./infinite-table";
 import { columns } from "./columns";
 import { authenticated_or_login } from "@/actions/appwrite_actions";
 import { cookies } from "next/headers";
@@ -25,14 +25,16 @@ export default async function AllClientsPage() {
         <div className="container mx-auto py-6">
             <h1 className="text-2xl font-bold mb-6">All Clients</h1>
 
-            <Suspense fallback={<TableSkeleton />}>
-                <InfiniteTable
-                    initialData={initialClientsData}
-                    fetchDataFn={getAllClientsPaginated}
-                    columns={columns}
-                    queryId="all-clients"
-                />
-            </Suspense>
+            <div className="">
+                <Suspense fallback={<TableSkeleton />}>
+                    <InfiniteTable
+                        initialData={initialClientsData}
+                        fetchDataFn={getAllClientsPaginated}
+                        columns={columns}
+                        queryId="all-clients"
+                    />
+                </Suspense>
+            </div>
         </div>
     );
 }

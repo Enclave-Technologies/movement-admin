@@ -72,12 +72,15 @@ export function InfiniteDataTable<TData, TValue>({
         >
             <Table style={{ display: "grid" }}>
                 <TableHeader
-                    className="sticky top-0 z-10 bg-background"
                     style={{
                         display: "grid",
                         position: "sticky",
                         top: 0,
-                        zIndex: 1,
+                        zIndex: 50,
+                        width: "100%",
+                        borderBottom: "1px solid var(--border)",
+                        backgroundColor: "hsl(var(--background))",
+                        boxShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
                     }}
                 >
                     {table.getHeaderGroups().map((headerGroup) => (
@@ -94,6 +97,7 @@ export function InfiniteDataTable<TData, TValue>({
                                             header.getSize() !== 0
                                                 ? header.getSize()
                                                 : "auto",
+                                        alignItems: "center",
                                     }}
                                 >
                                     {header.isPlaceholder
@@ -161,6 +165,7 @@ export function InfiniteDataTable<TData, TValue>({
                                                         0
                                                             ? cell.column.getSize()
                                                             : "auto",
+                                                    alignItems: "center",
                                                 }}
                                             >
                                                 {flexRender(
@@ -174,23 +179,23 @@ export function InfiniteDataTable<TData, TValue>({
                             })}
                         </>
                     )}
-                    {isLoading && rows.length > 0 && (
-                        <TableRow>
-                            <TableCell
-                                colSpan={columns.length}
-                                className="h-12 text-center text-muted-foreground"
-                            >
-                                Loading more...
-                            </TableCell>
-                        </TableRow>
-                    )}
+                    {/* Loading indicator moved outside the virtualized area */}
                 </TableBody>
             </Table>
+            {/* Loading indicator at the bottom of the table */}
+            {isLoading && (
+                <div className="h-10 w-full flex items-center justify-center border-t">
+                    <div className="text-sm text-muted-foreground">
+                        Fetching More...
+                    </div>
+                </div>
+            )}
+
             {/* Sentinel element for infinite scroll */}
             {hasMore && loadMoreRef && (
                 <div
                     ref={loadMoreRef}
-                    className="h-20 w-full flex items-center justify-center"
+                    className="h-10 w-full flex items-center justify-center"
                     style={{
                         position: "absolute",
                         bottom: "0",
@@ -198,11 +203,7 @@ export function InfiniteDataTable<TData, TValue>({
                         right: "0",
                     }}
                 >
-                    {isLoading ? (
-                        <div className="text-sm text-muted-foreground">
-                            Loading more...
-                        </div>
-                    ) : (
+                    {!isLoading && (
                         <div className="text-sm text-muted-foreground">
                             Scroll for more
                         </div>

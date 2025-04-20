@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import { fetchPeopleData } from "@/actions/table_actions";
-import { InfiniteTable } from "@/app/(protected)/(sidebar)/example-table/infinite-table";
+import { InfiniteTable } from "./infinite-table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { QueryProvider } from "@/providers/query-provider";
 

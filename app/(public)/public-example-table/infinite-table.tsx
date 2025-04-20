@@ -3,8 +3,7 @@
 import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
-// import { columns } from "./columns";
-import { Person, PersonApiResponse } from "@/actions/table_actions";
+import { Person } from "@/actions/table_actions";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
     ColumnDef,
@@ -14,6 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import CompactTableOperations from "@/components/ui/compact-table-operations";
+import { columns } from "./columns";
 
 interface InfiniteTableProps {
     initialData: {
@@ -23,15 +23,11 @@ interface InfiniteTableProps {
         };
     };
     fetchDataFn: (params: any) => Promise<any>;
-    columns: ColumnDef<any, unknown>[];
-    queryId?: string;
 }
 
 export function InfiniteTable({
     initialData,
     fetchDataFn,
-    columns,
-    queryId = "default",
 }: InfiniteTableProps) {
     // Reference to the scrolling element
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
@@ -48,8 +44,8 @@ export function InfiniteTable({
 
     // Use React Query for data fetching with infinite scroll
     const { data, fetchNextPage, isFetchingNextPage, isLoading } =
-        useInfiniteQuery<PersonApiResponse>({
-            queryKey: ["tableData", urlParams, queryId],
+        useInfiniteQuery({
+            queryKey: ["tableData", urlParams, "public-example"],
             queryFn: async ({ pageParam = 0 }) => {
                 const params = {
                     ...urlParams,
@@ -58,10 +54,7 @@ export function InfiniteTable({
                 return fetchDataFn(params as Record<string, unknown>);
             },
             initialPageParam: 0,
-            getNextPageParam: (
-                _lastPage: PersonApiResponse,
-                allPages: PersonApiResponse[]
-            ) => {
+            getNextPageParam: (_lastPage, allPages) => {
                 // Simply return the length of allPages as the next page param
                 // This will be 1, 2, 3, etc. as pages are added
                 return allPages.length;
@@ -76,7 +69,7 @@ export function InfiniteTable({
 
     // Flatten the data from all pages
     const flatData = React.useMemo(
-        () => data?.pages.flatMap((page: PersonApiResponse) => page.data) || [],
+        () => data?.pages.flatMap((page) => page.data) || [],
         [data]
     );
     const totalRowCount = data?.pages[0]?.meta?.totalRowCount || 0;

@@ -26,6 +26,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { MoreHorizontal, Eye, UserX, UserCog } from "lucide-react";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Checkbox } from "@/components/ui/checkbox";
 
 // Define the client type to match what comes from the database
 export type Client = {
@@ -42,6 +44,16 @@ export type Client = {
     age?: number | null;
     trainerName?: string | null;
 };
+
+// Function to get initials from a name
+function getInitials(name: string): string {
+    return name
+        .split(" ")
+        .map((part) => part[0])
+        .join("")
+        .toUpperCase()
+        .substring(0, 2);
+}
 
 // Placeholder coaches list, replace with real data fetching
 const coachesList = [
@@ -87,14 +99,18 @@ function TrainerCell({
     };
 
     return (
-        <div className="flex items-center gap-2">
-            <div className="flex-grow">{trainerName || "—"}</div>
+        <div className="flex items-center justify-center gap-2">
+            <div className="text-center">{trainerName || "—"}</div>
             <DropdownMenu
                 open={isDropdownOpen}
                 onOpenChange={setIsDropdownOpen}
             >
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 p-0 flex-shrink-0"
+                    >
                         <span className="sr-only">Switch trainer</span>
                         <UserCog className="h-4 w-4" />
                     </Button>
@@ -224,32 +240,85 @@ function ActionsCell({ userId }: { userId: string }) {
 
 export const columns: ColumnDef<Client>[] = [
     {
+        id: "select",
+        header: ({ table }) => (
+            <div className="flex justify-center">
+                <Checkbox
+                    checked={
+                        table.getIsAllPageRowsSelected() ||
+                        (table.getIsSomePageRowsSelected() && "indeterminate")
+                    }
+                    onCheckedChange={(value) =>
+                        table.toggleAllPageRowsSelected(!!value)
+                    }
+                    aria-label="Select all"
+                    className="h-4 w-4"
+                />
+            </div>
+        ),
+        cell: ({ row }) => (
+            <div className="flex justify-center">
+                <Checkbox
+                    checked={row.getIsSelected()}
+                    onCheckedChange={(value) => row.toggleSelected(!!value)}
+                    aria-label="Select row"
+                    className="h-4 w-4"
+                />
+            </div>
+        ),
+        enableSorting: false,
+        enableHiding: false,
+        size: 40,
+    },
+    {
         accessorKey: "fullName",
-        header: "Name",
+        header: () => <div>Full Name</div>,
         cell: ({ row }) => {
             const value = row.getValue("fullName") as string;
-            return <div className="font-medium">{value || "—"}</div>;
+            const imageUrl = row.original.imageUrl;
+
+            return (
+                <div className="flex items-center gap-2">
+                    <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarImage src={imageUrl || undefined} alt={value} />
+                        <AvatarFallback>{getInitials(value)}</AvatarFallback>
+                    </Avatar>
+                    <div className="font-medium">{value || "—"}</div>
+                </div>
+            );
         },
+        size: 250,
     },
     {
         accessorKey: "email",
-        header: "Email",
+        header: () => <div>Email</div>,
         cell: ({ row }) => {
             const value = row.getValue("email") as string;
-            return <div>{value || "—"}</div>;
+            return <div className="truncate max-w-[200px]">{value || "—"}</div>;
         },
+        size: 200,
+    },
+    {
+        accessorKey: "registrationDate",
+        header: () => <div>Member Since</div>,
+        cell: ({ row }) => {
+            const value = row.getValue("registrationDate") as Date;
+            return <div className="text-center">{formatDate(value)}</div>;
+        },
+        size: 120,
     },
     {
         accessorKey: "phone",
-        header: "Phone",
+        header: () => <div>Phone</div>,
         cell: ({ row }) => {
             const value = row.getValue("phone") as string;
-            return <div>{value || "—"}</div>;
+            return <div className="text-center">{value || "—"}</div>;
         },
+        size: 120,
     },
     {
         accessorKey: "gender",
-        header: "Gender",
+        header: () => <div>Gender</div>,
         cell: ({ row }) => {
             const value = row.getValue("gender") as string | null;
             let display = "—";
@@ -285,47 +354,51 @@ export const columns: ColumnDef<Client>[] = [
             }
 
             return (
-                <Badge variant={variant} className="font-normal">
-                    <span aria-label={display} title={display}>
-                        {icon} {display}
-                    </span>
-                </Badge>
+                <div className="flex justify-center">
+                    <Badge variant={variant} className="font-normal">
+                        <span aria-label={display} title={display}>
+                            {icon} {display}
+                        </span>
+                    </Badge>
+                </div>
             );
         },
-    },
-    {
-        accessorKey: "registrationDate",
-        header: "Registered",
-        cell: ({ row }) => {
-            const value = row.getValue("registrationDate") as Date;
-            return <div>{formatDate(value)}</div>;
-        },
+        size: 80,
     },
     {
         accessorKey: "age",
-        header: "Age",
+        header: () => <div>Age</div>,
         cell: ({ row }) => {
             const value = row.getValue("age") as number | null;
             return (
-                <div>{value !== null && value !== undefined ? value : "—"}</div>
+                <div className="text-center">
+                    {value !== null && value !== undefined ? value : "—"}
+                </div>
             );
         },
+        size: 60,
     },
     {
         accessorKey: "trainerName",
-        header: "Trainer",
+        header: () => <div>Trainer</div>,
         cell: ({ row }) => {
             const trainerName = row.getValue("trainerName") as string | null;
             const userId = row.original.userId;
             return <TrainerCell trainerName={trainerName} userId={userId} />;
         },
+        size: 150,
     },
     {
         id: "actions",
-        header: "Actions",
+        header: () => <div>Actions</div>,
         cell: ({ row }) => {
             const userId = row.original.userId;
-            return <ActionsCell userId={userId} />;
+            return (
+                <div className="flex justify-center">
+                    <ActionsCell userId={userId} />
+                </div>
+            );
         },
+        size: 80,
     },
 ];

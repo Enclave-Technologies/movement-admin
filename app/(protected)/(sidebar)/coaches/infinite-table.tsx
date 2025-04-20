@@ -3,8 +3,7 @@
 import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
-// import { columns } from "./columns";
-import { Person, PersonApiResponse } from "@/actions/table_actions";
+import { Coach } from "./columns";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 import {
     ColumnDef,
@@ -48,7 +47,7 @@ export function InfiniteTable({
 
     // Use React Query for data fetching with infinite scroll
     const { data, fetchNextPage, isFetchingNextPage, isLoading } =
-        useInfiniteQuery<PersonApiResponse>({
+        useInfiniteQuery({
             queryKey: ["tableData", urlParams, queryId],
             queryFn: async ({ pageParam = 0 }) => {
                 const params = {
@@ -59,8 +58,8 @@ export function InfiniteTable({
             },
             initialPageParam: 0,
             getNextPageParam: (
-                _lastPage: PersonApiResponse,
-                allPages: PersonApiResponse[]
+                _lastPage,
+                allPages
             ) => {
                 // Simply return the length of allPages as the next page param
                 // This will be 1, 2, 3, etc. as pages are added
@@ -76,7 +75,7 @@ export function InfiniteTable({
 
     // Flatten the data from all pages
     const flatData = React.useMemo(
-        () => data?.pages.flatMap((page: PersonApiResponse) => page.data) || [],
+        () => data?.pages.flatMap((page) => page.data) || [],
         [data]
     );
     const totalRowCount = data?.pages[0]?.meta?.totalRowCount || 0;
@@ -85,7 +84,7 @@ export function InfiniteTable({
     // Create react-table instance
     const table = useReactTable({
         data: flatData,
-        columns: columns as ColumnDef<Person, unknown>[],
+        columns: columns as ColumnDef<Coach, unknown>[],
         getCoreRowModel: getCoreRowModel(),
         getSortedRowModel: getSortedRowModel(),
         state: {
@@ -205,7 +204,7 @@ export function InfiniteTable({
             </div>
 
             <InfiniteDataTable
-                columns={columns as ColumnDef<Person, unknown>[]}
+                columns={columns as ColumnDef<Coach, unknown>[]}
                 rowVirtualizer={rowVirtualizer}
                 tableContainerRef={
                     tableContainerRef as React.RefObject<HTMLDivElement>
