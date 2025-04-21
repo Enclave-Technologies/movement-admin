@@ -42,12 +42,13 @@ export async function get_logged_in_user() {
         const db_user = await db
             .select({
                 id: Users.userId,
+                appwrite_id: Users.appwrite_id,
                 name: Users.fullName,
                 email: Users.email,
                 avatar: Users.imageUrl,
             })
             .from(Users)
-            .where(eq(Users.userId, user.$id));
+            .where(eq(Users.appwrite_id, user.$id));
 
         // Get user role information
         const userRoleData = await db
