@@ -43,6 +43,7 @@ export type Client = {
     dob?: Date | null;
     age?: number | null;
     trainerName?: string | null;
+    trainerId?: string | null;
 };
 
 export type ClientResponse = {

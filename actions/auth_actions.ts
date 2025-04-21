@@ -49,15 +49,12 @@ export async function login(previousState: string, formData: unknown) {
     const { email, password } = result.data;
     console.log("[LOGIN] Validated data - email:", email);
 
-    console.log("[LOGIN] Creating admin client");
     const { account } = await createAdminClient();
 
     let session;
 
     try {
-        console.log("[LOGIN] Attempting to create email/password session");
         session = await account.createEmailPasswordSession(email, password);
-        console.log("[LOGIN] Session created successfully:", session);
 
         const cookieOptions = {
             httpOnly: true,
@@ -66,16 +63,12 @@ export async function login(previousState: string, formData: unknown) {
             expires: new Date(session.expire),
             path: "/",
         };
-        console.log(
-            "[LOGIN] Setting session cookie with options:",
-            cookieOptions
-        );
+
         (await cookies()).set(
             MOVEMENT_SESSION_NAME,
             session.secret,
             cookieOptions
         );
-        console.log("[LOGIN] Session cookie set successfully");
     } catch (error) {
         console.error("[LOGIN] Error during session creation:", error);
 
@@ -94,16 +87,14 @@ export async function login(previousState: string, formData: unknown) {
         return "Invalid credentials";
     }
 
-    console.log("[LOGIN] Getting user account details");
     let redirectPath = "/awaiting-approval"; // Default path
-    
+
     try {
         const { account: clientAccount } = await createSessionClient(
             session.secret
         );
         const user = await clientAccount.get();
 
-        console.log("[LOGIN] Fetching user role information >>", user.$id);
         const userRoleData = await db
             .select({
                 roleName: Roles.roleName,
@@ -113,21 +104,18 @@ export async function login(previousState: string, formData: unknown) {
             .innerJoin(Roles, eq(UserRoles.roleId, Roles.roleId))
             .where(eq(UserRoles.userId, user.$id));
 
-        console.log("[LOGIN] User role data:", userRoleData);
-
         if (userRoleData.length > 0) {
-            console.log("[LOGIN] User roles:", userRoleData);
-
             // Check if user has only Client role
-            const isOnlyClient = userRoleData.length === 1 && 
-                               userRoleData[0].roleName === "Client";
+            const isOnlyClient =
+                userRoleData.length === 1 &&
+                userRoleData[0].roleName === "Client";
             if (isOnlyClient) {
                 const logoutRedirect = await logout();
                 redirectPath = `${logoutRedirect}?error=only_coach_allowed`;
             } else {
                 // Check if any role is Guest and not approved
                 const isGuestNotApproved = userRoleData.some(
-                    role => role.roleName === "Guest" && !role.approvedByAdmin
+                    (role) => role.roleName === "Guest" && !role.approvedByAdmin
                 );
 
                 if (!isGuestNotApproved) {

@@ -4,7 +4,14 @@ import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
 import { Client, tableOperations } from "./columns";
-import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import {
+    keepPreviousData,
+    useInfiniteQuery,
+    useQueryClient,
+    useMutation,
+} from "@tanstack/react-query";
+import { bulkDeleteClientRelationships } from "@/actions/client_actions";
+import { toast } from "sonner";
 import {
     ColumnDef,
     useReactTable,
@@ -27,8 +34,40 @@ export function InfiniteTable({
     queryId = "default",
     trainerId,
 }: InfiniteTableProps) {
+    const queryClient = useQueryClient();
     // Reference to the scrolling element
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
+
+    // State for row selection
+    const [rowSelection, setRowSelection] = React.useState({});
+    const [selectedRows, setSelectedRows] = React.useState<Client[]>([]);
+
+    // Mutation for bulk delete
+    const { mutate: bulkDelete } = useMutation({
+        mutationFn: async (clientIds: string[]) => {
+            if (!trainerId) {
+                throw new Error("Trainer ID is required for bulk delete");
+            }
+            return bulkDeleteClientRelationships(trainerId, clientIds);
+        },
+        onSuccess: (data) => {
+            toast.success(data.message);
+            // Reset selection
+            setRowSelection({});
+            setSelectedRows([]);
+            // Invalidate queries to refresh data
+            queryClient.invalidateQueries({
+                queryKey: ["tableData", urlParams, queryId],
+            });
+        },
+        onError: (error) => {
+            toast.error(
+                `Failed to delete clients: ${
+                    error instanceof Error ? error.message : String(error)
+                }`
+            );
+        },
+    });
 
     const {
         sorting,
@@ -89,10 +128,22 @@ export function InfiniteTable({
         state: {
             sorting,
             columnFilters,
+            rowSelection,
         },
+        enableRowSelection: true,
+        onRowSelectionChange: setRowSelection,
         manualSorting: true,
         debugTable: true,
     });
+
+    // Update selected rows when rowSelection changes
+    React.useEffect(() => {
+        const selectedRowsData = Object.keys(rowSelection)
+            .map((index) => flatData[parseInt(index)])
+            .filter(Boolean) as Client[];
+
+        setSelectedRows(selectedRowsData);
+    }, [rowSelection, flatData]);
 
     // Create row virtualizer
     const rowVirtualizer = useVirtualizer({
@@ -191,14 +242,45 @@ export function InfiniteTable({
                     }
                 }}
                 onApplyClick={() => {
-                    console.log("Apply clicked - refreshing data");
-                    // In a real application, you might want to trigger a data refresh here
+                    queryClient.invalidateQueries({
+                        queryKey: ["tableData", urlParams, queryId],
+                    });
                 }}
                 showNewButton={true}
                 onNewClick={() => {
                     console.log("New button clicked");
                     // In a real application, you might want to navigate to a create form or open a modal
                 }}
+                showDeleteButton={true}
+                selectedRows={selectedRows}
+                onDeleteClick={(rows) => {
+                    if (rows.length > 0) {
+                        const clientIds = rows.map((row) => row.userId);
+                        bulkDelete(clientIds);
+                    }
+                }}
+                getRowSampleData={(rows) => (
+                    <ul className="text-sm">
+                        {rows.slice(0, 5).map((row) => (
+                            <li
+                                key={row.userId}
+                                className="mb-1 pb-1 border-b border-gray-100 last:border-0"
+                            >
+                                <div className="font-medium">
+                                    {row.fullName}
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                    {row.email}
+                                </div>
+                            </li>
+                        ))}
+                        {rows.length > 5 && (
+                            <li className="text-xs text-muted-foreground mt-2">
+                                ...and {rows.length - 5} more
+                            </li>
+                        )}
+                    </ul>
+                )}
             />
 
             <div className="flex items-center text-sm text-muted-foreground">

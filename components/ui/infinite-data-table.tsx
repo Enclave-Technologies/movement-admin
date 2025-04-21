@@ -139,7 +139,9 @@ export function InfiniteDataTable<TData, TValue>({
                                             rowVirtualizer.measureElement(node)
                                         }
                                         data-state={
-                                            row.getIsSelected() && "selected"
+                                            row.getIsSelected()
+                                                ? "selected"
+                                                : ""
                                         }
                                         className={cn(
                                             rowClassName
@@ -184,9 +186,10 @@ export function InfiniteDataTable<TData, TValue>({
             </Table>
             {/* Loading indicator at the bottom of the table */}
             {isLoading && (
-                <div className="h-10 w-full flex items-center justify-center border-t">
-                    <div className="text-sm text-muted-foreground">
-                        Fetching More...
+                <div className="h-10 w-full flex items-center justify-center border-t bg-background">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                        Loading more data...
                     </div>
                 </div>
             )}
@@ -204,8 +207,8 @@ export function InfiniteDataTable<TData, TValue>({
                     }}
                 >
                     {!isLoading && (
-                        <div className="text-sm text-muted-foreground">
-                            Scroll for more
+                        <div className="text-sm text-muted-foreground italic animate-pulse">
+                            Scroll to load more
                         </div>
                     )}
                 </div>

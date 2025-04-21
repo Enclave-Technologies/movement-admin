@@ -4,7 +4,14 @@ import * as React from "react";
 import { useTableActions } from "@/hooks/use-table-actions";
 import { InfiniteDataTable } from "@/components/ui/infinite-data-table";
 import { Exercise, tableOperations } from "./columns";
-import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+import {
+    keepPreviousData,
+    useInfiniteQuery,
+    useQueryClient,
+    useMutation,
+} from "@tanstack/react-query";
+import { toast } from "sonner";
+import { CheckCircle2 } from "lucide-react";
 import {
     ColumnDef,
     useReactTable,
@@ -34,6 +41,48 @@ export function InfiniteTable({
 }: InfiniteTableProps) {
     // Reference to the scrolling element
     const tableContainerRef = React.useRef<HTMLDivElement>(null);
+
+    // State for row selection
+    const [rowSelection, setRowSelection] = React.useState({});
+    const [selectedRows, setSelectedRows] = React.useState<Exercise[]>([]);
+
+    const queryClient = useQueryClient();
+
+    // Mutation for bulk approve
+    const { mutate: bulkApprove } = useMutation({
+        mutationFn: async (exerciseIds: string[]) => {
+            // This would be replaced with an actual server action
+            console.log(`Bulk approving exercises: ${exerciseIds.join(", ")}`);
+
+            // Simulate API call with a delay
+            await new Promise((resolve) => setTimeout(resolve, 500));
+
+            // Return a success response
+            return {
+                success: true,
+                message: `Successfully approved ${exerciseIds.length} exercise${
+                    exerciseIds.length !== 1 ? "s" : ""
+                }`,
+            };
+        },
+        onSuccess: (data) => {
+            toast.success(data.message);
+            // Reset selection
+            setRowSelection({});
+            setSelectedRows([]);
+            // Invalidate queries to refresh data
+            queryClient.invalidateQueries({
+                queryKey: ["tableData", urlParams, queryId],
+            });
+        },
+        onError: (error) => {
+            toast.error(
+                `Failed to approve exercises: ${
+                    error instanceof Error ? error.message : String(error)
+                }`
+            );
+        },
+    });
 
     const {
         sorting,
@@ -87,10 +136,22 @@ export function InfiniteTable({
         state: {
             sorting,
             columnFilters,
+            rowSelection,
         },
+        enableRowSelection: true,
+        onRowSelectionChange: setRowSelection,
         manualSorting: true,
         debugTable: true,
     });
+
+    // Update selected rows when rowSelection changes
+    React.useEffect(() => {
+        const selectedRowsData = Object.keys(rowSelection)
+            .map((index) => flatData[parseInt(index)])
+            .filter(Boolean) as Exercise[];
+
+        setSelectedRows(selectedRowsData);
+    }, [rowSelection, flatData]);
 
     // Create row virtualizer
     const rowVirtualizer = useVirtualizer({
@@ -188,14 +249,58 @@ export function InfiniteTable({
                     }
                 }}
                 onApplyClick={() => {
-                    console.log("Apply clicked - refreshing data");
-                    // In a real application, you might want to trigger a data refresh here
+                    queryClient.invalidateQueries({
+                        queryKey: ["tableData", urlParams, queryId],
+                    });
                 }}
                 showNewButton={true}
                 onNewClick={() => {
                     console.log("New button clicked");
                     // In a real application, you might want to navigate to a create form or open a modal
                 }}
+                selectedRows={selectedRows}
+                customOperations={[
+                    {
+                        label: "Approve",
+                        icon: <CheckCircle2 size={16} />,
+                        variant: "default",
+                        onClick: (rows) => {
+                            if (rows.length > 0) {
+                                const exerciseIds = rows.map(
+                                    (row) => row.exerciseId
+                                );
+                                bulkApprove(exerciseIds);
+                            }
+                        },
+                        showConfirmation: true,
+                        confirmationTitle: "Confirm Bulk Approval",
+                        confirmationDescription:
+                            "You are about to approve the selected exercises. This will make them visible to all users.",
+                        confirmationButtonText: "Approve",
+                        getRowSampleData: (rows) => (
+                            <ul className="text-sm">
+                                {rows.slice(0, 5).map((row) => (
+                                    <li
+                                        key={row.exerciseId}
+                                        className="mb-1 pb-1 border-b border-gray-100 last:border-0"
+                                    >
+                                        <div className="font-medium">
+                                            {row.name}
+                                        </div>
+                                        <div className="text-xs text-muted-foreground">
+                                            {row.difficulty} • {row.muscleGroup}
+                                        </div>
+                                    </li>
+                                ))}
+                                {rows.length > 5 && (
+                                    <li className="text-xs text-muted-foreground mt-2">
+                                        ...and {rows.length - 5} more
+                                    </li>
+                                )}
+                            </ul>
+                        ),
+                    },
+                ]}
             />
 
             <div className="flex items-center text-sm text-muted-foreground">

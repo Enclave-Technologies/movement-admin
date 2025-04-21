@@ -8,7 +8,7 @@ import {
     Exercises,
 } from "@/db/schemas";
 import { db } from "@/db/xata";
-import { eq, and, desc, sql } from "drizzle-orm";
+import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import "server-only";
 
@@ -120,13 +120,13 @@ export async function getClientsManagedByUserPaginated(
     let parsedFilters: Array<{ id: string; value: unknown }> = [];
 
     // Ensure trainerAppwriteId is a string
-    if (typeof trainerAppwriteId !== 'string') {
-        console.error('Invalid trainerAppwriteId:', trainerAppwriteId);
-        throw new Error('trainerAppwriteId must be a string');
+    if (typeof trainerAppwriteId !== "string") {
+        console.error("Invalid trainerAppwriteId:", trainerAppwriteId);
+        throw new Error("trainerAppwriteId must be a string");
     }
 
     console.log(
-        `Received params for trainer ${trainerAppwriteId}:`,
+        `Received params for trainer ${trainerAppwriteId}:\n`,
         JSON.stringify(params, null, 2)
     );
 
@@ -170,6 +170,13 @@ export async function getClientsManagedByUserPaginated(
 
         // Keep all other params for potential filtering
         filters = { ...params };
+
+        console.log("Extracted filters:", filters);
+        console.log("Extracted sorting:", sorting);
+        console.log("Extracted search:", search);
+        console.log("Extracted page:", page);
+        console.log("Extracted pageSize:", size);
+
         // Remove extracted pagination params to avoid duplication
         delete filters.pageIndex;
         delete filters.pageSize;
@@ -205,23 +212,28 @@ export async function getClientsManagedByUserPaginated(
 
     // Define allowed filter columns
     const ALLOWED_FILTER_COLUMNS = new Set([
-        "fullName", "email", "phone", "gender"
+        "fullName",
+        "email",
+        "phone",
+        "gender",
     ]);
 
     // Add filter conditions
     const filterConditions = parsedFilters
         .map((filter: { id: string; value: unknown }) => {
             const { id, value } = filter;
-            
+
             // Skip filters for columns that are not in the allowed list
             if (!ALLOWED_FILTER_COLUMNS.has(id)) {
                 console.warn(`Unsupported filter column: ${id}`);
                 return undefined;
             }
-            
+
             switch (id) {
                 case "fullName":
-                    return sql`${Client.fullName} ILIKE ${`%${String(value)}%`}`;
+                    return sql`${Client.fullName} ILIKE ${`%${String(
+                        value
+                    )}%`}`;
                 case "email":
                     return sql`${Client.email} ILIKE ${`%${String(value)}%`}`;
                 case "phone":
@@ -479,23 +491,28 @@ export async function getAllClientsPaginated(
 
     // Define allowed filter columns
     const ALLOWED_FILTER_COLUMNS = new Set([
-        "fullName", "email", "phone", "gender"
+        "fullName",
+        "email",
+        "phone",
+        "gender",
     ]);
 
     // Add filter conditions
     const filterConditions = parsedFilters
         .map((filter: { id: string; value: unknown }) => {
             const { id, value } = filter;
-            
+
             // Skip filters for columns that are not in the allowed list
             if (!ALLOWED_FILTER_COLUMNS.has(id)) {
                 console.warn(`Unsupported filter column: ${id}`);
                 return undefined;
             }
-            
+
             switch (id) {
                 case "fullName":
-                    return sql`${Client.fullName} ILIKE ${`%${String(value)}%`}`;
+                    return sql`${Client.fullName} ILIKE ${`%${String(
+                        value
+                    )}%`}`;
                 case "email":
                     return sql`${Client.email} ILIKE ${`%${String(value)}%`}`;
                 case "phone":
@@ -670,6 +687,65 @@ export async function getAllClientsPaginated(
  * @param params - Object containing pagination, sorting, and filtering parameters
  * @returns Object containing exercises array and pagination info
  */
+/**
+ * Bulk delete client relationships for a trainer
+ * @param trainerAppwriteId - The appwrite_id of the trainer
+ * @param clientIds - Array of client IDs to delete
+ * @returns Object containing success status and count of deleted relationships
+ */
+export async function bulkDeleteClientRelationships(
+    trainerAppwriteId: string,
+    clientIds: string[]
+) {
+    console.log(
+        `Bulk deleting ${clientIds.length} client relationships for trainer: ${trainerAppwriteId}`
+    );
+
+    if (!clientIds.length) {
+        return {
+            success: false,
+            message: "No client IDs provided",
+            count: 0,
+        };
+    }
+
+    try {
+        // Mark relationships as inactive rather than deleting them
+        await db
+            .update(TrainerClients)
+            .set({
+                isActive: false,
+            })
+            .where(
+                and(
+                    eq(TrainerClients.trainerId, trainerAppwriteId),
+                    inArray(TrainerClients.clientId, clientIds)
+                )
+            );
+
+        console.log(
+            `Successfully marked ${clientIds.length} client relationships as inactive`
+        );
+
+        return {
+            success: true,
+            message: `Successfully removed ${clientIds.length} client${
+                clientIds.length !== 1 ? "s" : ""
+            }`,
+            count: clientIds.length,
+        };
+    } catch (error) {
+        console.error("Error bulk deleting client relationships:", error);
+        return {
+            success: false,
+            message: `Error removing clients: ${
+                error instanceof Error ? error.message : String(error)
+            }`,
+            count: 0,
+        };
+    }
+}
+
 export async function getAllExercises(params: Record<string, unknown> = {}) {
     // Extract pagination parameters from params
     const pageIndex =
