@@ -10,8 +10,8 @@
 -   [x] Auth
 -   [x] Error logging (Sentry)
 -   [x] Registration
--   [] Infinite Scroll Table
--   [] my-clients
+-   [x] Infinite Scroll Table
+-   [x] my-clients
     -   [] client add
     -   [] client management
 -   [] all-clients
