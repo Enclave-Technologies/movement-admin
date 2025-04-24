@@ -1,5 +1,5 @@
 "use client";
-import { defaultProfileURL } from "@/configs/constants";
+import { API_BASE_URL, defaultProfileURL } from "@/configs/constants";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import Select, { components, OptionProps } from "react-select";
@@ -7,7 +7,7 @@ import SubmitButton from "../ResponsiveButton";
 import { useFormState } from "react-dom";
 import { registerClient } from "@/server_functions/auth";
 import Toast from "../Toast";
-import { useGlobalContext } from "@/context/GlobalContextProvider";
+import axios from "axios";
 
 const Option = (props: OptionProps<any, false>) => {
     const { data, isSelected, isFocused } = props;
@@ -54,7 +54,7 @@ const AddUserForm = ({
     fetchData: () => void;
     trainerId?: string;
 }) => {
-    const { trainers } = useGlobalContext();
+    const [ trainers , setTrainers] = useState(null);
     const [clientState, clientAction] = useFormState(registerClient, undefined);
     const ref = useRef<HTMLFormElement>(null);
     const [showToast, setShowToast] = useState(false);
@@ -78,6 +78,25 @@ const AddUserForm = ({
             setShowToast(true);
         }
     }, [clientState]);
+
+
+    useEffect(() => {
+        const fetchTrainers = async () => {
+                try {
+                    const response = await axios.get(
+                        `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=5000`,
+                        {
+                            withCredentials: true, // Include cookies in the request
+                        }
+                    );
+                    setTrainers(response.data.data);
+                } catch (error) {
+                    console.error("Error fetching trainers:", error);
+                }
+            };
+
+        fetchTrainers();
+    }, []);
 
     const handleToastClose = () => {
         setShowToast(false);
