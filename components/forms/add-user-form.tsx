@@ -54,7 +54,8 @@ const AddUserForm = ({
     fetchData: () => void;
     trainerId?: string;
 }) => {
-    const [ trainers , setTrainers] = useState(null);
+    const [ trainers , setTrainers] = useState([]);
+    const [isTrainerLoading, setIsTrainerLoading] = useState(true); // Add loading state
     const [clientState, clientAction] = useFormState(registerClient, undefined);
     const ref = useRef<HTMLFormElement>(null);
     const [showToast, setShowToast] = useState(false);
@@ -83,6 +84,7 @@ const AddUserForm = ({
     useEffect(() => {
         const fetchTrainers = async () => {
                 try {
+                    setIsTrainerLoading(true);
                     const response = await axios.get(
                         `${API_BASE_URL}/mvmt/v1/admin/trainers?limit=5000`,
                         {
@@ -92,6 +94,9 @@ const AddUserForm = ({
                     setTrainers(response.data.data);
                 } catch (error) {
                     console.error("Error fetching trainers:", error);
+                }
+                finally{
+                    setIsTrainerLoading(false);
                 }
             };
 
@@ -229,7 +234,11 @@ const AddUserForm = ({
                         Select Trainer
                     </label>
 
-                    <Select
+                    {isTrainerLoading ? (
+                        <div className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-100 animate-pulse">
+                            Loading trainers...
+                        </div>
+                    ) : (<Select
                         id="trainerId"
                         name="trainerId"
                         options={trainers}
@@ -266,9 +275,9 @@ const AddUserForm = ({
                                     "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)", // Add a box shadow to the dropdown menu
                             }),
                         }}
-                    />
+                    />)}
                 </div>
-                <div>
+                {/* <div>
                     <label
                         htmlFor="idealWeight"
                         className="block text-sm font-medium text-gray-700"
@@ -286,7 +295,7 @@ const AddUserForm = ({
                             {clientState.errors.idealWeight}
                         </p>
                     )}
-                </div>
+                </div> */}
                 <SubmitButton label="Submit" />
             </form>
             {showToast && (
